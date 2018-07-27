@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
         android:enabled="true"
         android:icon="@drawable/ic_shortcut_new_tab">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="ninja2://new_tab/"
-            android:targetClass="com.zzl.ninja.view.activity.MainActivity"
-            android:targetPackage="com.zzl.ninja" />
+            android:targetClass="zzl.kotlin.ninja2.RouteActivity"
+            android:targetPackage="zzl.kotlin.ninja2" />
     </shortcut>
     <shortcut
         android:enabled="true"
@@ -16,7 +15,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:data="ninja2://private/"
-            android:targetClass="com.zzl.ninja.view.activity.MainActivity"
-            android:targetPackage="com.zzl.ninja" />
+            android:targetClass="zzl.kotlin.ninja2.RouteActivity"
+            android:targetPackage="zzl.kotlin.ninja2" />
     </shortcut>
 </shortcuts>
