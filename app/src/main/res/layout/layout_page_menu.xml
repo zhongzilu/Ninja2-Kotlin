@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<zzl.kotlin.ninja2.widget.MenuOptionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mMenuOptionWidget"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/screenshots"
+        android:id="@+id/mScreenshotMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -19,7 +20,7 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/share_url"
+        android:id="@+id/mShareUrlMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -32,7 +33,7 @@
         android:visibility="gone" />
 
     <Switch
-        android:id="@+id/desktop_mode_switch"
+        android:id="@+id/mDesktopSwitch"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -45,37 +46,8 @@
         android:textOn="@null"
         android:textSize="16sp" />
 
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/desktop_mode"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="48dp"-->
-    <!--android:background="?android:attr/selectableItemBackground"-->
-    <!--android:paddingEnd="8dp"-->
-    <!--android:paddingStart="16dp">-->
-
-    <!--<Switch-->
-    <!--android:id="@+id/desktop_mode_switch"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentEnd="true"-->
-    <!--android:layout_centerInParent="true"-->
-    <!--android:text="@null"-->
-    <!--android:textOff="@null"-->
-    <!--android:textOn="@null" />-->
-
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentStart="true"-->
-    <!--android:layout_centerInParent="true"-->
-    <!--android:layout_toStartOf="@+id/desktop_mode_switch"-->
-    <!--android:text="@string/page_menu_desktop_mode"-->
-    <!--android:textColor="@color/text_primary"-->
-    <!--android:textSize="16sp" />-->
-    <!--</RelativeLayout>-->
-
     <Switch
-        android:id="@+id/custom_ua_switch"
+        android:id="@+id/mCustomUASwitch"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -88,43 +60,13 @@
         android:textSize="16sp"
         android:visibility="gone" />
 
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/custom_ua"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="48dp"-->
-    <!--android:foreground="?android:attr/selectableItemBackground"-->
-    <!--android:paddingEnd="8dp"-->
-    <!--android:paddingStart="16dp"-->
-    <!--android:visibility="gone">-->
-
-    <!--<Switch-->
-    <!--android:id="@+id/custom_ua_switch"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentEnd="true"-->
-    <!--android:layout_centerInParent="true"-->
-    <!--android:text="@null"-->
-    <!--android:textOff="@null"-->
-    <!--android:textOn="@null" />-->
-
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentStart="true"-->
-    <!--android:layout_centerInParent="true"-->
-    <!--android:layout_toStartOf="@+id/custom_ua_switch"-->
-    <!--android:text="@string/page_menu_custom_ua"-->
-    <!--android:textColor="@color/text_primary"-->
-    <!--android:textSize="16sp" />-->
-    <!--</RelativeLayout>-->
-
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/divider" />
 
     <TextView
-        android:id="@+id/new_tab"
+        android:id="@+id/mNewTabMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -136,7 +78,7 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/privated"
+        android:id="@+id/mNewPrivateTabMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -148,7 +90,7 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/pin_to_homepage"
+        android:id="@+id/mPin2HomeMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -161,7 +103,7 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/add_to_launcher"
+        android:id="@+id/mAdd2LauncherMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -179,7 +121,7 @@
         android:background="@color/divider" />
 
     <TextView
-        android:id="@+id/settings"
+        android:id="@+id/mSettingsMenu"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
@@ -190,4 +132,4 @@
         android:textColor="@color/text_primary"
         android:textSize="16sp" />
 
-</LinearLayout>
+</zzl.kotlin.ninja2.widget.MenuOptionLayout>

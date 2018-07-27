@@ -11,7 +11,7 @@
 
         <!--Full Screen Mask Layout, It's below Bottom Sheet layout but above Main Content-->
         <View
-            android:id="@+id/mask"
+            android:id="@+id/mMaskView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.0"

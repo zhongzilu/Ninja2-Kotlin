@@ -13,13 +13,12 @@
         tools:showIn="@layout/activity_page">
 
         <!--Pin List RecyclerView-->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_pin"
+        <ViewStub
+            android:id="@+id/mPinsStub"
+            android:inflatedId="@+id/mPinsRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:scrollbars="vertical" />
+            android:layout="@layout/stub_pins_recycler"/>
 
         <!--Custom WebView-->
         <!--<com.zzl.ninja.widget.webkit.PageView-->
@@ -30,15 +29,12 @@
             <!--android:visibility="gone" />-->
 
         <!--Record List RecyclerView-->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_record"
+        <ViewStub
+            android:id="@+id/mRecordsStub"
+            android:inflatedId="@+id/mRecordsRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white_95"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:scrollbars="vertical"
-            android:visibility="gone" />
+            android:layout="@layout/stub_record_recycler"/>
 
     </FrameLayout>
 </merge>
