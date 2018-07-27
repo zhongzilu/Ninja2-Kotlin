@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/preference_category_function">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/preference_key_adblock"
+            android:summary="@string/preference_summary_adblock"
+            android:title="@string/preference_title_adblock" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preference_key_screenshot"
+            android:summary="@string/preference_summary_screenshot"
+            android:title="@string/preference_title_screenshot" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preference_key_show_soft_keyboard"
+            android:summary="@string/preference_summary_show_soft_keyboard"
+            android:title="@string/preference_title_show_soft_keyboard" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preference_key_homepage_reverse"
+            android:summary="@string/preference_summary_homepage_reverse"
+            android:title="@string/preference_title_homepage_reverse" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preference_key_omnibox_control"
+            android:summary="@string/preference_summary_omnibox_control"
+            android:title="@string/preference_title_omnibox_control" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/preference_key_back_vibrate"
+            android:summary="@string/preference_summary_back_vibrate"
+            android:title="@string/preference_title_back_vibrate" />
+        <Preference
+            android:key="@string/preference_key_fingerprint_extension"
+            android:summary="@string/preference_summary_fingerprint_extension"
+            android:title="@string/preference_title_fingerprint_extension" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preference_category_browser">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/preference_entries_search_engine_id"
+            android:entryValues="@array/preference_entry_values_search_engine_id"
+            android:key="@string/preference_key_search_engine_id"
+            android:title="@string/preference_title_search_engine_id" />
+        <Preference
+            android:key="@string/preference_key_custom_user_agent"
+            android:summary="@string/preference_summary_custom_user_agent"
+            android:title="@string/preference_title_custom_user_agent" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/preference_key_enable_multiple_windows"
+            android:summary="@string/preference_summary_enable_multiple_windows"
+            android:title="@string/preference_title_enable_multiple_windows" />
+        <Preference
+            android:key="@string/preference_key_import_export_pin"
+            android:title="@string/preference_title_import_export_pin" />
+        <Preference
+            android:key="@string/preference_key_clear_history"
+            android:title="@string/preference_title_clear_history" />
+        <Preference
+            android:key="@string/preference_key_clear_cookies"
+            android:title="@string/preference_title_clear_cookies" />
+        <Preference
+            android:key="@string/preference_key_clear_form_data"
+            android:title="@string/preference_title_clear_form_data" />
+        <Preference
+            android:key="@string/preference_key_clear_passwords"
+            android:title="@string/preference_title_clear_passwords" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preference_category_others">
+        <Preference
+            android:key="@string/preference_key_version"
+            android:title="@string/preference_title_version" />
+        <Preference
+            android:key="@string/preference_key_licenses"
+            android:title="@string/preference_title_licenses" />
+        <Preference
+            android:key="@string/preference_key_feedback"
+            android:title="@string/preference_title_feedback" />
+    </PreferenceCategory>
+</PreferenceScreen>

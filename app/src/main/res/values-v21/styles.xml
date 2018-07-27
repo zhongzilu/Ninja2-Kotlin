@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainActivityTheme" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowNoDisplay">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+    </style>
+
+    <style name="PageActivityTheme" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColorHighlight">@color/text_highlight</item>
+        <item name="android:toolbarStyle">@style/PageActivityTheme.ToolbarStyle</item>
+    </style>
+
+    <style name="PageActivityTheme.ToolbarStyle">
+        <item name="android:paddingEnd">-2dp</item>
+    </style>
+
+    <style name="SettingsActivityTheme" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!--<style name="SettingsActivityTheme">-->
+        <!--<item name="android:textColorPrimary">@color/text_primary</item>-->
+        <!--<item name="android:textColorSecondary">@color/text_secondary</item>-->
+        <!--<item name="android:colorAccent">@color/blue</item>-->
+    <!--</style>-->
+
+    <!--<style name="MyActionBarStyle" parent="android:Widget.Material.ActionBar" >-->
+    <!--<item name="android:background">@color/colorPrimaryDark</item>-->
+    <!--<item name="android:titleTextStyle">@style/AcBar_titleStyle</item>-->
+    <!--</style>-->
+
+    <!--<style name="AcBar_titleStyle">-->
+    <!--<item name="android:textSize">18sp</item>-->
+    <!--<item name="android:textColor">@android:color/primary_text_dark</item>-->
+    <!--</style>-->
+
+</resources>

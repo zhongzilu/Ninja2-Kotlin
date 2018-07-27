@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_new_tab">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="ninja2://new_tab/"
+            android:targetClass="com.zzl.ninja.view.activity.MainActivity"
+            android:targetPackage="com.zzl.ninja" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_private">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="ninja2://private/"
+            android:targetClass="com.zzl.ninja.view.activity.MainActivity"
+            android:targetPackage="com.zzl.ninja" />
+    </shortcut>
+</shortcuts>

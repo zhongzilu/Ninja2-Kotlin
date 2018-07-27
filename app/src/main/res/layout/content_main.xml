@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/action_bar_size_48"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context=".PageActivity"
+        tools:showIn="@layout/activity_page">
+
+        <!--Pin List RecyclerView-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_pin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+
+        <!--Custom WebView-->
+        <!--<com.zzl.ninja.widget.webkit.PageView-->
+            <!--android:id="@+id/page"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="@color/white"-->
+            <!--android:visibility="gone" />-->
+
+        <!--Record List RecyclerView-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_record"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white_95"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:visibility="gone" />
+
+    </FrameLayout>
+</merge>

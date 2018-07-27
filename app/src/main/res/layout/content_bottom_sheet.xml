@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottomSheetLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="@dimen/action_bar_size_48"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    tools:context=".PageActivity"
+    tools:showIn="@layout/activity_page">
+
+    <FrameLayout
+        android:id="@+id/omnibox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/divider" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="top"
+            android:indeterminate="false"
+            android:indeterminateOnly="false"
+            android:maxHeight="2dp"
+            android:progressDrawable="@drawable/page_progress_layer_list"
+            android:visibility="gone" />
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_bar_size_48"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:minHeight="@dimen/action_bar_size_48"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <EditText
+                android:id="@+id/input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:ellipsize="none"
+                android:hint="@string/hint_input_normal"
+                android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
+                android:textCursorDrawable="@null"
+                android:textSize="16sp" />
+        </android.support.v7.widget.Toolbar>
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/divider" />
+
+    <include layout="@layout/layout_page_menu" />
+</android.support.v7.widget.LinearLayoutCompat>
