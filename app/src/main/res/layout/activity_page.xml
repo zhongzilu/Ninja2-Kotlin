@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Main Content -->
+        <include layout="@layout/content_main" />
+
+        <!--Full Screen Mask Layout, It's below Bottom Sheet layout but above Main Content-->
+        <View
+            android:id="@+id/mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.0"
+            android:background="@color/black" />
+
+    </FrameLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="zzl.kotlin.ninja2.PageActivity">
+
+        <!-- Bottom Sheet Content -->
+        <include layout="@layout/content_bottom_sheet" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--自定义布局，用于网页呈现特殊布局，比如全屏观看视频-->
+        <!--<FrameLayout-->
+            <!--android:id="@+id/layout_custom"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="@color/black"-->
+            <!--android:clickable="true"-->
+            <!--android:focusable="true"-->
+            <!--android:focusableInTouchMode="true"-->
+            <!--android:visibility="gone" />-->
+
+        <!-- Full Screen Loading Layout-->
+        <ViewStub
+            android:id="@+id/mLoadingStub"
+            android:inflatedId="@+id/mLoadingStubLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout="@layout/layout_loading"/>
+
+    </FrameLayout>
+</merge>

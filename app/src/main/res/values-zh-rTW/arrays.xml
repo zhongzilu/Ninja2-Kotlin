@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preference_entries_search_engine_id">
+        <item>谷歌</item>
+        <item>DuckDuckGo</item>
+        <item>必應</item>
+        <item>百度</item>
+    </array>
+</resources>
