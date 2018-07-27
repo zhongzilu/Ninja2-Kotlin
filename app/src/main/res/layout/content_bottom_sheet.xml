@@ -40,6 +40,8 @@
             android:layout_height="@dimen/action_bar_size_48"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:minHeight="@dimen/action_bar_size_48"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
