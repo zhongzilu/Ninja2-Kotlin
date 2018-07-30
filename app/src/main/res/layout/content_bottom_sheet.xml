@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
+    android:elevation="5dp"
     android:orientation="vertical"
     app:behavior_hideable="false"
     app:behavior_peekHeight="@dimen/action_bar_size_48"
@@ -17,11 +18,6 @@
         android:id="@+id/omnibox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/divider" />
 
         <ProgressBar
             android:id="@+id/progress"
@@ -62,11 +58,6 @@
                 android:textSize="16sp" />
         </android.support.v7.widget.Toolbar>
     </FrameLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/divider" />
 
     <include layout="@layout/layout_page_menu" />
 </LinearLayout>

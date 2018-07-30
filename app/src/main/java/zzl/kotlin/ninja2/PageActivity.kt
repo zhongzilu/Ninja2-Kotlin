@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.*
@@ -65,6 +69,27 @@ class PageActivity : AppCompatActivity() {
         mBottomSheetBehavior.setBottomSheetCallback(mBottomSheetCallback)
 
         mMenuOptionWidget.setMenuOptionListener(mMenuOptionListener)
+        mInputBox.addTextChangedListener(mTextWatcher)
+        mInputBox.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == KeyEvent.KEYCODE_ENTER){
+
+            }
+            return@setOnEditorActionListener true
+        }
+    }
+
+    /**
+     * 地址栏输入框文字变化监听
+     */
+    private val mTextWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        }
     }
 
     /**
@@ -173,9 +198,24 @@ class PageActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var mRefreshMenu: MenuItem
+    private lateinit var mStopMenu: MenuItem
+    private lateinit var mConfirmMenu: MenuItem
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_page, menu)
+        mRefreshMenu = menu.findItem(R.id.refresh)
+        mStopMenu = menu.findItem(R.id.stop)
+        mConfirmMenu = menu.findItem(R.id.confirm)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.refresh -> {}
+            R.id.stop -> {}
+            R.id.confirm -> {}
+        }
         return true
     }
 
