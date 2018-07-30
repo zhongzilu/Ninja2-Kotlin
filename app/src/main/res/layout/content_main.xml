@@ -21,6 +21,10 @@
             android:layout="@layout/stub_pins_recycler"/>
 
         <!--Custom WebView-->
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
         <!--<com.zzl.ninja.widget.webkit.PageView-->
             <!--android:id="@+id/page"-->
             <!--android:layout_width="match_parent"-->
