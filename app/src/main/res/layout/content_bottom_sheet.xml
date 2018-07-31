@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomSheetLayout"
@@ -14,50 +14,53 @@
     tools:context=".PageActivity"
     tools:showIn="@layout/activity_page">
 
-    <FrameLayout
-        android:id="@+id/omnibox"
+    <ProgressBar
+        android:id="@+id/progress"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="2dp"
+        android:layout_alignParentTop="true"
+        android:indeterminate="false"
+        android:indeterminateOnly="false"
+        android:maxHeight="2dp"
+        android:progressDrawable="@drawable/page_progress_layer_list"
+        android:visibility="gone" />
 
-        <ProgressBar
-            android:id="@+id/progress"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/action_bar_size_48"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:minHeight="@dimen/action_bar_size_48"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <EditText
+            android:id="@+id/mInputBox"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_gravity="top"
-            android:indeterminate="false"
-            android:indeterminateOnly="false"
-            android:maxHeight="2dp"
-            android:progressDrawable="@drawable/page_progress_layer_list"
-            android:visibility="gone" />
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:ellipsize="none"
+            android:hint="@string/hint_input_normal"
+            android:imeOptions="actionDone"
+            android:inputType="textNoSuggestions"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:textCursorDrawable="@null"
+            android:textSize="16sp" />
+    </android.support.v7.widget.Toolbar>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/action_bar_size_48"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:minHeight="@dimen/action_bar_size_48"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
+    <zzl.kotlin.ninja2.widget.MenuOptionLayout
+        android:id="@+id/mMenuOptionWidget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/mInputBox"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:ellipsize="none"
-                android:hint="@string/hint_input_normal"
-                android:imeOptions="actionDone"
-                android:inputType="textNoSuggestions"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_hint"
-                android:textCursorDrawable="@null"
-                android:textSize="16sp" />
-        </android.support.v7.widget.Toolbar>
-    </FrameLayout>
+        <include layout="@layout/layout_page_menu" />
 
-    <include layout="@layout/layout_page_menu" />
-</LinearLayout>
+    </zzl.kotlin.ninja2.widget.MenuOptionLayout>
+</RelativeLayout>
