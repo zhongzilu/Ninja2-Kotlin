@@ -14,7 +14,6 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.layout_page_menu.*
 import zzl.kotlin.ninja2.application.go
 import zzl.kotlin.ninja2.application.hide
 import zzl.kotlin.ninja2.application.hideKeyboard
@@ -40,8 +39,9 @@ class PageActivity : AppCompatActivity() {
      * 因此尽量需要的时候才调用
      */
     private var mPinsRecycler: RecyclerView? = null
+
     private fun initPinRecycler() {
-        if (mPinsRecycler == null){
+        if (mPinsRecycler == null) {
             mPinsRecycler = mPinsStub.inflate() as RecyclerView
         }
 
@@ -53,8 +53,9 @@ class PageActivity : AppCompatActivity() {
      * 因此尽量需要的时候才调用
      */
     private var mRecordRecycler: RecyclerView? = null
-    private fun initRecordRecycler(){
-        if (mRecordRecycler == null){
+
+    private fun initRecordRecycler() {
+        if (mRecordRecycler == null) {
             mRecordRecycler = mRecordsStub.inflate() as RecyclerView
         }
 
@@ -69,9 +70,15 @@ class PageActivity : AppCompatActivity() {
         mBottomSheetBehavior.setBottomSheetCallback(mBottomSheetCallback)
 
         mMenuOptionWidget.setMenuOptionListener(mMenuOptionListener)
+    }
+
+    /**
+     * 初始化地址输入框
+     */
+    private fun initInputBox(){
         mInputBox.addTextChangedListener(mTextWatcher)
         mInputBox.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == KeyEvent.KEYCODE_ENTER){
+            if (actionId == KeyEvent.KEYCODE_ENTER) {
 
             }
             return@setOnEditorActionListener true
@@ -122,13 +129,14 @@ class PageActivity : AppCompatActivity() {
      * 展开底部菜单时出现的灰色背景遮罩，当触摸灰色遮罩时需要关闭底部菜单栏
      */
     private val mMaskTouchListener = View.OnTouchListener { v, _ ->
-        if (v.id == R.id.mMaskView){
+        if (v.id == R.id.mMaskView) {
             closeBottomSheet()
             return@OnTouchListener true
         }
 
         return@OnTouchListener false
     }
+
     /**
      * 底部菜单展开后执行
      */
@@ -160,6 +168,7 @@ class PageActivity : AppCompatActivity() {
      * 关闭底部菜单后执行Runnable任务
      */
     private var mCollapsedRunnable: Runnable? = null
+
     private fun closeBottomSheet(runnable: Runnable? = null) {
         this.mCollapsedRunnable = runnable
         mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -168,7 +177,7 @@ class PageActivity : AppCompatActivity() {
     /**
      * 底部菜单栏各选项的事件监听回调
      */
-    private val mMenuOptionListener = object : MenuOptionListener{
+    private val mMenuOptionListener = object : MenuOptionListener {
         override fun onDesktopCheckedChanged(check: Boolean) {
         }
 
@@ -211,10 +220,13 @@ class PageActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.refresh -> {}
-            R.id.stop -> {}
-            R.id.confirm -> {}
+        when (item.itemId) {
+            R.id.refresh -> {
+            }
+            R.id.stop -> {
+            }
+            R.id.confirm -> {
+            }
         }
         return true
     }
@@ -223,7 +235,8 @@ class PageActivity : AppCompatActivity() {
      * 显示截图等待视图
      */
     private var mLoadingView: View? = null
-    fun showLoading(){
+
+    fun showLoading() {
         if (mLoadingView == null) {
             mLoadingView = mLoadingStub.inflate()
         }
@@ -234,9 +247,9 @@ class PageActivity : AppCompatActivity() {
     /**
      * 隐藏截图等待视图
      */
-    fun hideLoading(){
+    fun hideLoading() {
         mLoadingView?.let {
-            if (it.visibility == View.VISIBLE){
+            if (it.visibility == View.VISIBLE) {
                 it.hide()
             }
         }
