@@ -1,37 +1,40 @@
 package zzl.kotlin.ninja2
 
+import android.graphics.Bitmap
+import android.net.Uri
+import android.net.http.SslError
 import android.os.Bundle
+import android.os.Message
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.*
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.*
 import kotlinx.android.synthetic.main.content_main.*
-import zzl.kotlin.ninja2.application.go
-import zzl.kotlin.ninja2.application.hide
-import zzl.kotlin.ninja2.application.hideKeyboard
-import zzl.kotlin.ninja2.application.show
+import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.MenuOptionListener
+import zzl.kotlin.ninja2.widget.PageView
 
 
-class PageActivity : AppCompatActivity() {
+class PageActivity : AppCompatActivity(), PageView.Delegate {
 
+    val TAG = "PageActivity-->"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
         setSupportActionBar(toolbar)
 
         initEvent()
-
-//        initPinRecycler()
-
+        initInputBox()
     }
 
     /**
@@ -70,19 +73,33 @@ class PageActivity : AppCompatActivity() {
         mBottomSheetBehavior.setBottomSheetCallback(mBottomSheetCallback)
 
         mMenuOptionWidget.setMenuOptionListener(mMenuOptionListener)
+
+        webView.setPageViewDelegate(this)
     }
 
     /**
      * 初始化地址输入框
      */
-    private fun initInputBox(){
+    private fun initInputBox() {
         mInputBox.addTextChangedListener(mTextWatcher)
         mInputBox.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == KeyEvent.KEYCODE_ENTER) {
+            if (actionId == KeyEvent.KEYCODE_ENDCALL) {
+                val url = mInputBox.text.toString().trim()
+                if (url.isEmpty()) {
+                    toast("请输入浏览地址")
+                    return@setOnEditorActionListener true
+                }
 
+                loadPage(url)
             }
             return@setOnEditorActionListener true
         }
+    }
+
+    private fun loadPage(url: String) {
+        mRecordRecycler?.gone()
+        webView.loadUrl(url)
+        mInputBox.hideKeyboard()
     }
 
     /**
@@ -135,6 +152,123 @@ class PageActivity : AppCompatActivity() {
         }
 
         return@OnTouchListener false
+    }
+
+    override fun onReceivedWebThemeColor(str: String) {
+    }
+
+    override fun onFormResubmission(dontResend: Message, resend: Message) {
+    }
+
+    override fun onReceivedClientCertRequest(request: ClientCertRequest) {
+    }
+
+    override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
+    }
+
+    override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
+    }
+
+    override fun onPageStarted(url: String, title: String, icon: Bitmap?) {
+        mProgress.visible()
+        webView.visible()
+        mInputBox.setText(url)
+        mStopMenu.isVisible = true
+        mRefreshMenu.isVisible = false
+    }
+
+    override fun onPageFinished(url: String, title: String, icon: Bitmap?) {
+        mProgress.gone()
+        mStopMenu.isVisible = false
+        mRefreshMenu.isVisible = true
+    }
+
+    override fun shouldOverrideUrlLoading(url: String): Boolean {
+        return false
+    }
+
+    override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
+
+    }
+
+    override fun onCloseWindow() {
+        Log.e(TAG, "onCloseWindow")
+    }
+
+    override fun onProgressChanged(progress: Int) {
+        Log.e(TAG, "onProgressChanged $progress")
+        mProgress.progress = progress
+
+        if (progress >= 99){
+            mProgress.gone()
+        }
+    }
+
+    override fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) {
+        Log.e(TAG, "onShowCustomView")
+    }
+
+    override fun onPermissionRequest(request: PermissionRequest) {
+        Log.e(TAG, "onPermissionRequest")
+    }
+
+    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+        Log.e(TAG, "onGeolocationPermissionsShowPrompt")
+    }
+
+    override fun onReceivedTitle(url: String, title: String) {
+        Log.e(TAG, "onReceivedTitle $title")
+    }
+
+    override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
+        Log.e(TAG, "onReceivedIcon ${icon == null}")
+    }
+
+    override fun onReceivedTouchIconUrl(url: String, precomposed: Boolean) {
+        Log.e(TAG, "onReceivedTouchIconUrl $url : precomposed $precomposed")
+    }
+
+    override fun onShowFileChooser(filePathCallback: ValueCallback<Array<Uri>>,
+                                   fileChooserParams: WebChromeClient.FileChooserParams): Boolean {
+        Log.e(TAG, "onShowFileChooser")
+        return false
+    }
+
+    override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
+        Log.e(TAG, "onJsAlert")
+        return false
+    }
+
+    override fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
+        Log.e(TAG, "onJsPrompt")
+        return false
+    }
+
+    override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+        Log.e(TAG, "onCreateWindow")
+        return false
+    }
+
+    override fun onHideCustomView() {
+        Log.e(TAG, "onHideCustomView")
+    }
+
+    override fun onPermissionRequestCanceled(request: PermissionRequest) {
+        Log.e(TAG, "onPermissionRequestCanceled")
+    }
+
+    override fun onJsConfirm(url: String, message: String, result: JsResult): Boolean {
+        Log.e(TAG, "onJsConfirm")
+        return false
+    }
+
+    override fun onGeolocationPermissionsHidePrompt() {
+        Log.e(TAG, "onGeolocationPermissionsHidePrompt")
+    }
+
+    override fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean {
+        Log.e(TAG, "onJsBeforeUnload")
+        return false
     }
 
     /**
@@ -221,14 +355,20 @@ class PageActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.refresh -> {
-            }
-            R.id.stop -> {
-            }
+            R.id.refresh -> webView.reload()
+            R.id.stop -> webView.stopLoading()
             R.id.confirm -> {
             }
         }
         return true
+    }
+
+    override fun onBackPressed() {
+        if (webView.canGoBack()){
+            webView.goBack()
+            return
+        }
+        super.onBackPressed()
     }
 
     /**

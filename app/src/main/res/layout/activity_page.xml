@@ -15,7 +15,8 @@
         android:alpha="0.0"
         android:background="@color/black" />
 
-    <android.support.design.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="zzl.kotlin.ninja2.PageActivity">
@@ -26,15 +27,7 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <!--自定义布局，用于网页呈现特殊布局，比如全屏观看视频-->
-    <!--<FrameLayout-->
-    <!--android:id="@+id/layout_custom"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@color/black"-->
-    <!--android:clickable="true"-->
-    <!--android:focusable="true"-->
-    <!--android:focusableInTouchMode="true"-->
-    <!--android:visibility="gone" />-->
+    <!--<FrameLayout/>-->
 
     <!-- Full Screen Loading Layout-->
     <ViewStub

@@ -19,7 +19,7 @@
         android:layout="@layout/stub_pins_recycler" />
 
     <!--Custom WebView-->
-    <WebView
+    <zzl.kotlin.ninja2.widget.PageView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
