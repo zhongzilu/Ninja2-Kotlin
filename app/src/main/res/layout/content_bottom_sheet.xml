@@ -15,7 +15,7 @@
     tools:showIn="@layout/activity_page">
 
     <ProgressBar
-        android:id="@+id/progress"
+        android:id="@+id/mProgress"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_alignParentTop="true"

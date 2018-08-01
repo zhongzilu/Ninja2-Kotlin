@@ -17,17 +17,22 @@ object SP {
     /**
      * 是否开启后台打开页面，默认为false
      */
-    var IsOpenInBackground: Boolean by ctx.preference(Key.OpenInBg, false)
+    var IsOpenInBackground: Boolean by ctx.preference(Key.OPEN_IN_BG, false)
 
     /**
      * 搜索引擎
      */
-    var SearchEngine: String by ctx.preference(Key.searchEngine, "0")
+    var SearchEngine: String by ctx.preference(Key.SEARCH_ENGINE, "0")
 
     /**
      * 是否开启网页截图
      */
-    var canScreenshot: Boolean by ctx.preference(Key.screenShot, false)
+    var canScreenshot: Boolean by ctx.preference(Key.SCREENSHOT, false)
+
+    /**
+     * 是否开启多窗口
+     */
+    val isEnableMultipleWindows: Boolean by ctx.preference(Key.MULTIPLE_WINDOW, true)
 }
 
 object Key {
@@ -37,15 +42,19 @@ object Key {
         ctx.resources.getString(R.string.preference_key_custom_user_agent)
     }
 
-    val OpenInBg: String by lazy(LazyThreadSafetyMode.NONE) {
+    val OPEN_IN_BG: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_open_in_background)
     }
 
-    val searchEngine: String by lazy(LazyThreadSafetyMode.NONE) {
+    val SEARCH_ENGINE: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_search_engine_id)
     }
 
-    val screenShot: String by lazy(LazyThreadSafetyMode.NONE) {
+    val SCREENSHOT: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_screenshot)
+    }
+
+    val MULTIPLE_WINDOW: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_enable_multiple_windows)
     }
 }

@@ -89,7 +89,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 
         when(key){
-            Key.screenShot -> {
+            Key.SCREENSHOT -> {
                 if (SP.canScreenshot) {
                     val manager = activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
@@ -100,7 +100,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 }
             }
 
-            Key.searchEngine -> {
+            Key.SEARCH_ENGINE -> {
                 setSearchSummary()
             }
         }
