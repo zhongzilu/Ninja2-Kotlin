@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/preference_category_function">
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="@string/preference_key_adblock"
             android:summary="@string/preference_summary_adblock"
             android:title="@string/preference_title_adblock" />

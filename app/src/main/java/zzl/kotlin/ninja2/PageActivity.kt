@@ -160,6 +160,7 @@ class PageActivity : AppCompatActivity(), PageView.Delegate {
     override fun onFormResubmission(dontResend: Message, resend: Message) {
     }
 
+
     override fun onReceivedClientCertRequest(request: ClientCertRequest) {
     }
 
