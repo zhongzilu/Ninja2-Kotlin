@@ -12,17 +12,12 @@ class Preference<T>(val context: Context, val name: String, val default: T) : Re
     val prefs by lazy {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
-    private var _value: T? = null
 
     override fun getValue(thisRef: Any?, property: KProperty<*>) : T {
-        if (_value == null){
-            _value = findPreference(name, default)
-        }
-        return _value!!
+        return findPreference(name, default)
     }
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T){
-        _value  = value
         putPreference(name, value)
     }
 
