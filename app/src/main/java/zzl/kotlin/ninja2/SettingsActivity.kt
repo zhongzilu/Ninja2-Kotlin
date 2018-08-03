@@ -125,7 +125,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
     private fun setSearchSummary() {
         findPreference(getString(R.string.preference_key_search_engine_id)).summary = resources
-                .getStringArray(R.array.preference_entries_search_engine_id)[SP.SearchEngine.toInt()]
+                .getStringArray(R.array.preference_entries_search_engine_id)[SP.searchEngine.toInt()]
     }
 
     private fun setVersionSummary() {
