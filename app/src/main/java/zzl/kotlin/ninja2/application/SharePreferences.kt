@@ -22,7 +22,7 @@ object SP {
     /**
      * 新建标签页时是否自动弹出软键盘，默认为false
      */
-    var showKeyboard: Boolean by ctx.preference(Key.KEYBOARD, false)
+    var isShowKeyboard: Boolean by ctx.preference(Key.KEYBOARD, false)
 
     /**
      * 主页列表自底向上排序，默认为false
@@ -40,24 +40,24 @@ object SP {
     var vibrate: Boolean by ctx.preference(Key.VIBRATE, false)
 
     /**
+     * 搜索引擎
+     */
+    var searchEngine: String by ctx.preference(Key.SEARCH_ENGINE, "0")
+
+    /**
      * 自定义User Agent，默认为空字符串
      */
     var UA: String by ctx.preference(Key.UA, "")
 
     /**
-     * 是否开启后台打开页面，默认为false
-     */
-    var IsOpenInBackground: Boolean by ctx.preference(Key.OPEN_IN_BG, false)
-
-    /**
-     * 搜索引擎
-     */
-    var SearchEngine: String by ctx.preference(Key.SEARCH_ENGINE, "0")
-
-    /**
      * 是否开启多窗口
      */
     val isEnableMultipleWindows: Boolean by ctx.preference(Key.MULTIPLE_WINDOW, true)
+
+    /**
+     * 是否开启后台打开页面，默认为false
+     */
+    var isOpenInBackground: Boolean by ctx.preference(Key.OPEN_IN_BG, false)
 }
 
 object Key {
@@ -86,7 +86,6 @@ object Key {
     val VIBRATE: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_back_vibrate)
     }
-
 
     val UA: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_custom_user_agent)
