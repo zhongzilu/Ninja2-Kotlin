@@ -6,7 +6,6 @@ import android.net.http.SslError
 import android.os.Bundle
 import android.os.Message
 import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.InputType
@@ -24,8 +23,7 @@ import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.MenuOptionListener
 import zzl.kotlin.ninja2.widget.PageView
 
-
-class PageActivity : AppCompatActivity(), PageView.Delegate {
+class PageActivity : BaseActivity(), PageView.Delegate {
 
     val TAG = "PageActivity-->"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,7 +171,8 @@ class PageActivity : AppCompatActivity(), PageView.Delegate {
     override fun onPageStarted(url: String, title: String, icon: Bitmap?) {
         mProgress.visible()
         webView.visible()
-        mInputBox.setText(url)
+        mInputBox.text = url.toColorUrl()
+        mInputBox.hideKeyboard()
         mStopMenu.isVisible = true
         mRefreshMenu.isVisible = false
     }
@@ -303,7 +302,6 @@ class PageActivity : AppCompatActivity(), PageView.Delegate {
      * 关闭底部菜单后执行Runnable任务
      */
     private var mCollapsedRunnable: Runnable? = null
-
     private fun closeBottomSheet(runnable: Runnable? = null) {
         this.mCollapsedRunnable = runnable
         mBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -338,7 +336,9 @@ class PageActivity : AppCompatActivity(), PageView.Delegate {
         }
 
         override fun onSettingsClick() {
-            go<SettingsActivity>()
+            closeBottomSheet(Runnable {
+                go<SettingsActivity>()
+            })
         }
     }
 

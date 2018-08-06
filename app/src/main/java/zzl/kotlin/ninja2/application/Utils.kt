@@ -1,12 +1,9 @@
 package zzl.kotlin.ninja2.application
 
-import java.util.regex.Pattern
-
 /**
  * Created by zhongzilu on 2018/8/1 0001.
  */
 object WebUtil {
-    private val pattern = Pattern.compile("(?i)((?:http|https|file|ftp)://|(?:data|about|javascript|mailto):|(?:.*:.*@))(.*)")
 
     val MIME_TYPE_TEXT_HTML = "text/html"
     val MIME_TYPE_TEXT_PLAIN = "text/plain"
@@ -32,6 +29,8 @@ object WebUtil {
     val URL_SUFFIX_GOOGLE_PLAY = "&sa"
     val URL_PREFIX_GOOGLE_PLUS = "plus.url.google.com/url?q="
     val URL_SUFFIX_GOOGLE_PLUS = "&rct"
+
+
 }
 
 object Protocol {

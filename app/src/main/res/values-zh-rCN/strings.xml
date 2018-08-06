@@ -95,6 +95,7 @@
     <string name="toast_add_to_launcher_successful">已添加 %1$s 到桌面</string>
     <string name="toast_camera_permission_denied">相机权限已被阻止</string>
     <string name="toast_clear_cookies">已清空 Cookies</string>
+    <string name="toast_clear_cookies_error">清空 Cookies异常</string>
     <string name="toast_clear_form_data">已清空表单数据</string>
     <string name="toast_clear_history">已清空历史记录</string>
     <string name="toast_clear_passwords">已清空网站密码</string>

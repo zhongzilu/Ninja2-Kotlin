@@ -22,8 +22,9 @@
         <item name="android:paddingEnd">-2dp</item>
     </style>
 
-    <style name="SettingsActivityTheme" parent="android:Theme.Material.Light.DarkActionBar">
-        <item name="android:colorAccent">@color/colorAccent</item>
+    <style name="SettingsActivityTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
     </style>
 
 </resources>
