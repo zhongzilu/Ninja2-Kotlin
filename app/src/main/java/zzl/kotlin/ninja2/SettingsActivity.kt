@@ -1,41 +1,52 @@
 package zzl.kotlin.ninja2
 
-import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceScreen
+import android.provider.Settings
 import android.support.v7.app.AlertDialog
+import android.view.MenuItem
 import android.view.View
+import android.webkit.CookieManager
+import android.webkit.WebViewDatabase
 import android.widget.Toast
 import zzl.kotlin.ninja2.application.Key
 import zzl.kotlin.ninja2.application.SP
 import zzl.kotlin.ninja2.application.versionName
 
-
 /**
  * Created by zhongzilu on 2018/7/27 0027.
  */
-class SettingsActivity : Activity() {
+class SettingsActivity : BaseActivity() {
 
     private lateinit var mFragment: SettingPreferenceFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val beginTransaction = fragmentManager.beginTransaction()
-        this.mFragment = SettingPreferenceFragment()
+        mFragment = SettingPreferenceFragment()
 
         /*
           这里很奇怪，如果新建一个布局文件，里面包含一个id名为content的FrameLayout,然后把android.R.id.content
           替换为R.id.content，则会出现R.xml.preferences中的ListPreference包空指针异常，这意味着SettingsActivity
           不能有自己的布局文件
          */
-        beginTransaction.replace(android.R.id.content, this.mFragment)
+        beginTransaction.replace(android.R.id.content, mFragment)
         beginTransaction.commit()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home){
+            onBackPressed()
+        }
+        return true
     }
 
     override fun onBackPressed() {
@@ -76,10 +87,62 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      */
     override fun onPreferenceTreeClick(preferenceScreen: PreferenceScreen?, preference: Preference): Boolean {
         when(preference.titleRes){
-            R.string.preference_title_clear_cookies -> {
-                toast(R.string.toast_clear_cookies)
+            //清空Cookies
+            R.string.preference_title_clear_cookies -> CookieManager.getInstance().apply {
+                    flush()
+                    removeAllCookies{ flag ->
+                        if (flag) toast(R.string.toast_clear_cookies)
+                        else toast(R.string.toast_clear_cookies_error)
+                    }
+                }
+
+            //清空表单数据
+            R.string.preference_title_clear_form_data -> dialog(R.string.preference_title_clear_form_data){
+                WebViewDatabase.getInstance(activity).clearFormData()
+                toast(R.string.toast_clear_form_data)
+            }
+
+            //清空历史记录
+            R.string.preference_title_clear_history -> dialog(R.string.preference_title_clear_history){
+
+            }
+
+            //清空网站密码
+            R.string.preference_title_clear_passwords -> dialog(R.string.preference_title_clear_passwords){
+                WebViewDatabase.getInstance(activity).clearHttpAuthUsernamePassword()
+                toast(R.string.toast_clear_passwords)
+            }
+
+            //指纹识别扩展
+            R.string.preference_title_fingerprint_extension ->
+                activity.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+
+            //书签导入导出
+            R.string.preference_title_import_export_pin -> {
+
+            }
+
+            //自定义UA
+            R.string.preference_title_custom_user_agent -> {
+
+            }
+
+            //反馈
+            R.string.preference_title_feedback -> {
+                openUrl("https://github.com/zhongzilu/Ninja2-Kotlin/issues")
+            }
+
+            //开源协议
+            R.string.preference_title_licenses -> {
+
+            }
+
+            //版本
+            R.string.preference_title_version -> {
+
             }
         }
+
         return super.onPreferenceTreeClick(preferenceScreen, preference)
     }
 
@@ -123,16 +186,40 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
     }
 
+    /**
+     * 设置搜索引擎选项的摘要文字
+     */
     private fun setSearchSummary() {
         findPreference(getString(R.string.preference_key_search_engine_id)).summary = resources
                 .getStringArray(R.array.preference_entries_search_engine_id)[SP.searchEngine.toInt()]
     }
 
+    /**
+     * 设置版本信息的摘要文字
+     */
     private fun setVersionSummary() {
         findPreference(getString(R.string.preference_key_version)).summary = activity.versionName()
     }
 
+    /**
+     * 设置Cookie大小的摘要文字
+     */
+    private fun setCookieSummary(){
+        findPreference(getString(R.string.preference_key_clear_cookies)).summary = "0Mb"
+    }
+
     private fun toast(msg: Int){
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * 以新页面打开网络地址
+     * @param url 目标访问地址
+     */
+    private fun openUrl(url: String){
+        val target = activity
+        if (target is BaseActivity){
+            target.openUrl(url)
+        }
     }
 }

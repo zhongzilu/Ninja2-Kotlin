@@ -109,6 +109,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate {
         set.userAgentString = userAgent
     }
 
+    override fun loadUrl(url: String) {
+        if (!shouldOverrideUrlLoading(url)) {
+            super.loadUrl(url)
+        }
+    }
+
     /**
      * 设置浏览模式
      * @param isPrivate true：无痕浏览模式，false：普通浏览模式，默认为false
@@ -267,10 +273,10 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate {
  * 自定义的WebViewClient
  * Created by zhongzilu on 2018/8/1
  *
- * detail see https://blog.csdn.net/languobeibei/article/details/53929403
+ * detail @see <a href="https://blog.csdn.net/languobeibei/article/details/53929403">点击这里</a>
  *
  ******************************/
-class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClient() {
+class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewClient() {
 
     interface Delegate {
         fun onFormResubmission(dontResend: Message, resend: Message)
@@ -288,6 +294,8 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
         fun shouldOverrideUrlLoading(url: String): Boolean = false
 
         fun doUpdateVisitedHistory(url: String, isReload: Boolean)
+
+        fun onReceivedError(url: String, code: Int, desc: String){}
     }
 
     /**
@@ -299,28 +307,32 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
      * @targetSdk < 24
      */
     override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-        return delegate.shouldOverrideUrlLoading(url)
+        return delegate?.shouldOverrideUrlLoading(url)
+                ?: super.shouldOverrideUrlLoading(view, url)
     }
 
     /**
      * @targetSdk >= 24
      */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        return delegate.shouldOverrideUrlLoading(request.url.toString())
+        return delegate?.shouldOverrideUrlLoading(request.url.toString())
+                ?: super.shouldOverrideUrlLoading(view, request)
     }
 
     /**
      * 开始加载网页页面时
      */
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-        delegate.onPageStarted(url, view.title, favicon)
+        delegate?.onPageStarted(url, view.title, favicon)
+                ?: super.onPageStarted(view, url, favicon)
     }
 
     /**
      * 页面加载完成回调方法，获取对应url地址
      */
     override fun onPageFinished(view: WebView, url: String) {
-        delegate.onPageFinished(url, view.title, view.favicon)
+        delegate?.onPageFinished(url, view.title, view.favicon)
+                ?: super.onPageFinished(view, url)
     }
 
     /**
@@ -328,7 +340,8 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
      * 回调该方法，获取对应url地址
      */
     override fun onPageCommitVisible(view: WebView, url: String) {
-        delegate.onPageFinished(url, view.title, view.favicon)
+        delegate?.onPageFinished(url, view.title, view.favicon)
+                ?: super.onPageCommitVisible(view, url)
     }
 
     /**
@@ -336,7 +349,8 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
      * 默认WebView取消HTTP认证，即handler.cancel()
      */
     override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
-        delegate.onReceivedHttpAuthRequest(handler, host, realm)
+        delegate?.onReceivedHttpAuthRequest(handler, host, realm)
+                ?: super.onReceivedHttpAuthRequest(view, handler, host, realm)
     }
 
     /**
@@ -344,21 +358,24 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
      * 回调onFormResubmission()方法，默认浏览器不重发请求数据。
      */
     override fun onFormResubmission(view: WebView, dontResend: Message, resend: Message) {
-        delegate.onFormResubmission(dontResend, resend)
+        delegate?.onFormResubmission(dontResend, resend)
+                ?: super.onFormResubmission(view, dontResend, resend)
     }
 
     /**
      * 回调该方法，处理SSL认证请求
      */
     override fun onReceivedClientCertRequest(view: WebView, request: ClientCertRequest) {
-        delegate.onReceivedClientCertRequest(request)
+        delegate?.onReceivedClientCertRequest(request)
+                ?: super.onReceivedClientCertRequest(view, request)
     }
 
     /**
      * 回调该方法，请求已授权用户自动登录
      */
     override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
-        delegate.onReceivedSslError(handler, error)
+        delegate?.onReceivedSslError(handler, error)
+                ?: super.onReceivedSslError(view, handler, error)
     }
 
     /**
@@ -366,7 +383,57 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
      * 当前WebView加载的url被重新加载，isReload为true，这一步可以判读是否执行刷新操作
      */
     override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
-        delegate.doUpdateVisitedHistory(url, isReload)
+        delegate?.doUpdateVisitedHistory(url, isReload)
+                ?: super.doUpdateVisitedHistory(view, url, isReload)
+    }
+
+    /**
+     * 网络不好或服务器请求超时，请求不到数据，加载出错时，让WebView加载指定页面
+     * 自己定义加载错误处理效果，比如：定义在没有网络时候，显示一张无网络的图片
+     * @targetSdk >= 23
+     */
+//    @RequiresApi(Build.VERSION_CODES.M)
+//    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+//        delegate?.onReceivedError(view.url, error.errorCode, error.description.toString())
+//                ?: super.onReceivedError(view, request, error)
+//    }
+
+    /**
+     * 报告Web资源加载错误
+     * @targetSdk < 23
+     */
+//    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+//        delegate?.onReceivedError(failingUrl, errorCode, description)
+//                ?: super.onReceivedError(view, errorCode, description, failingUrl)
+//    }
+
+    /**
+     * 提醒主机应用程序，请求已授权用户自动登录
+     */
+//    override fun onReceivedLoginRequest(view: WebView, realm: String, account: String, args: String) {
+//        super.onReceivedLoginRequest(view, realm, account, args)
+//    }
+
+    /**
+     * 通知主应用程序加载URL已被安全浏览标记。
+     */
+//    override fun onSafeBrowsingHit(view: WebView, request: WebResourceRequest, threatType: Int, callback: SafeBrowsingResponse) {
+//        super.onSafeBrowsingHit(view, request, threatType, callback)
+//    }
+
+    /**
+     * 加载指定url资源，比如判读是否为.apk文件，然后启动系统的文件下载管理器，下载指定的文件
+     */
+//    override fun onLoadResource(view: WebView, url: String) {
+//        super.onLoadResource(view, url)
+//    }
+
+    /**
+     * 应用程序在加载资源时从服务器收到HTTP错误
+     */
+    override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
+        delegate?.onReceivedError(view.url, errorResponse.statusCode, errorResponse.reasonPhrase)
+                ?: super.onReceivedHttpError(view, request, errorResponse)
     }
 }
 
@@ -375,7 +442,9 @@ class PageViewClient(val context: Context, val delegate: Delegate) : WebViewClie
  * 自定义的WebChromeClient
  * Created by zhongzilu on 2018/8/1
  *
- * detail see https://www.cnblogs.com/baiqiantao/p/7390276.html
+ * detail @see <a href="https://blog.csdn.net/zhanwubus/article/details/80340025">戳这里</a><br/>
+ * <a href="https://www.cnblogs.com/baiqiantao/p/7390276.html">还有这里</a>
+ *
  *
  ******************************/
 class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
@@ -416,74 +485,133 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
         fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean
     }
 
+    /**
+     * 告诉主应用程序加载页面的当前进度
+     */
     override fun onProgressChanged(view: WebView, newProgress: Int) {
         delegate.onProgressChanged(newProgress)
     }
 
+    /**
+     * 通知主应用程序文档标题的更改
+     */
     override fun onReceivedTitle(view: WebView, title: String) {
         delegate.onReceivedTitle(view.url, title)
     }
 
+    /**
+     * 通知主应用程序当前页面的新图标
+     */
     override fun onReceivedIcon(view: WebView, icon: Bitmap?) {
         delegate.onReceivedIcon(view.url, view.title, icon)
     }
 
+    /**
+     * 通知主应用程序当前页面的苹果图标
+     * 苹果为iOS设备配备了apple-touch-icon私有属性，添加该属性，
+     * 在iPhone,iPad,iTouch的safari浏览器上可以使用添加到主屏按钮将网站添加到主屏幕上，
+     * 方便用户以后访问。apple-touch-icon 标签支持sizes属性，可以用来放置对应不同的设备
+     */
     override fun onReceivedTouchIconUrl(view: WebView, url: String, precomposed: Boolean) {
         delegate.onReceivedTouchIconUrl(url, precomposed)
     }
 
+    /**
+     * 请求主应用程序创建一个新窗口
+     */
     override fun onCreateWindow(view: WebView, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
         return delegate.onCreateWindow(isDialog, isUserGesture, resultMsg)
     }
 
+    /**
+     * 通知主应用程序关闭给定的WebView并在必要时将其从视图系统中删除。
+     */
     override fun onCloseWindow(window: WebView) {
         delegate.onCloseWindow()
     }
 
+    /**
+     * 通知主应用程序当前页面已进入全屏模式
+     * @targetSdk >= 23
+     */
     override fun onShowCustomView(view: View, callback: CustomViewCallback) {
         delegate.onShowCustomView(view, callback)
     }
 
+    /**
+     * 通知主应用程序当前页面已进入全屏模式
+     * @targetSdk < 23
+     */
     override fun onShowCustomView(view: View, requestedOrientation: Int, callback: CustomViewCallback) {
         delegate.onShowCustomView(view, callback)
     }
 
+    /**
+     * 通知主应用程序当前页面已退出全屏模式
+     */
     override fun onHideCustomView() {
         delegate.onHideCustomView()
     }
 
+    /**
+     * 告诉客户端显示一个对话框，以确认离开当前页面的导航
+     */
     override fun onJsBeforeUnload(view: WebView, url: String, message: String, result: JsResult): Boolean {
         return delegate.onJsBeforeUnload(url, message, result)
     }
 
+    /**
+     * 告诉客户端显示一个JavaScript警告对话框
+     */
     override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult): Boolean {
         return delegate.onJsAlert(url, message, result)
     }
 
+    /**
+     * 告诉客户端向用户显示一个确认对话框
+     */
     override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
         return delegate.onJsConfirm(url, message, result)
     }
 
+    /**
+     * 告诉客户端向用户显示一个提示对话框
+     */
     override fun onJsPrompt(view: WebView, url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
         return delegate.onJsPrompt(url, message, defaultValue, result)
     }
 
+    /**
+     * 通知主应用程序指定来源的Web内容正在尝试使用Geolocation API，但目前没有为该来源设置权限状态
+     */
     override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
         delegate.onGeolocationPermissionsShowPrompt(origin, callback)
     }
 
+    /**
+     * 通知主应用程序，用先前对{@link #onGeolocationPermissionsShowPrompt}的调用进行的地理位置权限请求已被取消
+     */
     override fun onGeolocationPermissionsHidePrompt() {
         delegate.onGeolocationPermissionsHidePrompt()
     }
 
+    /**
+     * 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
+     */
     override fun onPermissionRequest(request: PermissionRequest) {
         delegate.onPermissionRequest(request)
     }
 
+    /**
+     * 通知主应用程序已经取消了给定的权限请求
+     */
     override fun onPermissionRequestCanceled(request: PermissionRequest) {
         delegate.onPermissionRequestCanceled(request)
     }
 
+    /**
+     * 告诉客户显示文件选择器
+     */
     override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
         return delegate.onShowFileChooser(filePathCallback, fileChooserParams)
     }

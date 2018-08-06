@@ -111,6 +111,7 @@
     <string name="toast_add_to_launcher_successful">Add %1$s to launcher</string>
     <string name="toast_camera_permission_denied">Camera permission denied</string>
     <string name="toast_clear_cookies">Clear cookies</string>
+    <string name="toast_clear_cookies_error">Clear cookies error</string>
     <string name="toast_clear_form_data">Clear form data</string>
     <string name="toast_clear_history">Clear history</string>
     <string name="toast_clear_passwords">Clear passwords</string>

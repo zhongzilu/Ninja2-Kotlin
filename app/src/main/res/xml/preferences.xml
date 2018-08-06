@@ -30,7 +30,7 @@
             android:title="@string/preference_title_omnibox_control" />
 
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="@string/preference_key_back_vibrate"
             android:summary="@string/preference_summary_back_vibrate"
             android:title="@string/preference_title_back_vibrate" />
