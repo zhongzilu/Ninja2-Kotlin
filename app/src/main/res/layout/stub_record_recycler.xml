@@ -5,4 +5,5 @@
     android:background="@color/white_95"
     android:clipChildren="false"
     android:clipToPadding="false"
+    android:visibility="gone"
     android:scrollbars="vertical" />

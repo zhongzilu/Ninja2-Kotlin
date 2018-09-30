@@ -1,23 +1,40 @@
 package zzl.kotlin.ninja2.application
 
+import android.animation.Animator
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.net.MailTo
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.preference.PreferenceManager
+import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
+import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.Patterns
+import android.util.SparseArray
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
-import android.widget.Toast
+import android.widget.TextView
+import com.anthonycr.grant.PermissionsManager
+import com.anthonycr.grant.PermissionsResultAction
+import org.jetbrains.anko.toast
 import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
+import java.io.File
+import java.io.FileOutputStream
 import java.net.URL
 import java.util.regex.Pattern
 
@@ -25,14 +42,55 @@ import java.util.regex.Pattern
 /**
  * Created by zhongzilu on 18-7-25.
  */
-//=========================
+//===========View相关==============
 fun View.visible() {
-    this.visibility = View.VISIBLE
+    visibility = View.VISIBLE
 }
 
 fun View.gone() {
-    this.visibility = View.GONE
+    visibility = View.GONE
 }
+
+fun View.isVisible() = visibility == View.VISIBLE
+
+fun View.isGone() = visibility == View.GONE
+
+/**
+ * 判断BottomSheet的状态是否为关闭，关闭时取决于@{link #peekHeight}的高度，默认为0
+ */
+fun <T : View> BottomSheetBehavior<T>.isCollapsed() = state == BottomSheetBehavior.STATE_COLLAPSED
+
+/**
+ * 设置BottomSheet的状态为关闭
+ */
+fun <T : View> BottomSheetBehavior<T>.collapsed() {
+    state = BottomSheetBehavior.STATE_COLLAPSED
+}
+
+/**
+ * 判断BottomSheet的状态是否为隐藏
+ */
+fun <T : View> BottomSheetBehavior<T>.isHidden() = state == BottomSheetBehavior.STATE_HIDDEN
+
+/**
+ * 设置BottomSheet的状态为隐藏
+ */
+fun <T : View> BottomSheetBehavior<T>.hidden() {
+    state = BottomSheetBehavior.STATE_HIDDEN
+}
+
+/**
+ * 判断BottomSheet的状态是否为展开
+ */
+fun <T : View> BottomSheetBehavior<T>.isExpanded() = state == BottomSheetBehavior.STATE_EXPANDED
+
+/**
+ * 设置BottomSheet的状态为展开
+ */
+fun <T : View> BottomSheetBehavior<T>.expanded() {
+    state = BottomSheetBehavior.STATE_EXPANDED
+}
+
 
 fun View.show(animate: Boolean = true) {
     if (animate) {
@@ -53,13 +111,24 @@ fun View.show(animate: Boolean = true) {
     visible()
 }
 
-fun View.hide(animate: Boolean = true) {
+fun View.hide(animate: Boolean = false) {
     if (animate) {
         animate().apply {
             alpha = 0f
             duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
             interpolator = LinearInterpolator()
-            setListener(null)
+            setListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {}
+
+                override fun onAnimationCancel(p0: Animator?) {}
+
+                override fun onAnimationStart(p0: Animator?) {}
+
+                override fun onAnimationEnd(p0: Animator?) {
+                    gone()
+                }
+
+            })
             start()
         }
 
@@ -91,44 +160,38 @@ fun View.hideKeyboard() {
     }
 }
 
-fun <T : View> T.visibleDo(todo: (T) -> Unit) {
-    if (this.visibility == View.VISIBLE) {
+/**
+ * 当View可见的时候执行的操作
+ */
+inline fun <T : View> T.visibleDo(todo: (T) -> Unit) {
+    if (visibility == View.VISIBLE) {
         todo(this)
     }
 }
 
-//========================
-
 /**
- * 短时间提示
+ * 封装通过Id频繁获取View的操作，并作类似ViewHolder机制的缓存
  */
-fun Context.toast(content: CharSequence) {
-    Toast.makeText(this, content, Toast.LENGTH_SHORT).show()
+fun <T : View> View.findViewOften(viewId: Int): T {
+    val viewHolder: SparseArray<View> = tag as? SparseArray<View> ?: SparseArray()
+    tag = viewHolder
+    var childView: View? = viewHolder.get(viewId)
+    if (null == childView) {
+        childView = findViewById(viewId)
+        viewHolder.put(viewId, childView)
+    }
+    return childView as T
 }
 
-/**
- * 短时间提示，提示资源文件中的字符串内容
- */
-fun Context.toast(resId: Int) {
-    toast(this.resources.getString(resId))
+//==========Context相关==============
+
+fun Context.openIntentByDefault(url: String) {
+    startActivity(Intent.parseUri(url, Intent.URI_INTENT_SCHEME))
 }
 
-//=========================
 inline fun <reified T : Activity> Context.go() {
     startActivity(Intent(this, T::class.java))
 }
-
-/**
- * 带返回值的Activity跳转
- *
- * @param clazz
- * @param requestCode
- */
-inline fun <reified T : Activity> Activity.go4Result(requestCode: Int) {
-    startActivityForResult(Intent(this, T::class.java), requestCode)
-}
-
-//=========================
 
 fun Context.defaultSharePreferences() = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -143,8 +206,6 @@ fun Context.versionCode() = packageManager
  */
 fun Context.versionName() = packageManager
         .getPackageInfo(packageName, PackageManager.GET_CONFIGURATIONS).versionName
-
-//==========================
 
 /**
  * 分享文本
@@ -173,6 +234,27 @@ fun Context.sendMailTo(mail: String) {
 }
 
 /**
+ * 将dip转换成px
+ */
+fun Context.dip2px(dip: Float) = (resources.displayMetrics.density * dip + 0.5f).toInt()
+
+/**
+ * 将sp转换为px
+ */
+fun Context.sp2px(sp: Float) = (resources.displayMetrics.scaledDensity * sp + 0.5f).toInt()
+
+//==========Activity相关=============
+/**
+ * 带返回值的Activity跳转
+ *
+ * @param clazz
+ * @param requestCode
+ */
+inline fun <reified T : Activity> Activity.go4Result(requestCode: Int) {
+    startActivityForResult(Intent(this, T::class.java), requestCode)
+}
+
+/**
  * 获取图片
  * @param requestCode   从相册选择图片
  */
@@ -182,7 +264,26 @@ fun Activity.pickImage(requestCode: Int) {
     startActivityForResult(intent, requestCode)
 }
 
-//==========================
+/**
+ * 动态申请权限
+ * @param permissions 权限集合
+ * @param f 授权后执行的动作
+ */
+fun Activity.permission(vararg permissions: String, f: () -> Unit) {
+    PermissionsManager.getInstance()
+            .requestPermissionsIfNecessaryForResult(this, permissions,
+                    object : PermissionsResultAction() {
+                        override fun onGranted() {
+                            f()
+                        }
+
+                        override fun onDenied(permission: String) {
+                            toast(R.string.toast_storage_permission_denied)
+                        }
+                    })
+}
+
+//===========String===============
 /**
  * 给地址着色，http协议用LightDark, https协议用Green, TextPrimary by Default
  * @param url 访问网址
@@ -205,18 +306,15 @@ fun String.toColorUrl(): SpannableStringBuilder {
             endIndex = 0
         }
     }
-    val foregroundColorSpan = ForegroundColorSpan(color)
     val builder = SpannableStringBuilder(this)
-    builder.setSpan(foregroundColorSpan, 0, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    builder.setSpan(ForegroundColorSpan(color), 0, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     return builder
 }
 
 /**
  * 验证字符串是否是Intent
  */
-fun String.isIntent(): Boolean {
-    return this.isNotEmpty() && this.startsWith(Protocol.INTENT)
-}
+fun String.isIntent() = isNotEmpty() && startsWith(Protocol.INTENT)
 
 /**
  * 扩展属性
@@ -227,20 +325,201 @@ val String.pattern
 /**
  * 验证是否是带有协议头的Url
  */
-fun String.isProtocolUrl(): Boolean {
-    return pattern.matcher(this).matches()
-}
+fun String.isProtocolUrl() = pattern.matcher(this).matches()
+
+/**
+ * 验证是否带有协议头{@link #Protocol.MAIL_TO}的Url
+ */
+fun String.isEmailTo() = isNotEmpty() && startsWith(Protocol.MAIL_TO)
 
 /**
  * 验证是否是Web路径
  */
-fun String.isWebUrl(): Boolean {
-    return Patterns.WEB_URL.matcher(this).matches()
-}
+fun String.isWebUrl() = Patterns.WEB_URL.matcher(this).matches()
 
 /**
  * 获取Url的主机地址部分
  */
-fun String.host(): String {
-    return URL(this).host
+fun String.host() = URL(this).host
+
+/**
+ * 将字符串转换为可用的Web URL
+ */
+fun String.parseUrl(): String {
+    val trim = trim()
+    val matcher = pattern.matcher(trim)
+    when {
+        matcher.matches() -> {
+            val group0 = matcher.group(0)
+            System.out.println("group0: $group0")
+            val group1 = matcher.group(1)
+            System.out.println("group1: $group1")
+            val group2 = matcher.group(2)
+            System.out.println("group2: $group2")
+            return trim.replace(" ", "%20")
+        }
+        Patterns.WEB_URL.matcher(trim).matches() -> return URLUtil.guessUrl(trim)
+        else -> {
+            val search = when (SP.searchEngine) {
+                Type.SEARCH_GOOGLE -> WebUtil.SEARCH_ENGINE_GOOGLE
+                Type.SEARCH_DUCKDUCKGO -> WebUtil.SEARCH_ENGINE_DUCKDUCKGO
+                Type.SEARCH_BING -> WebUtil.SEARCH_ENGINE_BING
+                Type.SEARCH_BAIDU -> WebUtil.SEARCH_ENGINE_BAIDU
+                else -> ""
+            }
+
+            return URLUtil.composeSearchUrl(trim, search, "%s")
+        }
+    }
+}
+
+//==========其他==========
+
+fun View.toBitmap(w: Float, h: Float, scroll: Boolean = false): Bitmap {
+    if (!isDrawingCacheEnabled) isDrawingCacheEnabled = true
+
+    var left = left
+    var top = top
+
+    if (scroll) {
+        left = scrollX
+        top = scrollY
+    }
+
+    return Bitmap.createBitmap(w.toInt(), h.toInt(), Bitmap.Config.ARGB_8888).apply {
+        eraseColor(Color.WHITE)
+
+        Canvas(this).apply {
+            val status = save()
+            translate(-left.toFloat(), -top.toFloat())
+
+            val scale = w / width
+            scale(scale, scale, left.toFloat(), top.toFloat())
+
+            draw(this)
+            restoreToCount(status)
+
+            val alphaPaint = Paint()
+            alphaPaint.color = Color.TRANSPARENT
+
+            drawRect(0f, 0f, 1f, h, alphaPaint)
+            drawRect(w - 1f, 0f, w, h, alphaPaint)
+            drawRect(0f, 0f, w, 1f, alphaPaint)
+            drawRect(0f, h - 1f, w, h, alphaPaint)
+            setBitmap(null)
+        }
+    }
+}
+
+/**
+ * 将Bitmap保存到手机Picture目录
+ * @param name 保存的文件名
+ * @return 保存的文件File对象
+ */
+fun Bitmap.save(name: String): File {
+    val externalStoragePublicDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+    var i = 0
+    var file = File(externalStoragePublicDirectory, "$name.png")
+    while (file.exists()) {
+        file = File(externalStoragePublicDirectory, "$name.${i++}.png")
+    }
+    val fileOutputStream = FileOutputStream(file)
+    compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+    fileOutputStream.flush()
+    fileOutputStream.close()
+    return file
+}
+
+/**
+ * 通知系统扫描文件
+ * @param context
+ */
+fun File.mediaScan(context: Context) {
+    context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(this)))
+}
+
+/**
+ * 判断是否是Android M（6.0）以上的系统版本
+ */
+inline fun supportM(todo: () -> Unit) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        todo()
+    }
+}
+
+/**
+ * 判断是否是Android N（7.0）以上的系统版本
+ */
+inline fun supportN(todo: () -> Unit) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        todo()
+    }
+}
+
+/**
+ * 判断Intent是否有效
+ */
+inline fun Context.supportIntent(intent: Intent, todo: () -> Unit) {
+    if (intent.resolveActivity(packageManager) != null) {
+        todo()
+    } else {
+        toast("没有可以处理的应用程序")
+    }
+}
+
+//========================
+/**
+ * 给TextView的左边添加drawable
+ */
+fun <T : TextView> T.drawableLeft(resId: Int) {
+    ContextCompat.getDrawable(context, resId)?.apply {
+        setBounds(0, 0, minimumWidth, minimumHeight)
+        setCompoundDrawables(this, null, null, null)
+    }
+}
+
+/**
+ * 给TextView的右边添加drawable
+ */
+fun <T : TextView> T.drawableRight(resId: Int) {
+    ContextCompat.getDrawable(context, resId)?.apply {
+        setBounds(0, 0, minimumWidth, minimumHeight)
+        setCompoundDrawables(null, null, this, null)
+    }
+}
+
+/**
+ * 给TextView的上边添加drawable
+ */
+fun <T : TextView> T.drawableTop(resId: Int) {
+    ContextCompat.getDrawable(context, resId)?.apply {
+        setBounds(0, 0, minimumWidth, minimumHeight)
+        setCompoundDrawables(null, this, null, null)
+    }
+}
+
+/**
+ * 给TextView的下边添加drawable
+ */
+fun <T : TextView> T.drawableBottom(resId: Int) {
+    ContextCompat.getDrawable(context, resId)?.apply {
+        setBounds(0, 0, minimumWidth, minimumHeight)
+        setCompoundDrawables(null, null, null, this)
+    }
+}
+
+/**
+ * 给TextView或继承自TextView的组件设置{@link #TextView.addTextChangedListener}
+ */
+fun <T : TextView> T.addTextWatcher(watcher: (text: String) -> Unit) {
+    this.addTextChangedListener(object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            watcher(s?.toString() ?: "")
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+    })
 }

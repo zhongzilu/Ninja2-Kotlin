@@ -65,6 +65,7 @@
     <string name="preference_summary_screenshot">將網頁保存爲圖片，開啓將導致浏覽網頁時性能損失。重啓整個應用後生效。</string>
     <string name="preference_summary_show_soft_keyboard">新建標簽頁時自動彈出軟鍵盤。</string>
     <string name="preference_summary_omnibox_control">允許左右滑動地址欄切換訪問歷史記錄</string>
+    <string name="preference_summary_omnibox_fixed">關閉地址欄跟隨滑動顯示/隱藏</string>
 
     <string name="preference_title_adblock">廣告屏蔽</string>
     <string name="preference_title_back_vibrate">返回時震動</string>
@@ -84,6 +85,7 @@
     <string name="preference_title_show_soft_keyboard">顯示軟鍵盤</string>
     <string name="preference_title_version">版本</string>
     <string name="preference_title_omnibox_control">地址欄控制</string>
+    <string name="preference_title_omnibox_fixed">地址欄固定</string>
 
     <string name="ssl_error_date_invalid">網站證書是無效的。</string>
     <string name="ssl_error_expired">網站證書已經過期。</string>

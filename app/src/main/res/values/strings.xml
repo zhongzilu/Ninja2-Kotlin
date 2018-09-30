@@ -81,6 +81,7 @@
     <string name="preference_summary_screenshot">Capture webpage as picture, but has some performance cost. Need to restart application.</string>
     <string name="preference_summary_show_soft_keyboard">Auto show soft keyboard when new tab.</string>
     <string name="preference_summary_omnibox_control">Swipe omnibox left/right to switch history</string>
+    <string name="preference_summary_omnibox_fixed">Disallowed omnibox nested scroll</string>
 
     <string name="preference_title_adblock">AdBlock</string>
     <string name="preference_title_back_vibrate">Back vibrate</string>
@@ -100,6 +101,7 @@
     <string name="preference_title_show_soft_keyboard">Show soft keyboard</string>
     <string name="preference_title_version">Version</string>
     <string name="preference_title_omnibox_control">Omnibox Control</string>
+    <string name="preference_title_omnibox_fixed">Omnibox Fixed</string>
 
     <string name="ssl_error_date_invalid">The date of the certificate is invalid.</string>
     <string name="ssl_error_expired">The certificate has expired.</string>
@@ -135,7 +137,7 @@
     <string name="app_intro_url">http://mthli.github.io/Ninja2-Introduction</string>
     <string name="app_licenses_url">https://github.com/mthli/Ninja2/blob/master/README.md</string>
     <string name="app_name">Ninja2</string>
-    <string name="com.crashlytics.android.build_id">4dbb2908-9c0a-4282-912c-fa86aacec976</string>
+    <string name="com.crashlytics.android.build_id">4dbb2908–9c0a–4282–912c-fa86aacec976</string>
     <string name="preference_key_adblock">preference_key_adblock</string>
     <string name="preference_key_back_vibrate">Back vibrate</string>
     <string name="preference_key_clear_cookies">preference_key_clear_cookies</string>
@@ -156,6 +158,7 @@
     <string name="preference_key_open_in_background">preference_key_open_in_background</string>
     <string name="preference_key_first_install">preference_key_first_install</string>
     <string name="preference_key_omnibox_control">preference_key_omnibox_control</string>
+    <string name="preference_key_omnibox_fixed">preference_key_omnibox_fixed</string>
 
     <string name="snackBar_button_repeal">repeal</string>
     <string name="snackBar_message_delete_pin">Delete Pin Record</string>
@@ -163,6 +166,51 @@
     <string name="text_import_pin">Import Pins</string>
     <string name="toast_msg_last_history">Already last history</string>
     <string name="toast_msg_url_null">Web url is Null</string>
+    <string name="input_box_behavior">zzl.kotlin.ninja2.application.InputBoxBehavior</string>
+
+    <string name="large_text">曾经，我以为自己是个很幽默的人，比如逗女孩开心，讲的是这样的笑话。
+
+一只蚂蚁第一次出门觅食，突然下起了雨，它不知道怎么回到蚁窝，这时遇见了另外一只蚂蚁，于是问：“你都如何回蚁窝？”
+
+另一只蚂蚁答：“带……带着笑或是很沉默？ ”
+
+后来，我真的听了很多遍《后来》，初听不知曲中意，再听已是曲中人。刘若英唱得淡淡的，却情深意切。
+
+遗失一些曾经的美好，经历几段感情的波折，才明白人生真就是一部肥皂剧，狗血的桥段随时在你身边上演，却都不是happy ending。
+
+多年以前，我觉得《后来》最戳心的歌词是“你都如何回忆我，带着笑或是很沉默”，而现在，反倒更关注“这些年来，有没有人能让你不寂寞”这一句。
+
+也许经历这样一个过程，才是真正的放下了。我最多只想知道过得你好不好，却不再去幻想我们之间是否还有别的可能。哪怕你睡醒后看到的人不再是我，我也会因为你可以拥有幸福而开心。
+
+“后来，终于在眼泪中明白，有些人一旦错过就不再。”
+
+02
+
+时隔17年，刘若英把《后来》拍成了《后来的我们》。
+
+上映第一天，我就去电影院看了，虽然没有期待中的惊艳，但是故事情节完整，演技画面在线，有被触动的部分，已经算是值回票价。尤其是最后林父写的那封信，让我一下子就泪奔了。
+
+见清和小晓，两个北漂的青年，因为患难而走到一起，相爱又契合。但他们都是一身缺点的俗人，尚不成熟的性格，对待感情的莽撞，甚至物质的匮乏，都让他们在感情里走得跌跌撞撞。
+
+分手于他们而言，从一开始就注定，如果没有失去挚爱的痛楚，就不会有见清后来的功成名就。
+
+如果换成从前的我，肯定会觉得见清没做错什么，全程都是小晓在作。你要的沙发、大房子、北京户口，我一直都在努力给你，只是还需要一点时间，你为什么还要赌气离开我？
+
+生活中也有很多见清那样的人，不开心了就用冷暴力逼女孩离开，自己还一脸茫然地说，你要的我都给你了啊？你怎么还不满足？
+
+可是，男女思维并不一样，你觉得她想要的是那些物质，而她真正想要的，是被你认定的感觉。她想要本地的房子，是想真正安定下来不用再被房东一个电话赶走，她想有自己的沙发，是想和你在一起时可以想肆无忌惮地蹦跶。她想要的是欢乐的时光可以永远延续下去，而不是你的颓废和冷暴力。
+
+电影让人触动的地方，是恋爱的美好和离开的决绝，都太真实了。有些人最后没能走到一起，不是因为不爱了，只是互相了解，互相折磨，终于有一方受不了，攒够了失望。
+
+在爱情面前，美好的时光就像夜空一颗忽闪而过的流星，擦亮了你我，但转瞬即逝。你回忆起的往事，不过是灿烂背后的冷寂，酸楚背后的坚强，幽怨背后的珍惜。
+
+03
+
+高中时代，我有两个铁磁兄弟，其中一个叫左逸，文理分科的时候选择了文，高二就和学霸女友林楠偷吃了禁果。
+
+想比之下，那时的我还不开窍，即便也有过心动的文科班女孩，却只是欣赏她一颦一笑裙摆飘飘的样子，只要能和她单独相处几分钟，便能在心里乐开了花。
+
+记得有一次去配钥匙，本来都配好了，看到她来了，假装自己刚刚到，立即要求师傅再配一把。</string>
 
 </resources>
 

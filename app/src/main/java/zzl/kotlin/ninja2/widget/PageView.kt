@@ -1,43 +1,100 @@
 package zzl.kotlin.ninja2.widget
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Message
+import android.preference.PreferenceManager
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.webkit.*
-import zzl.kotlin.ninja2.application.SP
-import zzl.kotlin.ninja2.application.WebUtil
+import android.webkit.WebChromeClient.FileChooserParams
+import zzl.kotlin.ninja2.R
+import zzl.kotlin.ninja2.application.*
 
 
 /**
+ * 自定义WebView
  * Created by zhongzilu on 2018/8/1 0001.
  */
-class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate {
+class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
-    companion object {
-        val TAG = "PageView-->"
-    }
+    private val TAG = "PageView-->"
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attr: AttributeSet) : super(context, attr)
     constructor(context: Context, attr: AttributeSet, defStyleAttr: Int) : super(context, attr, defStyleAttr)
 
-    interface Delegate : PageChromeClient.Delegate, PageViewClient.Delegate {
+    interface Delegate {
         fun onReceivedWebThemeColor(str: String)
+
+        fun onProgressChanged(progress: Int)
+
+        fun onFormResubmission(dontResend: Message, resend: Message)
+
+        fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback)
+
+        fun onReceivedClientCertRequest(request: ClientCertRequest)
+
+        fun onReceivedHttpAuthRequest(httpAuthHandler: HttpAuthHandler, str: String, str2: String)
+
+        fun onPermissionRequest(request: PermissionRequest)
+
+        fun onReceivedSslError(sslErrorHandler: SslErrorHandler, sslError: SslError)
+
+        fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback)
+
+        fun onReceivedTitle(url: String, title: String)
+
+        fun onReceivedIcon(url: String, title: String, icon: Bitmap?)
+
+        fun onPageStarted(url: String, title: String, icon: Bitmap?)
+
+        fun onPageFinished(url: String, title: String, icon: Bitmap?)
+
+        fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long)
+
+        fun onReceivedTouchIconUrl(url: String, precomposed: Boolean)
+
+        fun onShowFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean
+
+        fun onJsAlert(url: String, message: String, result: JsResult): Boolean
+
+        fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean
+
+        fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean
+
+        fun onPermissionRequestCanceled(request: PermissionRequest)
+
+        fun onWebViewLongPress(url: String)
+
+        fun onJsConfirm(url: String, message: String, result: JsResult): Boolean
+
+        fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean
+
+        fun onCloseWindow()
+
+        fun onHideCustomView()
+
+        fun onGeolocationPermissionsHidePrompt()
     }
 
     private var userAgent: String? = null
     private var mPrivateFlag: Boolean = false
-    private lateinit var set: WebSettings
 
     init {
         initWebView()
         initWebSetting()
+        settingMultipleWindow()
+        setWebContentsDebuggingEnabled(true)
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onResume() {
@@ -52,7 +109,17 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate {
 
     override fun destroy() {
         stopLoading()
+        super.onResume()
+        super.resumeTimers()
+        clearHistory()
+        removeAllViews()
+        destroyDrawingCache()
         super.destroy()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(this)
     }
 
     private fun initWebView() {
@@ -73,45 +140,50 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun initWebSetting() {
-        set = settings
-        set.allowContentAccess = true
-        set.allowFileAccess = true
-        set.allowFileAccessFromFileURLs = true
-        set.allowUniversalAccessFromFileURLs = true
-        set.setAppCacheEnabled(true)
-        set.setAppCachePath(context.cacheDir.toString())
-        set.cacheMode = WebSettings.LOAD_DEFAULT
-        set.databaseEnabled = true
-        set.domStorageEnabled = true
-        set.saveFormData = true
-        set.setSupportZoom(true)
-        set.useWideViewPort = true
-        set.builtInZoomControls = true
-        set.displayZoomControls = false
-        set.textZoom = 100
-        set.useWideViewPort = true
+    private fun initWebSetting() = with(settings) {
+        allowContentAccess = true
+        allowFileAccess = true
+        allowFileAccessFromFileURLs = true
+        allowUniversalAccessFromFileURLs = true
+        setAppCacheEnabled(true)
+        setAppCachePath(context.cacheDir.toString())
+        cacheMode = WebSettings.LOAD_DEFAULT
+        databaseEnabled = true
+        domStorageEnabled = true
+        saveFormData = true
+        setSupportZoom(true)
+        useWideViewPort = true
+        builtInZoomControls = true
+        displayZoomControls = false
+        textZoom = 100
+        useWideViewPort = true
 
-        set.javaScriptEnabled = true
-        set.javaScriptCanOpenWindowsAutomatically = SP.isEnableMultipleWindows
-        set.setSupportMultipleWindows(SP.isEnableMultipleWindows)
+        javaScriptEnabled = true
+        javaScriptCanOpenWindowsAutomatically = SP.isEnableMultipleWindows
+        setSupportMultipleWindows(SP.isEnableMultipleWindows)
 
-        set.mediaPlaybackRequiresUserGesture = true
-        set.blockNetworkImage = false
-        set.blockNetworkLoads = false
-        set.setGeolocationEnabled(true)
-        set.defaultTextEncodingName = WebUtil.URL_ENCODE
-        set.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
-        set.loadWithOverviewMode = true
-        set.loadsImagesAutomatically = true
-        set.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-        userAgent = set.userAgentString
-        set.userAgentString = userAgent
+        mediaPlaybackRequiresUserGesture = true
+        blockNetworkImage = false
+        blockNetworkLoads = false
+        setGeolocationEnabled(true)
+        defaultTextEncodingName = WebUtil.URL_ENCODE
+        layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+        loadWithOverviewMode = true
+        loadsImagesAutomatically = true
+        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+        userAgent = userAgentString
+    }
+
+    private fun settingMultipleWindow() {
+        val enableMultipleWindows = SP.isEnableMultipleWindows
+        settings.javaScriptCanOpenWindowsAutomatically = enableMultipleWindows
+        settings.setSupportMultipleWindows(enableMultipleWindows)
+//        mViewClient.setAdBlock(PreferenceUtils.isAdBlock(context))
     }
 
     override fun loadUrl(url: String) {
         if (!shouldOverrideUrlLoading(url)) {
-            super.loadUrl(url)
+            super.loadUrl(url.parseUrl())
         }
     }
 
@@ -121,149 +193,240 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate {
      */
     fun setupViewMode(isPrivate: Boolean) {
         mPrivateFlag = isPrivate
-        set.setAppCacheEnabled(!mPrivateFlag)
-        set.cacheMode = if (mPrivateFlag) WebSettings.LOAD_NO_CACHE else WebSettings.LOAD_DEFAULT
-        set.databaseEnabled = !mPrivateFlag
-        set.domStorageEnabled = !mPrivateFlag
-        set.saveFormData = !mPrivateFlag
-        set.setGeolocationEnabled(!mPrivateFlag)
+
+        if (mPrivateFlag) createNoTracePage()
+
+        with(settings) {
+            setAppCacheEnabled(!mPrivateFlag)
+            cacheMode = if (mPrivateFlag) WebSettings.LOAD_NO_CACHE else WebSettings.LOAD_DEFAULT
+            databaseEnabled = !mPrivateFlag
+            domStorageEnabled = !mPrivateFlag
+            saveFormData = !mPrivateFlag
+            setGeolocationEnabled(!mPrivateFlag)
+        }
     }
 
+    private fun createNoTracePage() {
+        loadUrl(Protocol.ABOUT_BLANK)
+    }
+
+    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+        super.onScrollChanged(l, t, oldl, oldt)
+        _scrollListener?.invoke(l - oldl, t - oldt)
+    }
+
+    /**
+     * 滚动监听器
+     */
+    private var _scrollListener: ((dx: Int, dy: Int) -> Unit)? = null
+
+    /**
+     * 设置滚动监听器
+     */
+    fun setScrollChangeListener(todo: ((dx: Int, dy: Int) -> Unit)?) {
+        _scrollListener = todo
+    }
+
+    /**
+     * 设置UserAgent
+     */
+    fun setUserAgent(type: Int) {
+        when (type) {
+            Type.UA_DESKTOP -> settings.userAgentString = WebUtil.UA_DESKTOP
+            Type.UA_CUSTOM -> settings.userAgentString = SP.UA
+            else -> settings.userAgentString = userAgent
+        }
+        reload()
+    }
+
+    /**
+     * 计算网页内容的宽度
+     */
+    fun getContentWidth() = computeHorizontalScrollRange()
+
+    /**
+     * 计算网页内容的高度
+     */
+    override fun getContentHeight() = computeVerticalScrollRange()
+
+    /**
+     *
+     */
     private var _delegate: Delegate? = null
+
     fun setPageViewDelegate(delegate: Delegate) {
         _delegate = delegate
     }
 
     private object mDownloadListener : DownloadListener {
         override fun onDownloadStart(url: String?, userAgent: String?, contentDisposition: String?, mimetype: String?, contentLength: Long) {
-            Log.e(TAG, "onDownloadStart")
+            L.e(TAG, "onDownloadStart")
         }
 
     }
 
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        L.e(TAG, "onSharedPreferenceChanged")
+        when(key){
+            resources.getString(R.string.preference_key_adblock) ->{
+                //todo set ad block
+            }
+            resources.getString(R.string.preference_key_enable_multiple_windows) ->{
+                settings.setSupportMultipleWindows(SP.isEnableMultipleWindows)
+            }
+        }
+    }
+
     override fun onFormResubmission(dontResend: Message, resend: Message) {
-        Log.e(TAG, "onFormResubmission")
+        L.e(TAG, "onFormResubmission")
         _delegate?.onFormResubmission(dontResend, resend)
     }
 
     override fun onReceivedClientCertRequest(request: ClientCertRequest) {
-        Log.e(TAG, "onReceivedClientCertRequest")
+        L.e(TAG, "onReceivedClientCertRequest")
         _delegate?.onReceivedClientCertRequest(request)
     }
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
-        Log.e(TAG, "onReceivedHttpAuthRequest")
+        L.e(TAG, "onReceivedHttpAuthRequest")
         _delegate?.onReceivedHttpAuthRequest(handler, host, realm)
     }
 
     override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
-        Log.e(TAG, "onReceivedSslError")
+        L.e(TAG, "onReceivedSslError: $error")
         _delegate?.onReceivedSslError(handler, error)
     }
 
     override fun onPageStarted(url: String, title: String, icon: Bitmap?) {
-        Log.e(TAG, "onPageStarted $url : $title")
+        L.e(TAG, "onPageStarted $url : $title")
         _delegate?.onPageStarted(url, title, icon)
     }
 
     override fun onPageFinished(url: String, title: String, icon: Bitmap?) {
-        Log.e(TAG, "onPageFinished $url : $title")
+        L.e(TAG, "onPageFinished $url : $title")
         _delegate?.onPageFinished(url, title, icon)
     }
 
     override fun shouldOverrideUrlLoading(url: String): Boolean {
-        Log.e(TAG, "shouldOverrideUrlLoading $url")
-        return _delegate?.shouldOverrideUrlLoading(url) ?: false
+        L.e(TAG, "shouldOverrideUrlLoading $url")
+
+        try {
+            return when {
+                url.isIntent() -> {
+                    context.openIntentByDefault(url)
+                    true
+                }
+                url.isEmailTo() -> {
+                    context.sendMailTo(url)
+                    true
+                }
+                url.isProtocolUrl() -> false
+                else -> {
+//                    context.openIntentByDefault(url)
+                    false
+                }
+            }
+
+
+        } catch (e: ActivityNotFoundException) {
+
+        }
+
+        return false
     }
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
-        Log.e(TAG, "doUpdateVisitedHistory $url isReload $isReload")
-        _delegate?.doUpdateVisitedHistory(url, isReload)
+        L.e(TAG, "doUpdateVisitedHistory $url isReload $isReload")
+        if (mPrivateFlag)
+            clearHistory()
+        else if (!isReload) {
+            SQLHelper.saveRecord(title, url)
+        }
     }
 
     override fun onCloseWindow() {
-        Log.e(PageView.TAG, "onCloseWindow")
+        L.e(TAG, "onCloseWindow")
         _delegate?.onCloseWindow()
     }
 
     override fun onProgressChanged(progress: Int) {
-        Log.e(PageView.TAG, "onProgressChanged $progress")
+        L.e(TAG, "onProgressChanged $progress")
         _delegate?.onProgressChanged(progress)
     }
 
     override fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) {
-        Log.e(PageView.TAG, "onShowCustomView")
+        L.e(TAG, "onShowCustomView")
         _delegate?.onShowCustomView(view, callback)
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        Log.e(PageView.TAG, "onPermissionRequest")
+        L.e(TAG, "onPermissionRequest")
         _delegate?.onPermissionRequest(request)
     }
 
     override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
-        Log.e(PageView.TAG, "onGeolocationPermissionsShowPrompt")
+        L.e(TAG, "onGeolocationPermissionsShowPrompt")
         _delegate?.onGeolocationPermissionsShowPrompt(origin, callback)
     }
 
     override fun onReceivedTitle(url: String, title: String) {
-        Log.e(PageView.TAG, "onReceivedTitle $title")
+        L.e(TAG, "onReceivedTitle $title")
         _delegate?.onReceivedTitle(url, title)
     }
 
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
-        Log.e(PageView.TAG, "onReceivedIcon ${icon == null}")
+        L.e(TAG, "onReceivedIcon ${icon == null}")
         _delegate?.onReceivedIcon(url, title, icon)
     }
 
     override fun onReceivedTouchIconUrl(url: String, precomposed: Boolean) {
-        Log.e(PageView.TAG, "onReceivedTouchIconUrl $url : precomposed $precomposed")
+        L.e(TAG, "onReceivedTouchIconUrl $url : precomposed $precomposed")
         _delegate?.onReceivedTouchIconUrl(url, precomposed)
     }
 
     override fun onShowFileChooser(filePathCallback: ValueCallback<Array<Uri>>,
                                    fileChooserParams: WebChromeClient.FileChooserParams): Boolean {
-        Log.e(PageView.TAG, "onShowFileChooser")
+        L.e(TAG, "onShowFileChooser")
         return _delegate?.onShowFileChooser(filePathCallback, fileChooserParams) ?: false
     }
 
     override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
-        Log.e(PageView.TAG, "onJsAlert")
+        L.e(TAG, "onJsAlert")
         return _delegate?.onJsAlert(url, message, result) ?: false
     }
 
     override fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
-        Log.e(PageView.TAG, "onJsPrompt")
+        L.e(TAG, "onJsPrompt")
         return _delegate?.onJsPrompt(url, message, defaultValue, result) ?: false
     }
 
     override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
-        Log.e(PageView.TAG, "onCreateWindow")
+        L.e(TAG, "onCreateWindow")
         return _delegate?.onCreateWindow(isDialog, isUserGesture, resultMsg) ?: false
     }
 
     override fun onHideCustomView() {
-        Log.e(PageView.TAG, "onHideCustomView")
+        L.e(TAG, "onHideCustomView")
         _delegate?.onHideCustomView()
     }
 
     override fun onPermissionRequestCanceled(request: PermissionRequest) {
-        Log.e(PageView.TAG, "onPermissionRequestCanceled")
+        L.e(TAG, "onPermissionRequestCanceled")
         _delegate?.onPermissionRequestCanceled(request)
     }
 
     override fun onJsConfirm(url: String, message: String, result: JsResult): Boolean {
-        Log.e(PageView.TAG, "onJsConfirm")
+        L.e(TAG, "onJsConfirm")
         return _delegate?.onJsConfirm(url, message, result) ?: false
     }
 
     override fun onGeolocationPermissionsHidePrompt() {
-        Log.e(PageView.TAG, "onGeolocationPermissionsHidePrompt")
+        L.e(TAG, "onGeolocationPermissionsHidePrompt")
         _delegate?.onGeolocationPermissionsHidePrompt()
     }
 
     override fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean {
-        Log.e(PageView.TAG, "onJsBeforeUnload")
+        L.e(TAG, "onJsBeforeUnload")
         return _delegate?.onJsBeforeUnload(url, message, result) ?: false
     }
 }
@@ -295,7 +458,7 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
 
         fun doUpdateVisitedHistory(url: String, isReload: Boolean)
 
-        fun onReceivedError(url: String, code: Int, desc: String){}
+        fun onReceivedError(url: String, code: Int, desc: String) {}
     }
 
     /**

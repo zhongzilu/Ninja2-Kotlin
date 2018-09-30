@@ -46,6 +46,7 @@
             android:imeOptions="actionDone"
             android:inputType="textNoSuggestions"
             android:selectAllOnFocus="true"
+            android:drawablePadding="5dp"
             android:singleLine="true"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_hint"
@@ -58,6 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
+        android:fillViewport="true"
         android:orientation="vertical">
 
         <include layout="@layout/layout_page_menu" />

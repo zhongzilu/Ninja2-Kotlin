@@ -1,7 +1,9 @@
 package zzl.kotlin.ninja2.application
 
+import android.util.Log
+
 /**
- * Created by zhongzilu on 2018/8/1 0001.
+ * Created by zhongzilu on 2018-08-01
  */
 object WebUtil {
 
@@ -30,7 +32,6 @@ object WebUtil {
     val URL_PREFIX_GOOGLE_PLUS = "plus.url.google.com/url?q="
     val URL_SUFFIX_GOOGLE_PLUS = "&rct"
 
-
 }
 
 object Protocol {
@@ -46,4 +47,38 @@ object Protocol {
     val HTTP = "http://"
     val HTTPS = "https://"
     val INTENT = "intent://"
+}
+
+/**
+ * Log Util
+ * Created by zhongzilu on 2018-09-30
+ */
+object L {
+    private const val DEBUG = 0x002
+    private const val INFO = 0x003
+    private const val WARE = 0x004
+    private const val ERROR = 0x005
+    private const val NOTHING = 0x006
+
+    private val LEVEL = DEBUG
+
+    fun d(tag: String, msg: String) {
+        if (LEVEL <= DEBUG)
+            Log.d(tag, msg)
+    }
+
+    fun i(tag: String, msg: String) {
+        if (LEVEL <= INFO)
+            Log.i(tag, msg)
+    }
+
+    fun w(tag: String, msg: String) {
+        if (LEVEL <= WARE)
+            Log.w(tag, msg)
+    }
+
+    fun e(tag: String, msg: String) {
+        if (LEVEL <= ERROR)
+            Log.e(tag, msg)
+    }
 }
