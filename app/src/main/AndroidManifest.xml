@@ -23,6 +23,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!--<meta-data android:name="DATABASE" android:value="ninja2.db" />-->
+        <!--<meta-data android:name="VERSION" android:value="1" />-->
+        <!--<meta-data android:name="QUERY_LOG" android:value="true" />-->
+        <!--<meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="zzl.kotlin.ninja2" />-->
+
         <activity
             android:name=".RouteActivity"
             android:excludeFromRecents="true"
@@ -74,7 +79,11 @@
             android:label="@string/label_settings"
             android:theme="@style/SettingsActivityTheme" />
 
-
+        <receiver android:name=".application.ShortcutAddedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

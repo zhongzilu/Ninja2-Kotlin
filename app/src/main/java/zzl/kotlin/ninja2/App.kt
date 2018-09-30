@@ -15,6 +15,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+//        SugarContext.init(this)
     }
 
     override fun onLowMemory() {
@@ -23,6 +25,7 @@ class App : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
+//        SugarContext.terminate()
     }
 
     override fun onTrimMemory(level: Int) {

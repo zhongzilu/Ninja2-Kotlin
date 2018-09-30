@@ -9,9 +9,9 @@
         android:shortcutShortLabel="@string/label_shortcut_new_tab_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="ninja://new_tab/"
-            android:targetClass="com.zzl.ninja.view.activity.MainActivity"
-            android:targetPackage="com.zzl.ninja" />
+            android:data="ninja2://new_tab/"
+            android:targetClass="zzl.kotlin.ninja2.RouteActivity"
+            android:targetPackage="zzl.kotlin.ninja2" />
     </shortcut>
     <shortcut
         android:enabled="true"
@@ -21,8 +21,8 @@
         android:shortcutShortLabel="@string/label_shortcut_private_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="ninja://private/"
-            android:targetClass="com.zzl.ninja.view.activity.MainActivity"
-            android:targetPackage="com.zzl.ninja" />
+            android:data="ninja2://private/"
+            android:targetClass="zzl.kotlin.ninja2.RouteActivity"
+            android:targetPackage="zzl.kotlin.ninja2" />
     </shortcut>
 </shortcuts>

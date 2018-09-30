@@ -35,6 +35,11 @@ object SP {
     var omniboxCtrl: Boolean by ctx.preference(Key.OMNIBOX_CTRL, false)
 
     /**
+     * 是否开启地址栏固定，开启后地址栏将不跟随滚动显示/隐藏，默认为关闭/false
+     */
+    var omniboxFixed: Boolean by ctx.preference(Key.OMNIBOX_FIXED, true)
+
+    /**
      * 是否开启返回时震动，默认为false
      */
     var vibrate: Boolean by ctx.preference(Key.VIBRATE, false)
@@ -58,6 +63,11 @@ object SP {
      * 是否开启后台打开页面，默认为false
      */
     var isOpenInBackground: Boolean by ctx.preference(Key.OPEN_IN_BG, false)
+
+    /**
+     * 是否首次安装应用启动，默认为false
+     */
+    var isFirstInstall: Boolean by ctx.preference(Key.FIRST_INSTALL, true)
 }
 
 object Key {
@@ -83,6 +93,10 @@ object Key {
         ctx.resources.getString(R.string.preference_key_omnibox_control)
     }
 
+    val OMNIBOX_FIXED: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_omnibox_fixed)
+    }
+
     val VIBRATE: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_back_vibrate)
     }
@@ -101,5 +115,9 @@ object Key {
 
     val MULTIPLE_WINDOW: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_enable_multiple_windows)
+    }
+
+    val FIRST_INSTALL: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_first_install)
     }
 }

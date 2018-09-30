@@ -2,16 +2,16 @@ package zzl.kotlin.ninja2.widget
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.support.v4.widget.NestedScrollView
 import android.util.AttributeSet
-import android.widget.LinearLayout
+import android.view.View
 import kotlinx.android.synthetic.main.layout_page_menu.view.*
 import zzl.kotlin.ninja2.application.*
 
 /**
  * Created by zhongzilu on 2018/7/27 0027.
  */
-class MenuOptionLayout
-    : LinearLayout, SharedPreferences.OnSharedPreferenceChangeListener{
+class MenuOptionLayout : NestedScrollView, SharedPreferences.OnSharedPreferenceChangeListener{
 
     constructor(context: Context) : super(context)
 
@@ -21,8 +21,8 @@ class MenuOptionLayout
 
     private var mListener: MenuOptionListener? = null
 
-    fun setMenuOptionListener(listener: MenuOptionListener) {
-        this.mListener = listener
+    fun setMenuOptionListener(listener: MenuOptionListener?) {
+        mListener = listener
     }
 
     override fun onAttachedToWindow() {
@@ -45,17 +45,13 @@ class MenuOptionLayout
         super.onFinishInflate()
 
         //截图菜单
-        mScreenshotMenu.visibleDo {
-            setOnClickListener {
-                mListener?.onScreenshotsClick()
-            }
+        mScreenshotMenu.setOnClickListener {
+            mListener?.onScreenshotsClick()
         }
 
         //分享菜单
-        mShareUrlMenu.visibleDo {
-            setOnClickListener {
-                mListener?.onShareUrlClick()
-            }
+        mShareUrlMenu.setOnClickListener {
+            mListener?.onShareUrlClick()
         }
 
         //桌面模式菜单
@@ -64,10 +60,8 @@ class MenuOptionLayout
         }
 
         //自定义UA
-        mCustomUASwitch.visibleDo {
-            it.setOnCheckedChangeListener{_, isChecked ->
-                mListener?.onCustomUACheckedChanged(isChecked)
-            }
+        mCustomUASwitch.setOnCheckedChangeListener{_, isChecked ->
+            mListener?.onCustomUACheckedChanged(isChecked)
         }
 
         //新建页面菜单
@@ -81,17 +75,13 @@ class MenuOptionLayout
         }
 
         //添加到首页
-        mPin2HomeMenu.visibleDo {
-            setOnClickListener {
-                mListener?.onPinToHome()
-            }
+        mPin2HomeMenu.setOnClickListener {
+            mListener?.onPinToHome()
         }
 
         //添加到桌面快捷方式
-        mAdd2LauncherMenu.visibleDo {
-            setOnClickListener {
-                mListener?.addToLauncher()
-            }
+        mAdd2LauncherMenu.setOnClickListener {
+            mListener?.addToLauncher()
         }
 
         //设置菜单
@@ -115,6 +105,26 @@ class MenuOptionLayout
             mDesktopSwitch.isChecked = false
             mCustomUASwitch.isChecked = false
         }
+    }
+
+    /**
+     * 加载网页时，显示出隐藏的网页菜单
+     */
+    fun showMoreMenu(){
+        mScreenshotMenu.visibility = if (SP.canScreenshot) View.VISIBLE else View.GONE
+        mShareUrlMenu.visible()
+        mPin2HomeMenu.visible()
+        mAdd2LauncherMenu.visible()
+    }
+
+    /**
+     * 退出网页浏览模式时，隐藏网页菜单
+     */
+    fun hideMoreMenu(){
+        mScreenshotMenu.gone()
+        mShareUrlMenu.gone()
+        mPin2HomeMenu.gone()
+        mAdd2LauncherMenu.gone()
     }
 }
 

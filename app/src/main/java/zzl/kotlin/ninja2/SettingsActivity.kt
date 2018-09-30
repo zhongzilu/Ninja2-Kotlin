@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceScreen
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
-import android.view.MenuItem
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebViewDatabase
@@ -28,25 +28,17 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        enableBackPress()
 
         val beginTransaction = fragmentManager.beginTransaction()
         mFragment = SettingPreferenceFragment()
 
         /*
           这里很奇怪，如果新建一个布局文件，里面包含一个id名为content的FrameLayout,然后把android.R.id.content
-          替换为R.id.content，则会出现R.xml.preferences中的ListPreference包空指针异常，这意味着SettingsActivity
-          不能有自己的布局文件
+          替换为R.id.content，则会出现R.xml.preferences中的ListPreference包空指针异常
          */
         beginTransaction.replace(android.R.id.content, mFragment)
         beginTransaction.commit()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home){
-            onBackPressed()
-        }
-        return true
     }
 
     override fun onBackPressed() {
@@ -199,6 +191,11 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      */
     private fun setVersionSummary() {
         findPreference(getString(R.string.preference_key_version)).summary = activity.versionName()
+    }
+
+    private fun setSearchEngines(){
+        val engines: ListPreference = findPreference(getString(R.string.preference_key_search_engine_id)) as ListPreference
+//        engines.entries
     }
 
     /**

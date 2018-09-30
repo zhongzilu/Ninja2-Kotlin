@@ -1,62 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/mScreenshotMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
+        style="@style/MenuOptionItemStyle"
         android:text="@string/page_menu_screenshot"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
         android:visibility="gone" />
 
     <TextView
         android:id="@+id/mShareUrlMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
+        style="@style/MenuOptionItemStyle"
         android:text="@string/page_menu_share_url"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
         android:visibility="gone" />
 
     <Switch
         android:id="@+id/mDesktopSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
+        style="@style/MenuOptionItemStyle"
         android:paddingEnd="8dp"
-        android:paddingStart="16dp"
         android:text="@string/page_menu_desktop_mode"
-        android:textColor="@color/text_primary"
         android:textOff="@null"
-        android:textOn="@null"
-        android:textSize="16sp" />
+        android:textOn="@null" />
 
     <Switch
         android:id="@+id/mCustomUASwitch"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
+        style="@style/MenuOptionItemStyle"
         android:paddingEnd="8dp"
-        android:paddingStart="16dp"
         android:text="@string/page_menu_custom_ua"
-        android:textColor="@color/text_primary"
         android:textOff="@null"
         android:textOn="@null"
-        android:textSize="16sp"
         android:visibility="gone" />
 
     <View
@@ -66,52 +40,24 @@
 
     <TextView
         android:id="@+id/mNewTabMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
-        android:text="@string/page_menu_new_tab"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp" />
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/page_menu_new_tab" />
 
     <TextView
         android:id="@+id/mNewPrivateTabMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
-        android:text="@string/page_menu_private"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp" />
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/page_menu_private" />
 
     <TextView
         android:id="@+id/mPin2HomeMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
+        style="@style/MenuOptionItemStyle"
         android:text="@string/page_menu_pin_to_homepage"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
         android:visibility="gone" />
 
     <TextView
         android:id="@+id/mAdd2LauncherMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
+        style="@style/MenuOptionItemStyle"
         android:text="@string/page_menu_add_to_launcher"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
         android:visibility="gone" />
 
     <View
@@ -121,14 +67,7 @@
 
     <TextView
         android:id="@+id/mSettingsMenu"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
-        android:text="@string/page_menu_settings"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp" />
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/page_menu_settings" />
 
-</merge>
+</LinearLayout>

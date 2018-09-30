@@ -65,6 +65,7 @@
     <string name="preference_summary_screenshot">将网页保存为图片，开启将导致浏览网页时性能损失。重启整个应用后生效。</string>
     <string name="preference_summary_show_soft_keyboard">新建标签页时自动弹出软键盘。</string>
     <string name="preference_summary_omnibox_control">允许左右滑动地址栏切换访问历史记录</string>
+    <string name="preference_summary_omnibox_fixed">关闭地址栏跟随滚动显示/隐藏</string>
 
     <string name="preference_title_adblock">广告屏蔽</string>
     <string name="preference_title_back_vibrate">返回时震动</string>
@@ -84,6 +85,7 @@
     <string name="preference_title_show_soft_keyboard">显示软键盘</string>
     <string name="preference_title_version">版本</string>
     <string name="preference_title_omnibox_control">地址栏控制</string>
+    <string name="preference_title_omnibox_fixed">地址栏固定</string>
 
     <string name="ssl_error_date_invalid">网站证书是无效的。</string>
     <string name="ssl_error_expired">网站证书已经过期。</string>
