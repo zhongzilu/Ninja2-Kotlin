@@ -1,6 +1,14 @@
 package zzl.kotlin.ninja2.application
 
+import android.content.Context
 import android.util.Log
+import org.jetbrains.anko.doAsync
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.URI
+import java.net.URISyntaxException
+import java.util.*
+
 
 /**
  * Created by zhongzilu on 2018-08-01
@@ -80,5 +88,53 @@ object L {
     fun e(tag: String, msg: String) {
         if (LEVEL <= ERROR)
             Log.e(tag, msg)
+    }
+}
+
+object AdBlock {
+
+    private const val FILE_NAME = "AdHosts"
+    private val hostSet = HashSet<String>()
+    private val locale = Locale.getDefault()
+
+    fun init(context: Context) {
+
+        if (hostSet.isNotEmpty()) return
+
+        doAsync {
+            val bufferedReader = BufferedReader(InputStreamReader(context.assets.open(FILE_NAME)))
+            while (true) {
+                val readLine = bufferedReader.readLine()
+                if (readLine != null) {
+                    AdBlock.hostSet.add(readLine.toLowerCase(AdBlock.locale))
+                } else break
+            }
+        }
+    }
+
+    @Throws(URISyntaxException::class)
+    private fun getHost(url: String): String {
+        var hostUrl = url.toLowerCase(locale)
+        val indexOf = hostUrl.indexOf("/", 8)
+        if (indexOf != -1) {
+            hostUrl = hostUrl.substring(0, indexOf)
+        }
+        val host = URI(hostUrl).host
+        if (host.isEmpty()) {
+            return hostUrl
+        }
+        return if (host.startsWith("www.")) host.substring(4) else host
+    }
+
+    /**
+     * 验证是否为广告链接地址
+     */
+    fun isAd(url: String): Boolean {
+        return try {
+            hostSet.contains(getHost(url).toLowerCase())
+        } catch (e: URISyntaxException) {
+            e.printStackTrace()
+            false
+        }
     }
 }

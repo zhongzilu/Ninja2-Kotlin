@@ -53,8 +53,8 @@ class SQL(ctx: Context = App.instance) : ManagedSQLiteOpenHelper(ctx, SQL.DB_NAM
 
         //创建历史记录表
         db?.createTable(RecordTable.NAME, true,
-                RecordTable.URL to TEXT + PRIMARY_KEY,
                 RecordTable.TITLE to TEXT,
+                RecordTable.URL to TEXT + PRIMARY_KEY,
                 RecordTable.TIME to TEXT)
     }
 
@@ -100,20 +100,18 @@ object SQLHelper {
         SQL.instance.use {
             insert(PinTable.NAME,
                     PinTable.TITLE to pin.title,
-                    PinTable.URL to pin.url,
-                    PinTable.ID to pin._id)
+                    PinTable.URL to pin.url)
         }
     }
 
     /**
      * 保存访问的网站作为Pin记录，该记录将出现在首页Pin列表
      */
-    fun savePin(title: String, url: String){
+    fun savePin(title: String, url: String) {
         SQL.instance.use {
             insert(PinTable.NAME,
                     PinTable.TITLE to title,
-                    PinTable.URL to url,
-                    PinTable.ID to 0)
+                    PinTable.URL to url)
         }
     }
 
@@ -122,17 +120,35 @@ object SQLHelper {
      */
     fun findAllPins(): List<Pin> {
         return SQL.instance.use {
-            select(PinTable.NAME).parseList(classParser<Pin>())
+            select(PinTable.NAME).parseList(classParser())
         }
     }
 
     //==========Record相关操作============
 
     /**
-     * 保存访问的网站作为历史纪录
+     * 保存访问的网站作为历史纪录，
+     * 如果不存在相同url的记录，则新增记录后退出，
+     * 如果存在相同url的记录，则更新该条记录后退出
      */
-    fun saveRecord(title: String, url: String) {
+    fun saveOrUpdateRecord(title: String, url: String) {
         SQL.instance.use {
+
+            val records = select(RecordTable.NAME).parseList(classParser<Record>())
+            records.forEach {
+                if (it.url == url) {
+                    //update record data
+                    update(RecordTable.NAME,
+                            RecordTable.TITLE to title,
+                            RecordTable.URL to url,
+                            RecordTable.TIME to System.currentTimeMillis())
+                            .whereArgs("url = {url}","url" to it.url)
+                            .exec()
+
+                    return@use
+                }
+            }
+
             insert(RecordTable.NAME,
                     RecordTable.TITLE to title,
                     RecordTable.URL to url,
@@ -145,7 +161,7 @@ object SQLHelper {
      */
     fun findAllRecords(): List<Record> {
         return SQL.instance.use {
-            select(PinTable.NAME).parseList(classParser<Record>())
+            select(PinTable.NAME).parseList(classParser())
         }
     }
 
@@ -154,9 +170,9 @@ object SQLHelper {
      */
     fun searchRecord(key: String): List<Record> {
         return SQL.instance.use {
-            select(RecordTable.NAME).whereArgs("title LIKE '%{key}%' OR url LIKE '%{key}%' ORDER BY time DESC",
-                    "key" to key)
-                    .parseList(classParser<Record>())
+            select(RecordTable.NAME).whereArgs("title LIKE {key} OR url LIKE {key} ORDER BY time DESC",
+                    "key" to "%$key%")
+                    .parseList(classParser())
         }
     }
 
@@ -164,7 +180,7 @@ object SQLHelper {
      * 清除所有历史纪录
      */
     fun clearAllRecord() {
-         SQL.instance.use {
+        SQL.instance.use {
             delete(RecordTable.NAME)
         }
     }
@@ -172,7 +188,7 @@ object SQLHelper {
     /**
      * 删除N天前的历史记录，默认为15天前
      */
-    fun clearOldRecord(time: Long = 1296000000){
+    fun clearOldRecord(time: Long = 1296000000) {
         SQL.instance.use {
             delete(RecordTable.NAME, "time < {time}",
                     "time" to (System.currentTimeMillis() - time))

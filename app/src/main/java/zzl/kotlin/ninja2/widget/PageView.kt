@@ -16,6 +16,7 @@ import android.webkit.*
 import android.webkit.WebChromeClient.FileChooserParams
 import zzl.kotlin.ninja2.R
 import zzl.kotlin.ninja2.application.*
+import java.io.ByteArrayInputStream
 
 
 /**
@@ -267,11 +268,11 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         L.e(TAG, "onSharedPreferenceChanged")
-        when(key){
-            resources.getString(R.string.preference_key_adblock) ->{
+        when (key) {
+            resources.getString(R.string.preference_key_adblock) -> {
                 //todo set ad block
             }
-            resources.getString(R.string.preference_key_enable_multiple_windows) ->{
+            resources.getString(R.string.preference_key_enable_multiple_windows) -> {
                 settings.setSupportMultipleWindows(SP.isEnableMultipleWindows)
             }
         }
@@ -340,8 +341,16 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         if (mPrivateFlag)
             clearHistory()
         else if (!isReload) {
-            SQLHelper.saveRecord(title, url)
+            SQLHelper.saveOrUpdateRecord(title, url)
         }
+    }
+
+    override fun shouldInterceptRequest(url: String): WebResourceResponse? {
+        if (SP.adBlock){
+            return WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(byteArrayOf()))
+        }
+
+        return null
     }
 
     override fun onCloseWindow() {
@@ -459,6 +468,8 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
         fun doUpdateVisitedHistory(url: String, isReload: Boolean)
 
         fun onReceivedError(url: String, code: Int, desc: String) {}
+
+        fun shouldInterceptRequest(url: String): WebResourceResponse?
     }
 
     /**
@@ -598,6 +609,35 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
         delegate?.onReceivedError(view.url, errorResponse.statusCode, errorResponse.reasonPhrase)
                 ?: super.onReceivedHttpError(view, request, errorResponse)
     }
+
+    /**
+     * 实现对webview的资源请求进行处理，这里可以用来屏蔽网页上的广告资源加载，但仍可能会有广告存在
+     *
+     * 广告屏蔽相关博客：
+     * @see http://wangbaiyuan.cn/realization-of-android-webview-advertising-filtering.html
+     * @see https://github.com/adblockplus/libadblockplus-android
+     * @see https://github.com/adblockplus/adblockplussbrowser
+     * @targetSdk > 21
+     */
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest?): WebResourceResponse {
+        delegate?.let {
+            return it.shouldInterceptRequest(view.url) ?: super.shouldInterceptRequest(view, request)
+        }
+
+        return super.shouldInterceptRequest(view, request)
+    }
+
+    /**
+     * 实现对webview的资源请求进行处理
+     * @targetSdk > 11 && < 21
+     */
+    override fun shouldInterceptRequest(view: WebView?, url: String): WebResourceResponse {
+        delegate?.let {
+            return it.shouldInterceptRequest(url) ?: super.shouldInterceptRequest(view, url)
+        }
+
+        return super.shouldInterceptRequest(view, url)
+    }
 }
 
 /******************************
@@ -607,7 +647,6 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
  *
  * detail @see <a href="https://blog.csdn.net/zhanwubus/article/details/80340025">戳这里</a><br/>
  * <a href="https://www.cnblogs.com/baiqiantao/p/7390276.html">还有这里</a>
- *
  *
  ******************************/
 class PageChromeClient(val delegate: Delegate) : WebChromeClient() {

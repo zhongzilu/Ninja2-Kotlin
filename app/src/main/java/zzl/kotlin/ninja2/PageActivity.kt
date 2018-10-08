@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Message
 import android.preference.PreferenceManager
 import android.support.design.widget.BottomSheetBehavior
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -133,7 +134,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      */
     private fun loadPinsData() {
         doAsync {
-//            val pins = SugarRecord.listAll(Pin::class.java)
             val pins = SQLHelper.findAllPins()
 
             uiThread {
@@ -189,9 +189,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         mRecordRecycler?.let {
             mRecordsAdapter = RecordsAdapter(this, mRecords)
-            it.layoutManager = LinearLayoutManager(this)
+            it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
             it.setHasFixedSize(true)
             it.itemAnimator = DefaultItemAnimator()
+            mRecordsAdapter.setOnClickListener { _, position ->
+                //加载网址
+                loadPage(mRecords[position].url)
+            }
             it.adapter = mRecordsAdapter
         }
     }
@@ -307,18 +311,23 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     private fun loadPage(url: String) {
-        mRecordRecycler?.gone()
+        goneRecordRecycler()
         mInputBox.hideKeyboard()
         mPageView.loadUrl(url)
     }
 
     /**
-     * 清空搜索记录并显示控件
+     * 显示历史访问记录
      */
     private fun showRecordRecycler() {
-        mRecords.clear()
-        mRecordsAdapter.notifyDataSetChanged()
         mRecordRecycler?.visible()
+    }
+
+    /**
+     * 隐藏历史访问记录
+     */
+    private fun goneRecordRecycler(){
+        mRecordRecycler?.gone()
     }
 
     /**
@@ -337,7 +346,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             //如果为其他模式则需要动态搜索历史记录
             //当输入内容为空时则隐藏历史记录列表
             if (input.isEmpty()) {
-                mRecordRecycler?.gone()
+                goneRecordRecycler()
                 return
             }
 
@@ -358,9 +367,38 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 搜索历史记录
      */
     private fun searchRecord(input: CharSequence) {
-        //todo 后台查询匹配记录项，查到后进行差异比较，最后更新对应位置的数据
+        //TODO 后台查询匹配记录项，查到后进行差异比较，最后更新对应位置的数据
+        doAsync {
+            val records = SQLHelper.searchRecord(input.toString())
 
-//        replaceSearchResult()
+            val oldList = ArrayList<Record>(mRecords)
+
+            mRecords.clear()
+            mRecords.addAll(records)
+
+            compareRecordListDiff(oldList, mRecords).dispatchUpdatesTo(mRecordsAdapter)
+        }
+    }
+
+    /**
+     * 对比Record记录列表的差异
+     */
+    private fun compareRecordListDiff(oldList: List<Record>, newList: List<Record>): DiffUtil.DiffResult {
+        return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                    oldList[oldItemPosition].url == newList[newItemPosition].url
+
+            override fun getOldListSize(): Int = oldList.size
+
+            override fun getNewListSize(): Int = newList.size
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val oldRecord = oldList[oldItemPosition]
+                val newRecord = newList[newItemPosition]
+                return oldRecord.title == newRecord.title && oldRecord.time == newRecord.time
+            }
+
+        })
     }
 
     /**
@@ -446,7 +484,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         //only show pageView
         mPageView.onResume()
         mPageView.visible()
-        mRecordRecycler?.gone()
+        goneRecordRecycler()
         mPinsRecycler?.gone()
 
         //show progress
@@ -644,9 +682,12 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         doAsync {
             SQLHelper.savePin(pin)
 
-            //todo notify pin update
-
             uiThread {
+
+                //notify update pin list
+                mPins.add(pin)
+                mPinsAdapter.notifyDataSetChanged()
+
                 toast(getString(R.string.toast_pin_to_homepage, mPageView.title))
             }
         }
