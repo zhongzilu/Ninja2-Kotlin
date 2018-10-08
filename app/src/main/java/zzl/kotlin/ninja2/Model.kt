@@ -21,5 +21,5 @@ data class Pin(
 data class Record(
         val title: String,
         val url: String,
-        val time: Long = 0L
+        val time: String
 )
