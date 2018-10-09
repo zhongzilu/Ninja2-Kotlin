@@ -88,6 +88,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
     private var userAgent: String? = null
     private var mPrivateFlag: Boolean = false
+    private var isAdBlock: Boolean = false
 
     init {
         initWebView()
@@ -99,19 +100,18 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onResume() {
-        super.onResume()
         super.resumeTimers()
+        super.onResume()
     }
 
     override fun onPause() {
-        super.onPause()
         super.pauseTimers()
+        super.onPause()
     }
 
     override fun destroy() {
         stopLoading()
-        super.onResume()
-        super.resumeTimers()
+        onPause()
         clearHistory()
         removeAllViews()
         destroyDrawingCache()
@@ -138,14 +138,18 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         webViewClient = PageViewClient(context, this)
         webChromeClient = PageChromeClient(this)
         setDownloadListener(mDownloadListener)
+
+        isAdBlock = SP.adBlock
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebSetting() = with(settings) {
         allowContentAccess = true
+        //支持引用文件
         allowFileAccess = true
         allowFileAccessFromFileURLs = true
         allowUniversalAccessFromFileURLs = true
+        //设置支持本地存储
         setAppCacheEnabled(true)
         setAppCachePath(context.cacheDir.toString())
         cacheMode = WebSettings.LOAD_DEFAULT
@@ -156,11 +160,13 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         useWideViewPort = true
         builtInZoomControls = true
         displayZoomControls = false
+        //禁止系统缩放字体大小
         textZoom = 100
         useWideViewPort = true
 
         javaScriptEnabled = true
         javaScriptCanOpenWindowsAutomatically = SP.isEnableMultipleWindows
+        //设置支持多窗口
         setSupportMultipleWindows(SP.isEnableMultipleWindows)
 
         mediaPlaybackRequiresUserGesture = true
@@ -169,10 +175,16 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         setGeolocationEnabled(true)
         defaultTextEncodingName = WebUtil.URL_ENCODE
         layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+        //缩放至屏幕的大小
         loadWithOverviewMode = true
         loadsImagesAutomatically = true
+        //支持混合模式
         mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         userAgent = userAgentString
+        //不需要请求控制直接播放媒体文件即可以自动播放音乐
+        mediaPlaybackRequiresUserGesture = false
+        //支持插件
+//        pluginState = WebSettings.PluginState.ON
     }
 
     private fun settingMultipleWindow() {
@@ -201,6 +213,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
             setAppCacheEnabled(!mPrivateFlag)
             cacheMode = if (mPrivateFlag) WebSettings.LOAD_NO_CACHE else WebSettings.LOAD_DEFAULT
             databaseEnabled = !mPrivateFlag
+            //是否开启DOM Storage
             domStorageEnabled = !mPrivateFlag
             saveFormData = !mPrivateFlag
             setGeolocationEnabled(!mPrivateFlag)
@@ -271,6 +284,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         when (key) {
             resources.getString(R.string.preference_key_adblock) -> {
                 //todo set ad block
+                isAdBlock = SP.adBlock
             }
             resources.getString(R.string.preference_key_enable_multiple_windows) -> {
                 settings.setSupportMultipleWindows(SP.isEnableMultipleWindows)
@@ -345,8 +359,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         }
     }
 
+    /**
+     * 拦截网页加载资源的请求，验证是否为广告链接，如果为广告链接则返会空WebResourceResponse对象，
+     * 如果不是广告链接，则不拦截，返回null，系统将正常加载资源
+     */
     override fun shouldInterceptRequest(url: String): WebResourceResponse? {
-        if (SP.adBlock){
+        if (isAdBlock && AdBlock.isAd(url)) {
             return WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(byteArrayOf()))
         }
 
@@ -617,26 +635,18 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
      * @see http://wangbaiyuan.cn/realization-of-android-webview-advertising-filtering.html
      * @see https://github.com/adblockplus/libadblockplus-android
      * @see https://github.com/adblockplus/adblockplussbrowser
-     * @targetSdk > 21
+     * @targetSdk >= 21
      */
-    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest?): WebResourceResponse {
-        delegate?.let {
-            return it.shouldInterceptRequest(view.url) ?: super.shouldInterceptRequest(view, request)
-        }
-
-        return super.shouldInterceptRequest(view, request)
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        return delegate?.shouldInterceptRequest(request.url.toString()) ?: super.shouldInterceptRequest(view, request)
     }
 
     /**
      * 实现对webview的资源请求进行处理
      * @targetSdk > 11 && < 21
      */
-    override fun shouldInterceptRequest(view: WebView?, url: String): WebResourceResponse {
-        delegate?.let {
-            return it.shouldInterceptRequest(url) ?: super.shouldInterceptRequest(view, url)
-        }
-
-        return super.shouldInterceptRequest(view, url)
+    override fun shouldInterceptRequest(view: WebView?, url: String): WebResourceResponse? {
+        return delegate?.shouldInterceptRequest(url) ?: super.shouldInterceptRequest(view, url)
     }
 }
 
