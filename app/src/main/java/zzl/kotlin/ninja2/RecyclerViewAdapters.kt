@@ -47,7 +47,7 @@ open class BaseViewHolder(itemView: View?, private val listener: ((view: View, p
 /**
  * 主页Pins适配器
  */
-class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(context, mPins){
+class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(context, mPins) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_pins, parent, false)
@@ -58,12 +58,23 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
         holder.findView<TextView>(R.id.pin).text = mList[position].title
     }
 
+    /**
+     * 将数据添加到列表中的指定位置
+     * @param position 添加到的指定位置
+     * @param pin 待添加的数据对象
+     */
+    fun addItem(position: Int, pin: Pin) {
+        mList.add(position, pin)
+        notifyItemInserted(position)
+        notifyItemChanged(position)
+    }
+
 }
 
 /**
  * 历史访问记录列表适配器
  */
-class RecordsAdapter(context: Context, mRecords: ArrayList<Record>) : BaseAdapter<Record>(context, mRecords){
+class RecordsAdapter(context: Context, mRecords: ArrayList<Record>) : BaseAdapter<Record>(context, mRecords) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_record, parent, false)

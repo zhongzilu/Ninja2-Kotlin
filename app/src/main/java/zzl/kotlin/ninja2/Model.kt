@@ -10,9 +10,10 @@ package zzl.kotlin.ninja2
  * 主页Pin
  */
 data class Pin(
-        val _id: Int = 0,
+        var _id: Int = 0,
         val title: String,
-        val url: String
+        val url: String,
+        val visit: Int = 0
 )
 
 /**
@@ -21,5 +22,6 @@ data class Pin(
 data class Record(
         val title: String,
         val url: String,
-        val time: String
+        val time: String,
+        val visit: Int = 0
 )
