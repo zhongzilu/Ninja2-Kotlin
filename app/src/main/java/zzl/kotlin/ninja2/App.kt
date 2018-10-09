@@ -1,6 +1,7 @@
 package zzl.kotlin.ninja2
 
 import android.app.Application
+import zzl.kotlin.ninja2.application.AdBlock
 import kotlin.properties.Delegates
 
 /**
@@ -16,6 +17,7 @@ class App : Application() {
         super.onCreate()
         instance = this
 
+        AdBlock.init(this)
     }
 
     override fun onLowMemory() {

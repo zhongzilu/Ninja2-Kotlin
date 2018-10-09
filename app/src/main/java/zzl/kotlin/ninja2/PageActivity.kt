@@ -172,6 +172,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mPinsAdapter.notifyDataSetChanged()
     }
 
+    private fun setItemTouchHelper(){
+
+    }
+
     /**
      * 初始化Record的RecyclerView，由于采用了ViewStub来延迟加载
      * 因此尽量需要的时候才调用
