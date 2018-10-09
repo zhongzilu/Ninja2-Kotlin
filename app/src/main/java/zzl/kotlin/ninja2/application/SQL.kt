@@ -20,6 +20,7 @@ object PinTable {
     val ID = "_id"
     val TITLE = "title"
     val URL = "url"
+    val VISIT = "visit"
 }
 
 /**
@@ -30,6 +31,7 @@ object RecordTable {
     val TITLE = "title"
     val URL = "url"
     val TIME = "time"
+    val VISIT = "visit"
 }
 
 /**
@@ -49,13 +51,15 @@ class SQL(ctx: Context = App.instance) : ManagedSQLiteOpenHelper(ctx, SQL.DB_NAM
         db?.createTable(PinTable.NAME, true,
                 PinTable.ID to INTEGER + PRIMARY_KEY,
                 PinTable.TITLE to TEXT,
-                PinTable.URL to TEXT)
+                PinTable.URL to TEXT,
+                PinTable.VISIT to INTEGER)
 
         //创建历史记录表
         db?.createTable(RecordTable.NAME, true,
                 RecordTable.TITLE to TEXT,
                 RecordTable.URL to TEXT + PRIMARY_KEY,
-                RecordTable.TIME to TEXT)
+                RecordTable.TIME to TEXT,
+                RecordTable.VISIT to INTEGER)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -95,28 +99,37 @@ object SQLHelper {
 
     /**
      * 保存Pin对象
+     *
+     * @param pin 待保存的数据对象
      */
     fun savePin(pin: Pin) {
         SQL.instance.use {
             insert(PinTable.NAME,
                     PinTable.TITLE to pin.title,
-                    PinTable.URL to pin.url)
+                    PinTable.URL to pin.url,
+                    PinTable.VISIT to pin.visit)
         }
     }
 
     /**
      * 保存访问的网站作为Pin记录，该记录将出现在首页Pin列表
+     *
+     * @param title 网站标题
+     * @param url 网站网址
      */
     fun savePin(title: String, url: String) {
         SQL.instance.use {
             insert(PinTable.NAME,
                     PinTable.TITLE to title,
-                    PinTable.URL to url)
+                    PinTable.URL to url,
+                    PinTable.VISIT to 0)
         }
     }
 
     /**
      * 获取所有的Pin记录
+     *
+     * @return List<Pin>
      */
     fun findAllPins(): List<Pin> {
         return SQL.instance.use {
@@ -124,12 +137,42 @@ object SQLHelper {
         }
     }
 
+    /**
+     * 根据Pin记录ID来更新其他数据字段
+     *
+     * @param pin 待更新的数据对象
+     */
+    fun updatePinById(pin: Pin) {
+        SQL.instance.use {
+            update(PinTable.NAME,
+                    PinTable.TITLE to pin.title,
+                    PinTable.URL to pin.url)
+                    .whereArgs("_id = {id}", "id" to pin._id)
+                    .exec()
+        }
+    }
+
+    /**
+     * 删除Pin记录ID对应的记录
+     *
+     * @param pin 待删除的数据对象
+     */
+    fun deletePin(pin: Pin){
+        SQL.instance.use {
+            delete(PinTable.NAME, "_id = {id}", "id" to pin._id)
+        }
+    }
+
+
     //==========Record相关操作============
 
     /**
      * 保存访问的网站作为历史纪录，
      * 如果不存在相同url的记录，则新增记录后退出，
      * 如果存在相同url的记录，则更新该条记录后退出
+     *
+     * @param title 访问网站的标题
+     * @param url 访问网站的网址
      */
     fun saveOrUpdateRecord(title: String, url: String) {
         SQL.instance.use {
@@ -141,8 +184,9 @@ object SQLHelper {
                     update(RecordTable.NAME,
                             RecordTable.TITLE to title,
                             RecordTable.URL to url,
-                            RecordTable.TIME to System.currentTimeMillis())
-                            .whereArgs("url = {url}","url" to it.url)
+                            RecordTable.TIME to System.currentTimeMillis(),
+                            RecordTable.VISIT to it.visit.inc())
+                            .whereArgs("url = {url}", "url" to it.url)
                             .exec()
 
                     return@use
@@ -152,12 +196,15 @@ object SQLHelper {
             insert(RecordTable.NAME,
                     RecordTable.TITLE to title,
                     RecordTable.URL to url,
-                    RecordTable.TIME to System.currentTimeMillis())
+                    RecordTable.TIME to System.currentTimeMillis(),
+                    RecordTable.VISIT to 0)
         }
     }
 
     /**
      * 获取所有历史记录
+     *
+     * @return List<Record>
      */
     fun findAllRecords(): List<Record> {
         return SQL.instance.use {
@@ -167,6 +214,8 @@ object SQLHelper {
 
     /**
      * 搜索匹配关键字的历史记录，比如根据url或名称进行搜索
+     *
+     * @param key 搜索关键字，该关键字将用于
      */
     fun searchRecord(key: String): List<Record> {
         return SQL.instance.use {
@@ -187,6 +236,8 @@ object SQLHelper {
 
     /**
      * 删除N天前的历史记录，默认为15天前
+     *
+     * @param time 时间戳，该方法将删除数据库中创建时间早于该时间戳的记录
      */
     fun clearOldRecord(time: Long = 1296000000) {
         SQL.instance.use {

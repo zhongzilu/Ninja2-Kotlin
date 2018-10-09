@@ -10,13 +10,16 @@ import android.os.Bundle
 import android.os.Message
 import android.preference.PreferenceManager
 import android.support.design.widget.BottomSheetBehavior
+import android.support.design.widget.Snackbar
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.util.SparseArray
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -34,6 +37,7 @@ import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.AddLauncherDialog
 import zzl.kotlin.ninja2.widget.MenuOptionListener
 import zzl.kotlin.ninja2.widget.PageView
+import java.util.*
 
 
 class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -127,6 +131,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
 
         setPinReversePadding()
+        setItemTouchHelper()
     }
 
     /**
@@ -147,7 +152,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     //设置主页列表反序时呈现的padding距离
     private fun setPinReversePadding() {
-        val padding = (dip2px(48.0f) - sp2px(24.0f)) / 2
+        val padding = dip2px(10f)
         if (SP.pinsReverse) {
             mPinsRecycler?.setPadding(0, 0, 0, padding)
         } else {
@@ -172,8 +177,154 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mPinsAdapter.notifyDataSetChanged()
     }
 
+    private var mCurrentEditorPosition: Int = 0
     private fun setItemTouchHelper(){
 
+        val callback = DefaultItemTouchHelperCallback(object : DefaultItemTouchHelperCallback.Callback{
+
+            //保存被删除item信息，用于撤销操作
+            //这里使用队列数据结构，当连续滑动删除几个item时可能会保存多个item数据，并需要记录删除循序。
+            //val queue = ArrayBlockingQueue<Pin>(2)
+            val array = SparseArray<Pin>()
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                mCurrentEditorPosition = viewHolder.adapterPosition
+
+                // 如果是往右滑动，则进入编辑模式
+                if (direction == ItemTouchHelper.RIGHT) {
+                    editPinName(mCurrentEditorPosition)
+                    mPinsAdapter.notifyItemChanged(mCurrentEditorPosition)
+                    return
+                }
+
+                // 如果是往左滑动，则先取出记录存到删除队列中，以备撤销使用
+                val pin = mPins[mCurrentEditorPosition]
+                L.i(TAG, "onSwiped pin position: $mCurrentEditorPosition")
+                array.put(viewHolder.adapterPosition, pin)
+
+                // 移除该条记录
+                mPins.removeAt(mCurrentEditorPosition)
+                mPinsAdapter.notifyItemRemoved(mCurrentEditorPosition)
+                mPinsAdapter.notifyItemChanged(mCurrentEditorPosition)
+            }
+
+            override fun onMove(srcPosition: Int, targetPosition: Int): Boolean {
+
+                var srcP = srcPosition
+                var targetP = targetPosition
+
+                if (srcPosition <= targetPosition) {
+                    srcP = targetPosition
+                    targetP = srcPosition
+                }
+
+                Collections.swap(mPins, targetP, srcP)
+                mPinsAdapter.notifyItemMoved(targetP, srcP)
+
+                //交换对应位置的两个Pin记录的ID
+                exchangePin(targetP, srcP)
+
+                return true
+            }
+
+            override fun clearView(viewHolder: RecyclerView.ViewHolder) {
+                if (array.size() > 0){
+                    //如果队列中有数据，说明刚才有删掉一些item
+                    Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackBar_button_repeal){
+                                //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
+
+                                val pin = array.valueAt(0)
+                                val position = array.keyAt(0)
+
+                                L.i(TAG, "position: $position")
+                                mPinsAdapter.addItem(position, pin)
+                                array.removeAt(0)
+
+                                //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
+                                //手动将recyclerView滑到顶部可以解决这个bug
+                                if (position == 0){
+                                    mPinsRecycler?.smoothScrollToPosition(0)
+                                }
+
+                            }
+                            .addCallback(object : Snackbar.Callback() {
+
+                                //不撤销将执行删除操作，监听SnackBar消失事件，
+                                //SnackBar消失（非排挤式消失）出队、删除数据。
+                                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                    super.onDismissed(transientBottomBar, event)
+
+                                    //event 为消失原因，详细介绍在 https://blog.csdn.net/hymanme/article/details/50931082
+                                    //排除一种情况就是联系删除多个item SnackBar挤掉前一个SnackBar导致的消失
+                                    if (event != DISMISS_EVENT_ACTION) {
+                                        val pin = array.valueAt(0)
+                                        doAsync { SQLHelper.deletePin(pin) }
+                                    }
+                                }
+
+                            }).show()
+                }
+            }
+
+        })
+
+        ItemTouchHelper(callback).attachToRecyclerView(mPinsRecycler)
+
+    }
+
+    /**
+     * 交换Pin数据ID
+     *
+     * ID | Title | Url                                             ID | Title | Url
+     * ================   交换ID    -----------------   更新数据库   =================
+     *  1 | 张三 | xxxx  ---  -->    3  | 张三 | xxxx  ----------->  1 | 李四 | ssss
+     * ----------------     X       ----------------                ----------------
+     *  3 | 李四 | ssss  ---  -->    1  | 李四 | ssss  ----------->  3 | 张三 | xxxx
+     * ----------------             ----------------                ----------------
+     *
+     * @param targetPosition
+     * @param srcPosition
+     */
+    private fun exchangePin(targetPosition: Int, srcPosition: Int) {
+
+        val targetPin = mPins[targetPosition]
+        val targetId = targetPin._id
+
+        val srcPin = mPins[srcPosition]
+
+        //交换ID
+        targetPin._id = srcPin._id
+        srcPin._id = targetId
+
+        doAsync {
+            SQLHelper.updatePinById(targetPin)
+            SQLHelper.updatePinById(srcPin)
+        }
+
+    }
+
+    /**
+     * 编辑
+     * @param position
+     */
+    private fun editPinName(position: Int) {
+        if (position < 0) return
+
+        // 设置当前的状态值为Pin编辑状态
+        mCurrentMode = Type.MODE_PIN_EDIT
+
+        val pin = mPins[position]
+        mInputBox.setHint(R.string.hint_input_edit)
+        mInputBox.setText(pin.title)
+        mInputBox.setSelection(pin.title.length)
+
+        mInputBox.showKeyboard()
+
+        // 显示确认菜单按钮，隐藏其他菜单按钮
+        mConfirmMenu?.isVisible = true
+        mRefreshMenu?.isVisible = false
+        mStopMenu?.isVisible = false
     }
 
     /**
@@ -685,11 +836,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         val pin = Pin(title = mPageView.title, url = mPageView.url)
         doAsync {
             SQLHelper.savePin(pin)
+            val newPins = SQLHelper.findAllPins()
 
             uiThread {
 
                 //notify update pin list
-                mPins.add(pin)
+                mPins.clear()
+                mPins.addAll(newPins)
                 mPinsAdapter.notifyDataSetChanged()
 
                 toast(getString(R.string.toast_pin_to_homepage, mPageView.title))
@@ -773,11 +926,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         finishAndRemoveTask()
         super.onBackPressed()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
     }
 
     /**
