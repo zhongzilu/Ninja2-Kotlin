@@ -38,7 +38,6 @@ import zzl.kotlin.ninja2.widget.AddLauncherDialog
 import zzl.kotlin.ninja2.widget.MenuOptionListener
 import zzl.kotlin.ninja2.widget.PageView
 import java.util.*
-import java.util.concurrent.ArrayBlockingQueue
 
 
 class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -337,9 +336,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mInputBox.showKeyboard()
 
         // 显示确认菜单按钮，隐藏其他菜单按钮
-        mConfirmMenu?.isVisible = true
-        mRefreshMenu?.isVisible = false
-        mStopMenu?.isVisible = false
+        showMenu(confirm = true)
     }
 
     /**
@@ -461,7 +458,12 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             if (actionId == KeyEvent.KEYCODE_ENDCALL) {
                 val url = mInputBox.text.toString().trim()
                 if (url.isEmpty()) {
-                    toast("请输入浏览地址")
+                    toast("输入内容不能为空")
+                    return@setOnEditorActionListener true
+                }
+
+                if (mCurrentMode == Type.MODE_PIN_EDIT){
+                    notifyPinUpdate(mCurrentEditorPosition)
                     return@setOnEditorActionListener true
                 }
 
@@ -878,6 +880,19 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         return true
     }
 
+    /**
+     * 显示菜单按钮, 默认全隐藏
+     *
+     * @param confirm 确认菜单按钮，默认为false
+     * @param stop 停止菜单按钮，默认为false
+     * @param refresh 刷新菜单按钮，默认为false
+     */
+    private fun showMenu(confirm: Boolean = false, stop: Boolean = false, refresh: Boolean = false){
+        mConfirmMenu?.isVisible = confirm
+        mRefreshMenu?.isVisible = refresh
+        mStopMenu?.isVisible = stop
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.refresh -> {
@@ -886,9 +901,53 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             }
             R.id.stop -> mPageView.stopLoading()
             R.id.confirm -> {
+                L.i(TAG, "confirm menu clicked!")
+                notifyPinUpdate(mCurrentEditorPosition)
             }
         }
         return true
+    }
+
+    /**
+     * 编辑Pin名称后更新UI和数据库
+     *
+     * @param position 编辑的Pin在RecyclerView中的position
+     */
+    private fun notifyPinUpdate(position: Int) {
+
+        val pin = mPins[position]
+        pin.title = mInputBox.text.toString().trim()
+
+        doAsync {
+            SQLHelper.updatePinById(pin)
+
+            uiThread {
+                mCurrentMode = Type.MODE_DEFAULT
+                mPinsAdapter.notifyItemChanged(position)
+
+                restUiAndStatus()
+            }
+        }
+    }
+
+    /**
+     * 重置Ui和状态
+     */
+    private fun restUiAndStatus(){
+        mCurrentMode = Type.MODE_DEFAULT
+
+        //rest optionMenu
+        showMenu(refresh = true)
+
+        //rest inputBox
+        mInputBox.setHint(R.string.hint_input_normal)
+        mInputBox.clearFocus()
+        mInputBox.setText("")
+        mInputBox.hideKeyboard()
+
+        mRecordRecycler?.visibleDo { it.gone() }
+        mPageView?.visibleDo { it.gone() }
+        mProgress?.visibleDo { it.gone() }
     }
 
     override fun onResume() {
@@ -910,6 +969,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onBackPressed() {
+
+        //当状态为Pin编辑模式时，无论当前在做什么，一律重置当前状态为普通模式
+        if (mCurrentMode == Type.MODE_PIN_EDIT){
+            restUiAndStatus()
+            return
+        }
+
         //当历史纪录列表呈现时按返回按钮，则隐藏历史记录列表
         mRecordRecycler?.visibleDo {
             it.gone()
@@ -923,7 +989,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             return
         }
 
-        //当网页可
+        //当网页可以后退
         if (mPageView.canGoBack()) {
             mPageView.goBack()
             return
