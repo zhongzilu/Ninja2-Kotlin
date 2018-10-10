@@ -9,8 +9,10 @@ import android.net.http.SslError
 import android.os.Bundle
 import android.os.Message
 import android.preference.PreferenceManager
+import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
+import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -37,6 +39,7 @@ import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.AddLauncherDialog
 import zzl.kotlin.ninja2.widget.MenuOptionListener
 import zzl.kotlin.ninja2.widget.PageView
+import java.io.IOException
 import java.util.*
 
 
@@ -462,7 +465,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                     return@setOnEditorActionListener true
                 }
 
-                if (mCurrentMode == Type.MODE_PIN_EDIT){
+                if (mCurrentMode == Type.MODE_PIN_EDIT) {
                     notifyPinUpdate(mCurrentEditorPosition)
                     return@setOnEditorActionListener true
                 }
@@ -664,16 +667,14 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mProgress.progress = 0
 
         //set menu item
-        mStopMenu?.isVisible = true
-        mRefreshMenu?.isVisible = false
-
-        mMenuOptionWidget.showMoreMenu()
+        showMenu(stop = true)
     }
 
     override fun onPageFinished(url: String, title: String, icon: Bitmap?) {
         mProgress.gone()
-        mStopMenu?.isVisible = false
-        mRefreshMenu?.isVisible = true
+        mMenuOptionWidget.showMoreMenu()
+
+        showMenu(refresh = true)
     }
 
     override fun onCloseWindow() {
@@ -712,9 +713,19 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onReceivedTouchIconUrl(url: String, precomposed: Boolean) {
     }
 
+    /**
+     * 网页发起选择文件的回调Callback
+     */
+    private var mFileChooserCallback: ValueCallback<Array<Uri>>? = null
+
+    /**
+     * 网页发起选择文件
+     */
     override fun onShowFileChooser(filePathCallback: ValueCallback<Array<Uri>>,
                                    fileChooserParams: WebChromeClient.FileChooserParams): Boolean {
-        return false
+        mFileChooserCallback = filePathCallback
+        startActivityForResult(fileChooserParams.createIntent(), Type.CODE_CHOOSE_FILE)
+        return true
     }
 
     override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
@@ -831,18 +842,28 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     /**
+     * 创建桌面启动图标的Dialog
+     */
+    private var mAddLauncherDialog: AddLauncherDialog? = null
+
+    /**
      * 创建桌面启动图标
      */
     private fun createLauncherIcon() {
-        AddLauncherDialog(this)
+        if (mAddLauncherDialog == null) {
+            mAddLauncherDialog = AddLauncherDialog(this)
+                    .setOnPositiveClickListener {
+                        createLauncherShortcut(it.getUrl(), it.getTitle(), it.getIcon())
+                    }
+                    .setOnSelectListener {
+                        pickImage(Type.CODE_GET_IMAGE)
+                    }
+        }
+
+        mAddLauncherDialog!!
+                .setUrl(mPageView.url)
                 .setIcon(mPageView.favicon)
                 .setLabel(mPageView.title)
-                .setOnPositiveClickListener {
-                    mPageView?.let { createLauncherShortcut(it.url, it.title, it.favicon) }
-                }
-                .setOnSelectListener {
-                    pickImage(0)
-                }
                 .show()
     }
 
@@ -887,7 +908,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * @param stop 停止菜单按钮，默认为false
      * @param refresh 刷新菜单按钮，默认为false
      */
-    private fun showMenu(confirm: Boolean = false, stop: Boolean = false, refresh: Boolean = false){
+    private fun showMenu(confirm: Boolean = false, stop: Boolean = false, refresh: Boolean = false) {
         mConfirmMenu?.isVisible = confirm
         mRefreshMenu?.isVisible = refresh
         mStopMenu?.isVisible = stop
@@ -896,14 +917,18 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.refresh -> {
-                mPageView.visible()
-                mPageView.reload()
+                //默认模式时，刷新Pin列表
+                if (mCurrentMode == Type.MODE_DEFAULT) {
+                    loadPinsData()
+                }
+
+                //网页浏览模式时，刷新网页
+                else if (mCurrentMode == Type.MODE_WEB) {
+                    mPageView.reload()
+                }
             }
             R.id.stop -> mPageView.stopLoading()
-            R.id.confirm -> {
-                L.i(TAG, "confirm menu clicked!")
-                notifyPinUpdate(mCurrentEditorPosition)
-            }
+            R.id.confirm -> notifyPinUpdate(mCurrentEditorPosition)
         }
         return true
     }
@@ -933,7 +958,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     /**
      * 重置Ui和状态
      */
-    private fun restUiAndStatus(){
+    private fun restUiAndStatus() {
         mCurrentMode = Type.MODE_DEFAULT
 
         //rest optionMenu
@@ -971,7 +996,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onBackPressed() {
 
         //当状态为Pin编辑模式时，无论当前在做什么，一律重置当前状态为普通模式
-        if (mCurrentMode == Type.MODE_PIN_EDIT){
+        if (mCurrentMode == Type.MODE_PIN_EDIT) {
             restUiAndStatus()
             return
         }
@@ -1055,6 +1080,54 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 toast(R.string.toast_screenshot_failed)
             }
         }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        //网页选择文件回调
+        if (requestCode == Type.CODE_CHOOSE_FILE) {
+            mFileChooserCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data))
+            return
+        }
+
+        //添加桌面图标时，选择更换图标
+        if (requestCode == Type.CODE_GET_IMAGE) {
+            data?.let {
+                try {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
+                    //todo 裁剪或缩放或压缩图片大小或尺寸，bitmap过大将不能创建桌面快捷方式
+                    if (bitmap.width > 192 || bitmap.height > 192) {
+                        toast(resources.getString(R.string.toast_select_icon_size_error, 192, 192))
+                        return@let
+                    }
+
+                    mAddLauncherDialog?.setIcon(bitmap)
+
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    toast(R.string.toast_select_icon_failed)
+                }
+            }
+        }
+    }
+
+
+    private var mAlertDialog: AlertDialog.Builder? = null
+    private fun jsResponseDialog(msg: Int, confirm: () -> Unit) {
+        if (mAlertDialog == null) {
+            mAlertDialog = AlertDialog.Builder(this)
+                    .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+        }
+
+        mAlertDialog!!
+                .setMessage(msg)
+                .setPositiveButton(R.string.dialog_button_confirm) { _, _ ->
+                    confirm()
+                }.show()
 
     }
 }
