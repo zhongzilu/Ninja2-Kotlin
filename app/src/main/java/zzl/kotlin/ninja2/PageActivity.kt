@@ -38,6 +38,7 @@ import zzl.kotlin.ninja2.widget.AddLauncherDialog
 import zzl.kotlin.ninja2.widget.MenuOptionListener
 import zzl.kotlin.ninja2.widget.PageView
 import java.util.*
+import java.util.concurrent.ArrayBlockingQueue
 
 
 class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -145,7 +146,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 mPins.clear()
                 mPins.addAll(pins)
                 mPinsAdapter.notifyDataSetChanged()
-                mPinsAdapter.notifyItemRangeChanged(0, mPins.size)
+//                mPinsAdapter.notifyItemRangeChanged(0, mPins.size)
             }
         }
     }
@@ -178,9 +179,15 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     private var mCurrentEditorPosition: Int = 0
-    private fun setItemTouchHelper(){
 
-        val callback = DefaultItemTouchHelperCallback(object : DefaultItemTouchHelperCallback.Callback{
+    /**
+     * 给RecyclerView设置ItemTouch监听器，用于监听滑动事件，实现左右侧滑和上下滑动交换功能
+     * 代码参考
+     * @see https://blog.csdn.net/hymanme/article/details/50931082
+     */
+    private fun setItemTouchHelper() {
+
+        val callback = DefaultItemTouchHelperCallback(object : DefaultItemTouchHelperCallback.Callback {
 
             //保存被删除item信息，用于撤销操作
             //这里使用队列数据结构，当连续滑动删除几个item时可能会保存多个item数据，并需要记录删除循序。
@@ -200,7 +207,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 // 如果是往左滑动，则先取出记录存到删除队列中，以备撤销使用
                 val pin = mPins[mCurrentEditorPosition]
                 L.i(TAG, "onSwiped pin position: $mCurrentEditorPosition")
-                array.put(viewHolder.adapterPosition, pin)
+//                array.put(viewHolder.adapterPosition, pin)
+                array.put(mCurrentEditorPosition, pin)
 
                 // 移除该条记录
                 mPins.removeAt(mCurrentEditorPosition)
@@ -228,10 +236,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             }
 
             override fun clearView(viewHolder: RecyclerView.ViewHolder) {
-                if (array.size() > 0){
+                if (array.size() > 0) {
                     //如果队列中有数据，说明刚才有删掉一些item
                     Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.snackBar_button_repeal){
+                            .setAction(R.string.snackBar_button_repeal) {
                                 //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
 
                                 val pin = array.valueAt(0)
@@ -243,7 +251,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
                                 //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
                                 //手动将recyclerView滑到顶部可以解决这个bug
-                                if (position == 0){
+                                if (position == 0) {
                                     mPinsRecycler?.smoothScrollToPosition(0)
                                 }
 
@@ -255,11 +263,18 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                                     super.onDismissed(transientBottomBar, event)
 
-                                    //event 为消失原因，详细介绍在 https://blog.csdn.net/hymanme/article/details/50931082
-                                    //排除一种情况就是联系删除多个item SnackBar挤掉前一个SnackBar导致的消失
+                                    /*
+                                    * event 为消失原因。
+                                    * 连续删除多个item时，SnackBar挤掉前一个SnackBar导致的消失，将会直接删除，
+                                    * event 为 DISMISS_EVENT_CONSECUTIVE。
+                                    * DISMISS_EVENT_ACTION为点击Action导致的消失，本代码中Action执行的动作为撤销，
+                                    * 因此不能执行删除操作，需要排除掉
+                                    */
                                     if (event != DISMISS_EVENT_ACTION) {
-                                        val pin = array.valueAt(0)
-                                        doAsync { SQLHelper.deletePin(pin) }
+                                        array.removeAt(0)
+//                                        doAsync {
+//                                            SQLHelper.deletePin(array.valueAt(0))
+//                                        }
                                     }
                                 }
 
@@ -274,7 +289,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     /**
-     * 交换Pin数据ID
+     * 交换Pin数据ID后，更新数据库中的数据记录，实现数据交换的目的
      *
      * ID | Title | Url                                             ID | Title | Url
      * ================   交换ID    -----------------   更新数据库   =================
@@ -481,7 +496,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     /**
      * 隐藏历史访问记录
      */
-    private fun goneRecordRecycler(){
+    private fun goneRecordRecycler() {
         mRecordRecycler?.gone()
     }
 
