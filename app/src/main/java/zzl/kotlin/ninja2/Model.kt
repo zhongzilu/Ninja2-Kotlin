@@ -11,7 +11,7 @@ package zzl.kotlin.ninja2
  */
 data class Pin(
         var _id: Int = 0,
-        val title: String,
+        var title: String,
         val url: String,
         val visit: Int = 0
 )
