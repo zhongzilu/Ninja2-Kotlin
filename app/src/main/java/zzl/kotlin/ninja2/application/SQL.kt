@@ -213,13 +213,14 @@ object SQLHelper {
     }
 
     /**
-     * 搜索匹配关键字的历史记录，比如根据url或名称进行搜索
+     * 搜索匹配关键字的历史记录，比如根据url或名称进行搜索，
+     * 结果以{@link RecordTable.VISIT}字段倒序排列
      *
      * @param key 搜索关键字，该关键字将用于
      */
     fun searchRecord(key: String): List<Record> {
         return SQL.instance.use {
-            select(RecordTable.NAME).whereArgs("title LIKE {key} OR url LIKE {key} ORDER BY time DESC",
+            select(RecordTable.NAME).whereArgs("title LIKE {key} OR url LIKE {key} ORDER BY visit DESC",
                     "key" to "%$key%")
                     .parseList(classParser())
         }
