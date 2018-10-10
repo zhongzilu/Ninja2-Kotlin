@@ -32,12 +32,33 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
     }
 
     /**
+     * 桌面快捷方式访问地址
+     */
+    private var url: String = ""
+
+    fun setUrl(url: String): AddLauncherDialog{
+        this.url = url
+        return this
+    }
+
+    fun getUrl() = url
+
+    /**
      * 桌面图标标题文字
      */
     private var mLabelText: CharSequence? = null
 
     /**
+     * 获取桌面图标标题
+     *
+     * @return String 桌面图标标题
+     */
+    fun getTitle() = mLabelText?.toString()?:""
+
+    /**
      * 设置桌面图标标题
+     *
+     * @param title 标题
      */
     fun setLabel(title: CharSequence?): AddLauncherDialog {
         mLabelText = title
@@ -46,6 +67,8 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
 
     /**
      * 设置桌面图标标题
+     *
+     * @param titleId 资源ID
      */
     override fun setTitle(titleId: Int) {
         mLabelText = context.resources.getString(titleId)
@@ -53,18 +76,33 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
 
     /**
      * 设置桌面图标标题
+     *
+     * @param title 标题
      */
     override fun setTitle(title: CharSequence?) {
         mLabelText = title
     }
 
     /**
-     * 设置桌面图标Bitmap
+     * 桌面图标Bitmap
      */
     private var mLauncherBitmap: Bitmap? = null
 
+    /**
+     * 获取桌面图标Bitmap
+     *
+     * @return Bitmap？桌面图标Bitmap，可能为空
+     */
+    fun getIcon(): Bitmap = mLauncherBitmap!!
+
+    /**
+     * 设置桌面图标Bitmap
+     *
+     * @param bitmap 桌面图标bitmap
+     */
     fun setIcon(bitmap: Bitmap): AddLauncherDialog {
         mLauncherBitmap = bitmap
+        mLauncherIcon?.setImageBitmap(mLauncherBitmap)
         return this
     }
 
