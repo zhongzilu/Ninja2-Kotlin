@@ -490,9 +490,9 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     /**
      * 根据Message信息加载网页页面
      */
-    private fun loadPage(msg: Message){
+    private fun loadPage(msg: Message) {
         val transport = msg.obj
-        when(transport){
+        when (transport) {
             is WebView.WebViewTransport -> {
                 transport.webView = mPageView
                 msg.sendToTarget()
@@ -651,7 +651,17 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onFormResubmission(dontResend: Message, resend: Message) {
-        //todo 处理表单重新提交数据
+        //todo[Checked] 处理表单重新提交数据
+        dialogBuilder().setCancelable(false)
+                .setMessage(R.string.dialog_message_form_resubmission)
+                .setPositiveButton(R.string.dialog_button_resend) { dialog, _ ->
+                    resend.sendToTarget()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
+                    dontResend.sendToTarget()
+                    dialog.dismiss()
+                }.create().show()
     }
 
 
@@ -721,7 +731,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     private var mOriginalOrientation: Int = 0
     private var mCustomViewCallback: WebChromeClient.CustomViewCallback? = null
     override fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) {
-        //todo 通知主应用程序当前页面已进入全屏模式
+        //todo[Checked] 通知主应用程序当前页面已进入全屏模式
         mCustomView?.let {
             onHideCustomView()
             return
@@ -751,7 +761,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     @SuppressLint("WrongConstant")
     override fun onHideCustomView() {
-        //todo 通知主应用程序当前页面已退出全屏模式
+        //todo[Checked] 通知主应用程序当前页面已退出全屏模式
         // 1. Remove the custom view
 //        val decor = window.decorView as FrameLayout
 //        val decor = find<FrameLayout>(android.R.id.content)
@@ -821,7 +831,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
                     result.cancel()
                     dialog.dismiss()
-                }.show()
+                }.create().show()
         return true
     }
 
@@ -1235,6 +1245,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
                     jsResult.cancel()
                     dialog.dismiss()
-                }.show()
+                }.create().show()
     }
 }
