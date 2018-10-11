@@ -1,7 +1,9 @@
 package zzl.kotlin.ninja2
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.*
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.Uri
@@ -21,11 +23,9 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.SparseArray
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.webkit.*
+import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.*
@@ -93,6 +93,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     private fun checkExtra() {
         mTargetUrl = intent.getStringExtra(EXTRA_TARGET_URL)
         mTargetUrl?.let { if (it.isNotEmpty()) loadPage(it) }
+
+        App.MESSAGE?.let { loadPage(it) }
 
         isPrivate = intent.getBooleanExtra(EXTRA_PRIVATE, false)
         mPageView.setupViewMode(isPrivate)
@@ -485,6 +487,22 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
     }
 
+    /**
+     * 根据Message信息加载网页页面
+     */
+    private fun loadPage(msg: Message){
+        val transport = msg.obj
+        when(transport){
+            is WebView.WebViewTransport -> {
+                transport.webView = mPageView
+                msg.sendToTarget()
+            }
+        }
+    }
+
+    /**
+     * 根据网络地址加载网页页面
+     */
     private fun loadPage(url: String) {
         goneRecordRecycler()
         mInputBox.hideKeyboard()
@@ -682,10 +700,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         showMenu(refresh = true)
     }
 
-    override fun onCloseWindow() {
-        //todo 关闭给定的WebView并在必要时将其从视图系统中删除
-    }
-
     override fun onProgressChanged(progress: Int) {
         mProgress.progress = progress
 
@@ -702,8 +716,56 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         //todo 处理网页长按事件，弹出快捷菜单浮窗
     }
 
+    private var mCustomView: View? = null
+    private var mOriginalSystemUiVisibility: Int = 0
+    private var mOriginalOrientation: Int = 0
+    private var mCustomViewCallback: WebChromeClient.CustomViewCallback? = null
     override fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) {
         //todo 通知主应用程序当前页面已进入全屏模式
+        mCustomView?.let {
+            onHideCustomView()
+            return
+        }
+
+        // 1. Stash the current state
+        mCustomView = view
+        mOriginalSystemUiVisibility = window.decorView.systemUiVisibility
+        mOriginalOrientation = requestedOrientation
+
+        // 2. Stash the custom view callback
+        mCustomViewCallback = callback
+
+        // 3. Add the custom view to the view hierarchy
+//        val decor = window.decorView as FrameLayout
+//        val decor = find<FrameLayout>(android.R.id.content)
+        mCustomViewContainer.visible()
+        mCustomViewContainer.addView(mCustomView, FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT))
+
+
+        // 4. Change the state of the window
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    }
+
+    @SuppressLint("WrongConstant")
+    override fun onHideCustomView() {
+        //todo 通知主应用程序当前页面已退出全屏模式
+        // 1. Remove the custom view
+//        val decor = window.decorView as FrameLayout
+//        val decor = find<FrameLayout>(android.R.id.content)
+        mCustomViewContainer.removeView(mCustomView)
+        mCustomViewContainer.gone()
+        mCustomView = null
+
+        // 2. Restore the state to it's original form
+        window.decorView.systemUiVisibility = mOriginalSystemUiVisibility
+        requestedOrientation = mOriginalOrientation
+
+        // 3. Call the custom view callback
+        mCustomViewCallback?.onCustomViewHidden()
+        mCustomViewCallback = null
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
@@ -750,6 +812,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
         //todo[Checked] 处理网站上的prompt弹窗
         dialogBuilder().setTitle(url.host())
+                .setCancelable(false)
                 .setMessage(message)
                 .setPositiveButton(R.string.dialog_button_confirm) { dialog, _ ->
                     result.confirm(defaultValue)
@@ -763,12 +826,15 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
-        //todo 处理请求主应用程序创建一个新窗口
-        return false
+        //todo[Checked] 处理请求主应用程序创建一个新窗口
+        App.MESSAGE = resultMsg
+        openUrl("", this.isPrivate, taskId)
+        return true
     }
 
-    override fun onHideCustomView() {
-        //todo 通知主应用程序当前页面已退出全屏模式
+    override fun onCloseWindow() {
+        //todo[Checked] 关闭给定的WebView并在必要时将其从视图系统中删除
+        finishAndRemoveTask()
     }
 
     override fun onPermissionRequestCanceled(request: PermissionRequest) {
@@ -893,6 +959,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                     }
         }
 
+        //todo[BUG] 当网站未设置favicon图标时，此方法会抛出异常
         mAddLauncherDialog!!
                 .setUrl(mPageView.url)
                 .setIcon(mPageView.favicon)
@@ -1126,7 +1193,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         //网页选择文件回调
         if (requestCode == Type.CODE_CHOOSE_FILE) {
-            //todo[BUG] 网页选择文件后会出现崩溃现象
             mFileChooserCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data))
             return
         }
@@ -1160,6 +1226,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      */
     private fun jsResponseDialog(url: String, msg: String, jsResult: JsResult) {
         dialogBuilder().setTitle(url.host())
+                .setCancelable(false)
                 .setMessage(msg)
                 .setPositiveButton(R.string.dialog_button_confirm) { dialog, _ ->
                     jsResult.confirm()
