@@ -20,6 +20,7 @@ import zzl.kotlin.ninja2.application.SP
 import zzl.kotlin.ninja2.application.versionName
 
 /**
+ * 设置页面
  * Created by zhongzilu on 2018/7/27 0027.
  */
 class SettingsActivity : BaseActivity() {
@@ -96,7 +97,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
             //清空历史记录
             R.string.preference_title_clear_history -> dialog(R.string.preference_title_clear_history){
-
+                //todo 清空历史纪录
             }
 
             //清空网站密码
@@ -111,27 +112,23 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
             //书签导入导出
             R.string.preference_title_import_export_pin -> {
-
+                //todo 处理书签的导入/导出
             }
 
             //自定义UA
             R.string.preference_title_custom_user_agent -> {
-
+                //todo 实现UA的自定设置
             }
 
             //反馈
-            R.string.preference_title_feedback -> {
-                openUrl("https://github.com/zhongzilu/Ninja2-Kotlin/issues")
-            }
+            R.string.preference_title_feedback -> openUrl(getString(R.string.app_feedback_url))
 
             //开源协议
-            R.string.preference_title_licenses -> {
-
-            }
+            R.string.preference_title_licenses -> openUrl(getString(R.string.app_licenses_url))
 
             //版本
             R.string.preference_title_version -> {
-
+                //todo 应用版本的问题
             }
         }
 
@@ -194,6 +191,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     }
 
     private fun setSearchEngines(){
+        //todo 动态添加搜索引擎
         val engines: ListPreference = findPreference(getString(R.string.preference_key_search_engine_id)) as ListPreference
 //        engines.entries
     }

@@ -12,7 +12,6 @@ import android.preference.PreferenceManager
 import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -242,8 +241,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                     //如果队列中有数据，说明刚才有删掉一些item
                     Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
                             .setAction(R.string.snackBar_button_repeal) {
+                                //todo[BUG] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
                                 //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
-
                                 val pin = array.valueAt(0)
                                 val position = array.keyAt(0)
 
@@ -273,6 +272,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                                     * 因此不能执行删除操作，需要排除掉
                                     */
                                     if (event != DISMISS_EVENT_ACTION) {
+                                        //todo 处理滑动多条数据的删除
                                         array.removeAt(0)
 //                                        doAsync {
 //                                            SQLHelper.deletePin(array.valueAt(0))
@@ -542,7 +542,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 搜索历史记录
      */
     private fun searchRecord(input: CharSequence) {
-        //TODO 后台查询匹配记录项，查到后进行差异比较，最后更新对应位置的数据
+        //todo[Checked] 后台查询匹配记录项，查到后进行差异比较，最后更新对应位置的数据
         doAsync {
             val records = SQLHelper.searchRecord(input.toString())
 
@@ -629,22 +629,27 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onReceivedWebThemeColor(str: String) {
+        //todo 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
     }
 
     override fun onFormResubmission(dontResend: Message, resend: Message) {
+        //todo 处理表单重新提交数据
     }
 
 
     override fun onReceivedClientCertRequest(request: ClientCertRequest) {
+        //todo 处理接收到SSL认证请求
     }
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
+        //todo 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
     }
 
     /**
      * @see https://blog.csdn.net/Crazy_zihao/article/details/51557425
      */
     override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
+        //todo 处理HTTPS的网站加载HTTP的内容安全问题
         handler.proceed()
     }
 
@@ -678,6 +683,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onCloseWindow() {
+        //todo 关闭给定的WebView并在必要时将其从视图系统中删除
     }
 
     override fun onProgressChanged(progress: Int) {
@@ -689,28 +695,35 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
-
+        //todo 处理下载任务监听
     }
 
     override fun onWebViewLongPress(url: String) {
+        //todo 处理网页长按事件，弹出快捷菜单浮窗
     }
 
     override fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) {
+        //todo 通知主应用程序当前页面已进入全屏模式
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
+        //todo 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
     }
 
     override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+        //todo 处理网站请求访问用户地理位置权限
     }
 
     override fun onReceivedTitle(url: String, title: String) {
+        //todo 处理接收到的网站标题
     }
 
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
+        //todo 处理接收到网站图标
     }
 
     override fun onReceivedTouchIconUrl(url: String, precomposed: Boolean) {
+        //todo 处理接收到网站设置的苹果图标资源
     }
 
     /**
@@ -729,31 +742,51 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
-        return false
+        //todo[Checked] 处理网站上的alert弹窗
+        jsResponseDialog(url, message, result)
+        return true
     }
 
     override fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
-        return false
+        //todo[Checked] 处理网站上的prompt弹窗
+        dialogBuilder().setTitle(url.host())
+                .setMessage(message)
+                .setPositiveButton(R.string.dialog_button_confirm) { dialog, _ ->
+                    result.confirm(defaultValue)
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
+                    result.cancel()
+                    dialog.dismiss()
+                }.show()
+        return true
     }
 
     override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+        //todo 处理请求主应用程序创建一个新窗口
         return false
     }
 
     override fun onHideCustomView() {
+        //todo 通知主应用程序当前页面已退出全屏模式
     }
 
     override fun onPermissionRequestCanceled(request: PermissionRequest) {
+        //todo 通知主应用程序已经取消了请求访问指定资源的权限请求
     }
 
     override fun onJsConfirm(url: String, message: String, result: JsResult): Boolean {
-        return false
+        //todo[Checked] 处理网站上的confirm弹窗
+        jsResponseDialog(url, message, result)
+        return true
     }
 
     override fun onGeolocationPermissionsHidePrompt() {
+        //todo 处理取消网站访问地理位置的请求
     }
 
     override fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean {
+        //todo 告诉客户端显示一个对话框，以确认离开当前页面的导航
         return false
     }
 
@@ -986,6 +1019,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onDestroy() {
+        //todo[BUG] 退出应用后，内存并没有得到释放
         mPageView.destroy()
         mInputBox.removeTextChangedListener(mTextWatcher)
         mMenuOptionWidget.setMenuOptionListener(null)
@@ -1012,6 +1046,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         if (mBottomSheetBehavior.isExpanded()) {
             closeBottomSheet()
             return
+        }
+
+        if (mBottomSheetBehavior.isHidden()) {
+            mBottomSheetBehavior.collapsed()
         }
 
         //当网页可以后退
@@ -1088,6 +1126,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         //网页选择文件回调
         if (requestCode == Type.CODE_CHOOSE_FILE) {
+            //todo[BUG] 网页选择文件后会出现崩溃现象
             mFileChooserCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data))
             return
         }
@@ -1097,7 +1136,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             data?.let {
                 try {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
-                    //todo 裁剪或缩放或压缩图片大小或尺寸，bitmap过大将不能创建桌面快捷方式
+                    //todo[BUG] 裁剪或缩放或压缩图片大小或尺寸，bitmap过大将不能创建桌面快捷方式
                     if (bitmap.width > 192 || bitmap.height > 192) {
                         toast(resources.getString(R.string.toast_select_icon_size_error, 192, 192))
                         return@let
@@ -1113,21 +1152,22 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
     }
 
-
-    private var mAlertDialog: AlertDialog.Builder? = null
-    private fun jsResponseDialog(msg: Int, confirm: () -> Unit) {
-        if (mAlertDialog == null) {
-            mAlertDialog = AlertDialog.Builder(this)
-                    .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-        }
-
-        mAlertDialog!!
+    /**
+     * 处理网页上的alert、confirm等弹窗事件
+     * @param url
+     * @param msg
+     * @param jsResult
+     */
+    private fun jsResponseDialog(url: String, msg: String, jsResult: JsResult) {
+        dialogBuilder().setTitle(url.host())
                 .setMessage(msg)
-                .setPositiveButton(R.string.dialog_button_confirm) { _, _ ->
-                    confirm()
+                .setPositiveButton(R.string.dialog_button_confirm) { dialog, _ ->
+                    jsResult.confirm()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
+                    jsResult.cancel()
+                    dialog.dismiss()
                 }.show()
-
     }
 }

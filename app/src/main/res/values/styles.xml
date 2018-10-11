@@ -31,7 +31,7 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <!-- 自定义loading dialog -->
+    <!-- 自定义loaddialogBuilderalog -->
     <style name="AppTheme.Dialog" parent="android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>

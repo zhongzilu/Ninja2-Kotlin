@@ -162,14 +162,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         displayZoomControls = false
         //禁止系统缩放字体大小
         textZoom = 100
-        useWideViewPort = true
 
         javaScriptEnabled = true
         javaScriptCanOpenWindowsAutomatically = SP.isEnableMultipleWindows
         //设置支持多窗口
         setSupportMultipleWindows(SP.isEnableMultipleWindows)
 
-        mediaPlaybackRequiresUserGesture = true
         blockNetworkImage = false
         blockNetworkLoads = false
         setGeolocationEnabled(true)
@@ -191,7 +189,6 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         val enableMultipleWindows = SP.isEnableMultipleWindows
         settings.javaScriptCanOpenWindowsAutomatically = enableMultipleWindows
         settings.setSupportMultipleWindows(enableMultipleWindows)
-//        mViewClient.setAdBlock(PreferenceUtils.isAdBlock(context))
     }
 
     override fun loadUrl(url: String) {
@@ -232,7 +229,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     /**
      * 滚动监听器
      */
-    private var _scrollListener: ((dx: Int, dy: Int) -> Unit)? = null
+    private var _scrollListener: ((dx: Int, dy: Int) -> Unit)? =     null
 
     /**
      * 设置滚动监听器
@@ -283,7 +280,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         L.e(TAG, "onSharedPreferenceChanged")
         when (key) {
             resources.getString(R.string.preference_key_adblock) -> {
-                //todo set ad block
+                //set ad block
                 isAdBlock = SP.adBlock
             }
             resources.getString(R.string.preference_key_enable_multiple_windows) -> {
@@ -662,15 +659,7 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
 class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
 
     interface Delegate {
-        fun onCloseWindow()
-
         fun onProgressChanged(progress: Int)
-
-        fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback)
-
-        fun onPermissionRequest(request: PermissionRequest)
-
-        fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback)
 
         fun onReceivedTitle(url: String, title: String) {}
 
@@ -684,17 +673,25 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
 
         fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean
 
+        fun onJsConfirm(url: String, message: String, result: JsResult): Boolean
+
+        fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean
+
         fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean
+
+        fun onCloseWindow()
+
+        fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback)
 
         fun onHideCustomView()
 
+        fun onPermissionRequest(request: PermissionRequest)
+
         fun onPermissionRequestCanceled(request: PermissionRequest)
 
-        fun onJsConfirm(url: String, message: String, result: JsResult): Boolean
+        fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback)
 
         fun onGeolocationPermissionsHidePrompt()
-
-        fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean
     }
 
     /**
