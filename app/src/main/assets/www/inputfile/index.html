@@ -10,7 +10,17 @@
 <input type="file" name="file">
 <br/>
 <p>测试网页弹窗</p>
-<p><button onclick="alert('alert')">Alert</button><button onclick="prompt('prompt')">Prompt</button><button onclick="confirm('confirm')">Confirm</button></p>
+<p>
+    <button onclick="alert('alert')">Alert</button>
+    <button onclick="prompt('prompt')">Prompt</button>
+    <button onclick="confirm('confirm')">Confirm</button>
+</p>
+
+<p>测试表单提交</p>
+<form name="form" action="http://www.bit100.com/api" method="post" accept-charset="UTF-8">
+    <input type="text" name="name" placeholder="请输入任意内容" required>
+    <input type="submit" value="Submit">
+</form>
 
 <script type="text/javascript">
 </script>
