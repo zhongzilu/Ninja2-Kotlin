@@ -1,19 +1,22 @@
 package zzl.kotlin.ninja2.widget
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.net.http.SslError
+import android.os.Build
 import android.os.Message
 import android.preference.PreferenceManager
+import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.View
 import android.webkit.*
 import android.webkit.WebChromeClient.FileChooserParams
+import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
 import zzl.kotlin.ninja2.application.*
 import java.io.ByteArrayInputStream
@@ -100,12 +103,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onResume() {
-        super.resumeTimers()
+        resumeTimers()
         super.onResume()
     }
 
     override fun onPause() {
-        super.pauseTimers()
+        pauseTimers()
         super.onPause()
     }
 
@@ -116,6 +119,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         removeAllViews()
         destroyDrawingCache()
         super.destroy()
+    }
+
+    fun onBackPressed() {
+        stopLoading()
+        onPause()
+        gone()
     }
 
     override fun onDetachedFromWindow() {
@@ -182,8 +191,8 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         //支持混合模式
         mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         userAgent = userAgentString
-        //不需要请求控制直接播放媒体文件即可以自动播放音乐
-        mediaPlaybackRequiresUserGesture = false
+        //false不需要请求控制直接播放媒体文件即可以自动播放音乐
+        mediaPlaybackRequiresUserGesture = true
         //支持插件
 //        pluginState = WebSettings.PluginState.ON
     }
@@ -232,7 +241,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     /**
      * 滚动监听器
      */
-    private var _scrollListener: ((dx: Int, dy: Int) -> Unit)? =     null
+    private var _scrollListener: ((dx: Int, dy: Int) -> Unit)? = null
 
     /**
      * 设置滚动监听器
@@ -321,7 +330,6 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         L.e(TAG, "onPageFinished $url : $title")
         _delegate?.onPageFinished(url, title, icon)
     }
-
     override fun shouldOverrideUrlLoading(url: String): Boolean {
         L.e(TAG, "shouldOverrideUrlLoading $url")
 
@@ -336,19 +344,19 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                     true
                 }
                 url.isProtocolUrl() -> false
+                url.startsWith(Protocol.FILE) -> false
                 else -> {
-//                    context.openIntentByDefault(url)
+                    context.openIntentByDefault(url)
                     false
                 }
             }
-
-
-        } catch (e: ActivityNotFoundException) {
-
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         return false
     }
+
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
         L.e(TAG, "doUpdateVisitedHistory $url isReload $isReload")
@@ -357,6 +365,10 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         else if (!isReload) {
             SQLHelper.saveOrUpdateRecord(title, url)
         }
+    }
+
+    override fun onReceivedError(url: String, code: Int, desc: String) {
+        L.e(TAG, "onReceivedError $url & code: $code & desc: $desc")
     }
 
     /**
@@ -485,7 +497,7 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
 
         fun doUpdateVisitedHistory(url: String, isReload: Boolean)
 
-        fun onReceivedError(url: String, code: Int, desc: String) {}
+        fun onReceivedError(url: String, code: Int, desc: String)
 
         fun shouldInterceptRequest(url: String): WebResourceResponse?
     }
@@ -584,20 +596,20 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
      * 自己定义加载错误处理效果，比如：定义在没有网络时候，显示一张无网络的图片
      * @targetSdk >= 23
      */
-//    @RequiresApi(Build.VERSION_CODES.M)
-//    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-//        delegate?.onReceivedError(view.url, error.errorCode, error.description.toString())
-//                ?: super.onReceivedError(view, request, error)
-//    }
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        delegate?.onReceivedError(request.url.toString(), error.errorCode, error.description.toString())
+                ?: super.onReceivedError(view, request, error)
+    }
 
     /**
      * 报告Web资源加载错误
      * @targetSdk < 23
      */
-//    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-//        delegate?.onReceivedError(failingUrl, errorCode, description)
-//                ?: super.onReceivedError(view, errorCode, description, failingUrl)
-//    }
+    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+        delegate?.onReceivedError(failingUrl, errorCode, description)
+                ?: super.onReceivedError(view, errorCode, description, failingUrl)
+    }
 
     /**
      * 提醒主机应用程序，请求已授权用户自动登录
@@ -700,8 +712,8 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
     /**
      * 获取网页Video的默认显示图
      */
-    override fun getDefaultVideoPoster(): Bitmap? {
-        return super.getDefaultVideoPoster()
+    override fun getDefaultVideoPoster(): Bitmap {
+        return BitmapFactory.decodeResource(App.instance.resources, R.drawable.poster)
     }
 
     /**

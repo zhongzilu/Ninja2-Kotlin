@@ -57,7 +57,7 @@ object Protocol {
     const val ABOUT_BLANK = "about:blank"
     const val ABOUT = "about:"
     const val MAIL_TO = "mailto:"
-    const val FILE = "file://"
+    const val FILE = "file:///"
     const val FTP = "ftp://"
     const val HTTP = "http://"
     const val HTTPS = "https://"
