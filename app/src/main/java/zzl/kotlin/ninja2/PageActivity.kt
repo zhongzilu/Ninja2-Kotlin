@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Message
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.security.KeyChain
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
 import android.support.v7.util.DiffUtil
@@ -666,7 +667,32 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
 
     override fun onReceivedClientCertRequest(request: ClientCertRequest) {
-        //todo 处理接收到SSL认证请求
+        //todo[Checked] 处理接收到SSL认证请求
+        KeyChain.choosePrivateKeyAlias(this, { alias ->
+            alias?.let {
+                if (it.isEmpty()) request.cancel()
+                else proceedClientCertRequest(request, it)
+            }
+        }, request.keyTypes,
+                request.principals,
+                request.host,
+                request.port,
+                null)
+    }
+
+    /**
+     * 处理SSL认证请求
+     */
+    private fun proceedClientCertRequest(request: ClientCertRequest, alias: String) {
+        doAsync {
+            try {
+                request.proceed(KeyChain.getPrivateKey(this@PageActivity, alias),
+                        KeyChain.getCertificateChain(this@PageActivity, alias))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                request.ignore()
+            }
+        }
     }
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
@@ -862,8 +888,9 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean {
-        //todo 告诉客户端显示一个对话框，以确认离开当前页面的导航
-        return false
+        //todo[Checked] 告诉客户端显示一个对话框，以确认离开当前页面的导航
+        jsResponseDialog(url, message, result)
+        return true
     }
 
     /**
