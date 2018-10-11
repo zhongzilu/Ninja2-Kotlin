@@ -133,11 +133,10 @@
     <string name="toast_import_pin_success">Import Pin success</string>
     <string name="toast_import_pin_failed">Import Pin failed</string>
 
-    <string name="app_feedback_url">https://github.com/mthli/Ninja2/issues</string>
+    <string name="app_feedback_url">https://github.com/zhongzilu/Ninja2-Kotlin/issues</string>
     <string name="app_intro_url">http://mthli.github.io/Ninja2-Introduction</string>
-    <string name="app_licenses_url">https://github.com/mthli/Ninja2/blob/master/README.md</string>
+    <string name="app_licenses_url">https://github.com/mthli/Ninja/blob/master/LICENSE</string>
     <string name="app_name">Ninja2</string>
-    <string name="com.crashlytics.android.build_id">4dbb2908–9c0a–4282–912c-fa86aacec976</string>
     <string name="preference_key_adblock">preference_key_adblock</string>
     <string name="preference_key_back_vibrate">Back vibrate</string>
     <string name="preference_key_clear_cookies">preference_key_clear_cookies</string>

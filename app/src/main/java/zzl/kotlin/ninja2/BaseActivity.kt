@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v4.content.pm.ShortcutInfoCompat
 import android.support.v4.content.pm.ShortcutManagerCompat
 import android.support.v4.graphics.drawable.IconCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import zzl.kotlin.ninja2.application.Protocol
@@ -136,6 +137,15 @@ abstract class BaseActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
             }
         }
+    }
+
+    private var mAlertDialog: AlertDialog.Builder? = null
+    fun dialogBuilder(): AlertDialog.Builder {
+        if (mAlertDialog == null) {
+            mAlertDialog = AlertDialog.Builder(this)
+        }
+
+        return mAlertDialog!!
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

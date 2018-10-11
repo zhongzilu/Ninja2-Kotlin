@@ -27,10 +27,12 @@ dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
-    implementation 'org.jetbrains.anko:anko-commons:0.10.4'
-    implementation "org.jetbrains.anko:anko-sqlite:0.10.4"
+    implementation ("org.jetbrains.anko:anko-sqlite:0.10.4"){
+        exclude group: "org.jetbrains.kotlin"
+    }
     testImplementation 'junit:junit:4.12'
 
-    implementation 'com.anthonycr.grant:permissions:1.0'
-//    implementation 'com.github.satyan:sugar:1.5'
+    implementation ('com.anthonycr.grant:permissions:1.0'){
+        exclude group: "com.android.support"
+    }
 }
