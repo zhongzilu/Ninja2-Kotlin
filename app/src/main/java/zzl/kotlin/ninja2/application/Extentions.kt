@@ -307,7 +307,9 @@ fun String.toColorUrl(): SpannableStringBuilder {
         }
     }
     val builder = SpannableStringBuilder(this)
-    builder.setSpan(ForegroundColorSpan(color), 0, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    if (endIndex > 0) {
+        builder.setSpan(ForegroundColorSpan(color), 0, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
     return builder
 }
 

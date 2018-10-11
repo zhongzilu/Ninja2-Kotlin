@@ -1235,9 +1235,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
 
         if (mPageView.isVisible()) {
-            mPageView.gone()
-            mPageView.stopLoading()
-            mPageView.onPause()
+            mPageView.onBackPressed()
             mPinsRecycler?.visible()
             mMenuOptionWidget.hideMoreMenu()
             mInputBox.setText("")
