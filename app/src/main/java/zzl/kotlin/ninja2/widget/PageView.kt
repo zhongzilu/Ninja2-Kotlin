@@ -139,6 +139,9 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         webChromeClient = PageChromeClient(this)
         setDownloadListener(mDownloadListener)
 
+        // AppRTC requires third party cookies to work
+        CookieManager.getInstance().acceptThirdPartyCookies(this)
+
         isAdBlock = SP.adBlock
     }
 
@@ -415,12 +418,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
-        L.e(TAG, "onJsAlert")
+        L.e(TAG, "onJsAlert: $url")
         return _delegate?.onJsAlert(url, message, result) ?: false
     }
 
     override fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
-        L.e(TAG, "onJsPrompt")
+        L.e(TAG, "onJsPrompt: $url")
         return _delegate?.onJsPrompt(url, message, defaultValue, result) ?: false
     }
 
@@ -440,7 +443,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onJsConfirm(url: String, message: String, result: JsResult): Boolean {
-        L.e(TAG, "onJsConfirm")
+        L.e(TAG, "onJsConfirm: $url")
         return _delegate?.onJsConfirm(url, message, result) ?: false
     }
 
@@ -692,6 +695,20 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
         fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback)
 
         fun onGeolocationPermissionsHidePrompt()
+    }
+
+    /**
+     * 获取网页Video的默认显示图
+     */
+    override fun getDefaultVideoPoster(): Bitmap? {
+        return super.getDefaultVideoPoster()
+    }
+
+    /**
+     * 获取访问的历史纪录列表
+     */
+    override fun getVisitedHistory(callback: ValueCallback<Array<String>>?) {
+        super.getVisitedHistory(callback)
     }
 
     /**

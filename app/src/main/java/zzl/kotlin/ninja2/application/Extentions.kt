@@ -340,7 +340,13 @@ fun String.isWebUrl() = Patterns.WEB_URL.matcher(this).matches()
 /**
  * 获取Url的主机地址部分
  */
-fun String.host() = URL(this).host
+fun String.host(): String{
+    return try {
+        URL(this).host
+    } catch (e: Exception){
+        this
+    }
+}
 
 /**
  * 将字符串转换为可用的Web URL
