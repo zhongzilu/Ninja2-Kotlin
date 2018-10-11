@@ -43,11 +43,11 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
         fun onReceivedClientCertRequest(request: ClientCertRequest)
 
-        fun onReceivedHttpAuthRequest(httpAuthHandler: HttpAuthHandler, str: String, str2: String)
+        fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String)
 
         fun onPermissionRequest(request: PermissionRequest)
 
-        fun onReceivedSslError(sslErrorHandler: SslErrorHandler, sslError: SslError)
+        fun onReceivedSslError(handler: SslErrorHandler, error: SslError)
 
         fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback)
 

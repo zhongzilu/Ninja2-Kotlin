@@ -20,9 +20,8 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.text.Editable
-import android.text.InputType
-import android.text.TextWatcher
+import android.text.*
+import android.text.style.StyleSpan
 import android.util.SparseArray
 import android.view.*
 import android.webkit.*
@@ -695,16 +694,54 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
     }
 
-    override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
-        //todo 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
-    }
-
     /**
      * @see https://blog.csdn.net/Crazy_zihao/article/details/51557425
      */
     override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
         //todo 处理HTTPS的网站加载HTTP的内容安全问题
         handler.proceed()
+
+        val host = mPageView.url.host()
+
+        val builder = SpannableStringBuilder().apply {
+            append(getString(R.string.dialog_message_ssl_error_prefix))
+            append(host)
+            setSpan(StyleSpan(1), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            append(getString(R.string.dialog_message_ssl_error_middle))
+            append(getSslErrorMsg(error))
+        }
+
+        dialogBuilder().setCancelable(false)
+                .setMessage(builder)
+                .setPositiveButton(R.string.dialog_button_cancel) { dialog, _ ->
+                    handler.cancel()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_button_process) { dialog, _ ->
+                    handler.proceed()
+                    dialog.dismiss()
+                }.create().show()
+    }
+
+    /**
+     * 获取Ssl错误提示信息文字
+     *
+     * @param sslError
+     * @return String 错误提示文字
+     */
+    private fun getSslErrorMsg(sslError: SslError): String {
+        return when (sslError.primaryError) {
+            SslError.SSL_NOTYETVALID -> resources.getString(R.string.ssl_error_notyetvalid)
+            SslError.SSL_EXPIRED -> resources.getString(R.string.ssl_error_expired)
+            SslError.SSL_IDMISMATCH -> resources.getString(R.string.ssl_error_idmismatch)
+            SslError.SSL_UNTRUSTED -> resources.getString(R.string.ssl_error_untrusted)
+            SslError.SSL_DATE_INVALID -> resources.getString(R.string.ssl_error_date_invalid)
+            else -> resources.getString(R.string.ssl_error_invalid)
+        }
+    }
+
+    override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
+        //todo 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
     }
 
     override fun onPageStarted(url: String, title: String, icon: Bitmap?) {
@@ -808,8 +845,51 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         //todo 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
     }
 
+    override fun onPermissionRequestCanceled(request: PermissionRequest) {
+        //通知主应用程序已经取消了请求访问指定资源的权限请求
+    }
+
     override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
-        //todo 处理网站请求访问用户地理位置权限
+        //todo[Checked] 处理网站请求访问用户地理位置权限
+        permission(Manifest.permission.ACCESS_FINE_LOCATION) {
+            showRequestLocationPermissionDialog(origin, callback)
+        }
+    }
+
+    override fun onGeolocationPermissionsHidePrompt() {
+        //处理取消网站访问地理位置的请求
+    }
+
+    /**
+     * 弹出网站请求获取用户地理位置权限的弹窗
+     */
+    private fun showRequestLocationPermissionDialog(origin: String, callback: GeolocationPermissions.Callback) {
+        //todo[BUG] 容易出现获取host不正确的问题
+        val host = mPageView.url.host()
+
+        val builder = SpannableStringBuilder().apply {
+            append(getString(R.string.dialog_message_allow_location_prefix))
+            append(host)
+            setSpan(StyleSpan(android.graphics.Typeface.BOLD), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            append(getString(R.string.dialog_message_allow_location_suffix))
+        }
+
+        dialogBuilder().setCancelable(true)
+                .setMessage(builder)
+                .setPositiveButton(R.string.dialog_button_allow) { dialog, _ ->
+                    callback.invoke(origin, true, true)
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_button_deny) { dialog, _ ->
+                    callback.invoke(origin, false, false)
+                    dialog.dismiss()
+                }
+                .setNeutralButton(R.string.dialog_button_block) { dialog, _ ->
+                    callback.invoke(origin, false, true)
+                    dialog.dismiss()
+                }.setOnCancelListener {
+                    callback.invoke(origin, false, false)
+                }.create().show()
     }
 
     override fun onReceivedTitle(url: String, title: String) {
@@ -873,18 +953,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         finishAndRemoveTask()
     }
 
-    override fun onPermissionRequestCanceled(request: PermissionRequest) {
-        //todo 通知主应用程序已经取消了请求访问指定资源的权限请求
-    }
-
     override fun onJsConfirm(url: String, message: String, result: JsResult): Boolean {
         //todo[Checked] 处理网站上的confirm弹窗
         jsResponseDialog(url, message, result)
         return true
-    }
-
-    override fun onGeolocationPermissionsHidePrompt() {
-        //todo 处理取消网站访问地理位置的请求
     }
 
     override fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean {
