@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <Switch
+        android:id="@+id/optionSwitch"
+        style="@style/MenuOptionItemStyle"
+        android:layout_height="@dimen/action_bar_size_56"
+        android:paddingEnd="8dp"
+        android:text="@string/label_quick_options"
+        android:textOff="@null"
+        android:textOn="@null"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/newTab"
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/options_new_tab" />
+
+    <TextView
+        android:id="@+id/privateTab"
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/options_private" />
+
+    <TextView
+        android:id="@+id/downloadImg"
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/options_download_image"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/copyUrl"
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/options_copy_url" />
+
+    <TextView
+        android:id="@+id/shareUrl"
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/options_share_url" />
+</LinearLayout>

@@ -41,4 +41,9 @@
         <item name="android:backgroundDimAmount">0.5</item>
     </style>
 
+    <style name="AppTheme.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
 </resources>

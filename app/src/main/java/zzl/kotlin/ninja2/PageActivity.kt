@@ -38,6 +38,7 @@ import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.AddLauncherDialog
 import zzl.kotlin.ninja2.widget.MenuOptionListener
 import zzl.kotlin.ninja2.widget.PageView
+import zzl.kotlin.ninja2.widget.QuickOptionDialog
 import java.io.IOException
 import java.util.*
 
@@ -91,13 +92,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 检查Intent传递的参数
      */
     private fun checkExtra() {
+        isPrivate = intent.getBooleanExtra(EXTRA_PRIVATE, false)
+        mPageView.setupViewMode(isPrivate)
+
         mTargetUrl = intent.getStringExtra(EXTRA_TARGET_URL)
         mTargetUrl?.let { if (it.isNotEmpty()) loadPage(it) }
 
         App.MESSAGE?.let { loadPage(it) }
-
-        isPrivate = intent.getBooleanExtra(EXTRA_PRIVATE, false)
-        mPageView.setupViewMode(isPrivate)
     }
 
     /**
@@ -698,15 +699,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * @see https://blog.csdn.net/Crazy_zihao/article/details/51557425
      */
     override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
-        //todo 处理HTTPS的网站加载HTTP的内容安全问题
-        handler.proceed()
-
+        //todo[Checked] 处理HTTPS的网站加载HTTP的内容安全问题
         val host = mPageView.url.host()
 
         val builder = SpannableStringBuilder().apply {
             append(getString(R.string.dialog_message_ssl_error_prefix))
             append(host)
-            setSpan(StyleSpan(1), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(android.graphics.Typeface.BOLD), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             append(getString(R.string.dialog_message_ssl_error_middle))
             append(getSslErrorMsg(error))
         }
@@ -785,8 +784,32 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         //todo 处理下载任务监听
     }
 
+    private var mQuickOptionDialog: QuickOptionDialog? = null
     override fun onWebViewLongPress(url: String) {
-        //todo 处理网页长按事件，弹出快捷菜单浮窗
+        //todo[Checked] 处理网页长按事件，弹出快捷菜单浮窗
+        if (mQuickOptionDialog == null) {
+            mQuickOptionDialog = QuickOptionDialog(this)
+                    .setQuickListener {
+                        quickNewTab = {
+                            if (SP.isOpenInBackground)
+                                openUrlOverviewScreen(it, taskId = taskId)
+                            else openUrl(it, taskId = taskId)
+                        }
+
+                        quickNewPrivateTab = {
+                            if (SP.isOpenInBackground)
+                                openUrlOverviewScreen(it, true, taskId)
+                            else openUrl(it, true, taskId)
+                        }
+
+                        quickDownloadImg = {
+
+                        }
+                    }
+
+        }
+
+        mQuickOptionDialog!!.setUrl(url).show()
     }
 
     private var mCustomView: View? = null

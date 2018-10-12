@@ -2,6 +2,8 @@ package zzl.kotlin.ninja2.application
 
 import android.animation.Animator
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -223,14 +225,30 @@ fun Context.shareText(text: String) {
  * @param mail  目标邮件地址
  */
 fun Context.sendMailTo(mail: String) {
-    val intent = Intent(Intent.ACTION_SEND)
-    val parse = MailTo.parse(mail)
-    intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(parse.to))
-    intent.putExtra(Intent.EXTRA_TEXT, parse.body)
-    intent.putExtra(Intent.EXTRA_SUBJECT, parse.subject)
-    intent.putExtra(Intent.EXTRA_CC, parse.cc)
-    intent.type = "message/rfc822"
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        val parse = MailTo.parse(mail)
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(parse.to))
+        putExtra(Intent.EXTRA_TEXT, parse.body)
+        putExtra(Intent.EXTRA_SUBJECT, parse.subject)
+        putExtra(Intent.EXTRA_CC, parse.cc)
+        type = "message/rfc822"
+    }
     startActivity(intent)
+}
+
+/**
+ * 将字符串拷贝到剪切板
+ */
+fun Context.copyToClipboard(text: String) {
+    // Gets a handle to the clipboard service.
+    val mClipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    // Creates a new text clip to put on the clipboard
+    val clip = ClipData.newPlainText(null, text.trim())
+
+    // Set the clipboard's primary clip.
+    mClipboard.primaryClip = clip
+    toast(resources.getString(R.string.toast_copy_url, text))
 }
 
 /**
@@ -342,10 +360,11 @@ fun String.isWebUrl() = Patterns.WEB_URL.matcher(this).matches()
 /**
  * 获取Url的主机地址部分
  */
-fun String.host(): String{
+fun String.host(): String {
     return try {
         URL(this).host
-    } catch (e: Exception){
+    } catch (e: Exception) {
+        e.printStackTrace()
         this
     }
 }
