@@ -151,6 +151,50 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         // AppRTC requires third party cookies to work
         CookieManager.getInstance().acceptThirdPartyCookies(this)
 
+        //@see http://www.cnblogs.com/classloader/p/5302784.html
+        setOnLongClickListener {
+            L.d(TAG, "longClick")
+            hitTestResult?.apply {
+                extra?.let { _delegate?.onWebViewLongPress(it) }
+                return@setOnLongClickListener when (type) {
+                    HitTestResult.EDIT_TEXT_TYPE -> {
+                        L.d(TAG, "选中的文字类型: ${this.extra}")
+                        false
+                    }
+                    HitTestResult.PHONE_TYPE -> {
+                        L.d(TAG, "处理拨号: ${this.extra}")
+                        false
+                    }
+                    HitTestResult.EMAIL_TYPE -> {
+                        L.d(TAG, "处理Email: ${this.extra}")
+                        context?.sendMailTo(this.extra)
+                        false
+                    }
+                    HitTestResult.GEO_TYPE -> {
+                        L.d(TAG, "地图类型: ${this.extra}")
+                        false
+                    }
+                    HitTestResult.SRC_ANCHOR_TYPE -> {
+                        L.d(TAG, "超链接: ${this.extra}")
+                        false
+                    }
+                    HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+                        L.d(TAG, "带有链接的图片类型: ${this.extra}")
+                        false
+                    }
+                    HitTestResult.IMAGE_TYPE -> {
+                        L.d(TAG, "处理长按图片的菜单项: ${this.extra}")
+                        false
+                    }
+                    else -> {
+                        L.d(TAG, "未知: ${this.extra}")
+                        false
+                    }
+                }
+            }
+            return@setOnLongClickListener false
+        }
+
         isAdBlock = SP.adBlock
     }
 
@@ -330,6 +374,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         L.e(TAG, "onPageFinished $url : $title")
         _delegate?.onPageFinished(url, title, icon)
     }
+
     override fun shouldOverrideUrlLoading(url: String): Boolean {
         L.e(TAG, "shouldOverrideUrlLoading $url")
 
@@ -650,7 +695,8 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
      * @targetSdk >= 21
      */
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-        return delegate?.shouldInterceptRequest(request.url.toString()) ?: super.shouldInterceptRequest(view, request)
+        return delegate?.shouldInterceptRequest(request.url.toString())
+                ?: super.shouldInterceptRequest(view, request)
     }
 
     /**
