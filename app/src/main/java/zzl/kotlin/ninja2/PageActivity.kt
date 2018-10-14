@@ -27,6 +27,8 @@ import android.view.*
 import android.webkit.*
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams
+import com.anthonycr.grant.PermissionsManager
+import com.anthonycr.grant.PermissionsResultAction
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.view.*
@@ -41,6 +43,7 @@ import zzl.kotlin.ninja2.widget.PageView
 import zzl.kotlin.ninja2.widget.QuickOptionDialog
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -865,7 +868,41 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        //todo 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
+        //todo[Checked] 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
+        val permission = arrayOfNulls<String>(0)
+        request.resources.forEach {
+            when (it) {
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE -> permission[permission.size] = Manifest.permission.CAMERA
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE -> permission[permission.size] = Manifest.permission.RECORD_AUDIO
+                else -> L.i(TAG, "request other permission: $it")
+            }
+        }
+
+        if (permission.isNotEmpty()) {
+            PermissionsManager.getInstance()
+                    .requestPermissionsIfNecessaryForResult(this, permission,
+                            object : PermissionsResultAction() {
+                                override fun onGranted() {
+                                    request.grant(permission)
+                                }
+
+                                override fun onDenied(permission: String) {
+                                    request.deny()
+                                    grantVideoAndAudioPermissionFail(permission)
+                                }
+                            })
+        }
+    }
+
+    /**
+     * 网页授权失败提示
+     * @param permission 申请的权限
+     */
+    private fun grantVideoAndAudioPermissionFail(permission: String) {
+        when (permission) {
+            Manifest.permission.CAMERA -> toast(R.string.toast_camera_permission_denied)
+            Manifest.permission.RECORD_AUDIO -> toast(R.string.toast_record_audio_permission_denied)
+        }
     }
 
     override fun onPermissionRequestCanceled(request: PermissionRequest) {
