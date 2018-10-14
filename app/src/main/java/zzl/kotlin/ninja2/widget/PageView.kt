@@ -153,8 +153,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
         //@see http://www.cnblogs.com/classloader/p/5302784.html
         setOnLongClickListener {
-            L.d(TAG, "longClick")
-            hitTestResult?.apply {
+            hitTestResult.apply {
                 extra?.let { _delegate?.onWebViewLongPress(it) }
                 return@setOnLongClickListener when (type) {
                     HitTestResult.EDIT_TEXT_TYPE -> {
@@ -163,12 +162,13 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                     }
                     HitTestResult.PHONE_TYPE -> {
                         L.d(TAG, "处理拨号: ${this.extra}")
-                        false
+                        context!!.callPhone(this.extra)
+                        true
                     }
                     HitTestResult.EMAIL_TYPE -> {
                         L.d(TAG, "处理Email: ${this.extra}")
-                        context?.sendMailTo(this.extra)
-                        false
+                        context!!.sendMailTo(this.extra)
+                        true
                     }
                     HitTestResult.GEO_TYPE -> {
                         L.d(TAG, "地图类型: ${this.extra}")

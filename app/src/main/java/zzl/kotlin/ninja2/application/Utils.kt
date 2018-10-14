@@ -62,6 +62,7 @@ object Protocol {
     const val HTTP = "http://"
     const val HTTPS = "https://"
     const val INTENT = "intent://"
+    const val TEL = "tel:"
 }
 
 /**

@@ -226,14 +226,29 @@ fun Context.shareText(text: String) {
  */
 fun Context.sendMailTo(mail: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
-        val parse = MailTo.parse(mail)
+        val parse = MailTo.parse(if (mail.startsWith(Protocol.MAIL_TO)) mail else Protocol.MAIL_TO + mail)
         putExtra(Intent.EXTRA_EMAIL, arrayOf(parse.to))
         putExtra(Intent.EXTRA_TEXT, parse.body)
         putExtra(Intent.EXTRA_SUBJECT, parse.subject)
         putExtra(Intent.EXTRA_CC, parse.cc)
         type = "message/rfc822"
     }
-    startActivity(intent)
+
+    supportIntent(intent) { startActivity(it) }
+}
+
+/**
+ * 调用拨号器界面
+ *
+ * @param phone 目标电话号码
+ */
+fun Context.callPhone(phone: String) {
+    val intent = Intent(Intent.ACTION_DIAL).apply {
+        data = Uri.parse(if (phone.startsWith(Protocol.TEL)) phone else Protocol.TEL + phone)
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
+    supportIntent(intent) { startActivity(it) }
 }
 
 /**
@@ -488,9 +503,9 @@ inline fun supportN(todo: () -> Unit) {
 /**
  * 判断Intent是否有效
  */
-inline fun Context.supportIntent(intent: Intent, todo: () -> Unit) {
+inline fun Context.supportIntent(intent: Intent, todo: (Intent) -> Unit) {
     if (intent.resolveActivity(packageManager) != null) {
-        todo()
+        todo(intent)
     } else {
         toast("没有可以处理的应用程序")
     }
