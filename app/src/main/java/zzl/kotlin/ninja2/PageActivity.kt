@@ -1335,9 +1335,9 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mPageView.apply {
             try {
                 val saveName = title
-                val bitmap = toBitmap(getContentWidth().toFloat(), contentHeight.toFloat())
 
                 doAsync {
+                    val bitmap = toBitmap(getContentWidth().toFloat(), contentHeight.toFloat())
                     val file = bitmap.save(saveName)
                     file.mediaScan(this@PageActivity)
 
