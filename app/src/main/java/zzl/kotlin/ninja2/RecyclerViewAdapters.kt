@@ -79,6 +79,16 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
         notifyItemChanged(position)
     }
 
+    /**
+     * 将指定位置的数据从集合中移除
+     * @param position 待删除的指定位置
+     */
+    fun removeItem(position: Int){
+        mList.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemChanged(position)
+    }
+
 }
 
 /**
