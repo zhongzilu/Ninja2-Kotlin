@@ -255,15 +255,17 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             /**
              * 撤销方法
              */
-            private fun revoke() {
+            fun revoke() {
                 //todo[Checked] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
                 //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
-                val index = array.size() - 1
-                val position = array.keyAt(index)
-                val pin = array.valueAt(index)
+//                val index = array.size() - 1
+                val position = array.keyAt(0)
+                val pin = array.valueAt(0)
 
                 mPinsAdapter.addItem(position, pin)
-                array.removeAt(index)
+                array.removeAt(0)
+
+                L.i(TAG, "revoke array size: ${array.size()}")
 
                 //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
                 //手动将recyclerView滑到顶部可以解决这个bug
@@ -272,7 +274,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 }
             }
 
-            private fun delete(event: Int) {
+            /**
+             * 删除方法
+             */
+            fun delete(event: Int) {
                 /*
                 * event 为消失原因。
                 * 连续删除多个item时，SnackBar挤掉前一个SnackBar导致的消失，将会直接删除，
@@ -282,9 +287,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 */
                 if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
                     //todo 处理滑动多条数据的删除
-                    val index = array.size() - 1
-                    val pin = array.valueAt(index)
-                    array.removeAt(index)
+                    val pin = array.valueAt(0)
+                    array.removeAt(0)
                     L.i(TAG, "array size: ${array.size()}")
 //                    doAsync {
 //                        SQLHelper.deletePin(pin)
