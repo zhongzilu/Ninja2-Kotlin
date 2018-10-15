@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import zzl.kotlin.ninja2.application.L
 import zzl.kotlin.ninja2.application.findViewOften
 
 /**
@@ -64,6 +65,15 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
      * @param pin 待添加的数据对象
      */
     fun addItem(position: Int, pin: Pin) {
+        L.i("-->", "position: $position")
+
+        if (position == mList.size){
+            mList.add(pin)
+            notifyItemInserted(position)
+            notifyItemRangeChanged(0, mList.size)
+            return
+        }
+
         mList.add(position, pin)
         notifyItemInserted(position)
         notifyItemChanged(position)

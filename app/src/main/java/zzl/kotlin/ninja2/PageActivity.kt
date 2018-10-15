@@ -243,53 +243,65 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             }
 
             override fun clearView(viewHolder: RecyclerView.ViewHolder) {
+                L.i(TAG, "clearView array size: ${array.size()}")
                 if (array.size() > 0) {
                     //如果队列中有数据，说明刚才有删掉一些item
                     Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.snackBar_button_repeal) {
-                                //todo[BUG] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
-                                //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
-                                val pin = array.valueAt(0)
-                                val position = array.keyAt(0)
-
-                                L.i(TAG, "position: $position")
-                                mPinsAdapter.addItem(position, pin)
-                                array.removeAt(0)
-
-                                //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
-                                //手动将recyclerView滑到顶部可以解决这个bug
-                                if (position == 0) {
-                                    mPinsRecycler?.smoothScrollToPosition(0)
-                                }
-
-                            }
-                            .addCallback(object : Snackbar.Callback() {
-
-                                //不撤销将执行删除操作，监听SnackBar消失事件，
-                                //SnackBar消失（非排挤式消失）出队、删除数据。
-                                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                    super.onDismissed(transientBottomBar, event)
-
-                                    /*
-                                    * event 为消失原因。
-                                    * 连续删除多个item时，SnackBar挤掉前一个SnackBar导致的消失，将会直接删除，
-                                    * event 为 DISMISS_EVENT_CONSECUTIVE。
-                                    * DISMISS_EVENT_ACTION为点击Action导致的消失，本代码中Action执行的动作为撤销，
-                                    * 因此不能执行删除操作，需要排除掉
-                                    */
-                                    if (event != DISMISS_EVENT_ACTION) {
-                                        //todo 处理滑动多条数据的删除
-                                        array.removeAt(0)
-//                                        doAsync {
-//                                            SQLHelper.deletePin(array.valueAt(0))
-//                                        }
-                                    }
-                                }
-
-                            }).show()
+                            .setAction(R.string.snackBar_button_repeal) { revoke() }
+                            .addCallback(mSnackCallback).show()
                 }
             }
 
+            /**
+             * 撤销方法
+             */
+            private fun revoke() {
+                //todo[Checked] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
+                //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
+                val index = array.size() - 1
+                val position = array.keyAt(index)
+                val pin = array.valueAt(index)
+
+                mPinsAdapter.addItem(position, pin)
+                array.removeAt(index)
+
+                //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
+                //手动将recyclerView滑到顶部可以解决这个bug
+                if (position == 0) {
+                    mPinsRecycler?.smoothScrollToPosition(0)
+                }
+            }
+
+            private fun delete(event: Int) {
+                /*
+                * event 为消失原因。
+                * 连续删除多个item时，SnackBar挤掉前一个SnackBar导致的消失，将会直接删除，
+                * event 为 DISMISS_EVENT_CONSECUTIVE。
+                * DISMISS_EVENT_ACTION为点击Action导致的消失，本代码中Action执行的动作为撤销，
+                * 因此不能执行删除操作，需要排除掉
+                */
+                if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
+                    //todo 处理滑动多条数据的删除
+                    val index = array.size() - 1
+                    val pin = array.valueAt(index)
+                    array.removeAt(index)
+                    L.i(TAG, "array size: ${array.size()}")
+//                    doAsync {
+//                        SQLHelper.deletePin(pin)
+//                    }
+                }
+            }
+
+            private val mSnackCallback = object : Snackbar.Callback() {
+
+                //不撤销将执行删除操作，监听SnackBar消失事件，
+                //SnackBar消失（非排挤式消失）出队、删除数据。
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                    delete(event)
+                }
+
+            }
         })
 
         ItemTouchHelper(callback).attachToRecyclerView(mPinsRecycler)
@@ -1295,6 +1307,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
 
         if (mPageView.isVisible()) {
+            mCurrentMode = Type.MODE_DEFAULT
             mPageView.onBackPressed()
             mPinsRecycler?.visible()
             mMenuOptionWidget.hideMoreMenu()
