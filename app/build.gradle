@@ -24,15 +24,22 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
-    implementation ("org.jetbrains.anko:anko-sqlite:0.10.4"){
+    implementation("org.jetbrains.anko:anko-sqlite:0.10.4") {
         exclude group: "org.jetbrains.kotlin"
     }
-    testImplementation 'junit:junit:4.12'
 
-    implementation ('com.anthonycr.grant:permissions:1.0'){
+    //动态权限申请
+    implementation('com.anthonycr.grant:permissions:1.0') {
         exclude group: "com.android.support"
     }
+
+    //测试
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support:appcompat-v7:27.1.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

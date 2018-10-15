@@ -66,7 +66,7 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
      */
     fun addItem(position: Int, pin: Pin) {
         L.i("-->", "position: $position")
-
+        L.i("-->", "size: ${mList.size}")
         if (position == mList.size){
             mList.add(pin)
             notifyItemInserted(position)
