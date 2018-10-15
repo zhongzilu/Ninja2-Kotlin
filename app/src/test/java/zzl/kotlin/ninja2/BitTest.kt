@@ -17,18 +17,18 @@ class BitTest {
         assertEquals(2, FLAG or (1 shl 1))
         assertEquals(4, FLAG or (1 shl 2))
     }
-//
-//    @Test
-//    fun testBitShlCount() {
-//        FLAG = FLAG or 1
-//        assertEquals(1, FLAG)
-//
-//        FLAG = FLAG or (1 shl 1)
-//        assertEquals(3, FLAG)
-//
-//        FLAG = FLAG or (1 shl 2)
-//        assertEquals(7, FLAG)
-//    }
+
+    @Test
+    fun testBitShlCount() {
+        FLAG = FLAG or 1
+        assertEquals(1, FLAG)
+
+        FLAG = FLAG or (1 shl 1)
+        assertEquals(3, FLAG)
+
+        FLAG = FLAG or (1 shl 2)
+        assertEquals(7, FLAG)
+    }
 
     @Test
     fun testBit2Boolean() {
@@ -53,13 +53,32 @@ class BitTest {
     }
 
     @Test fun testBoolean2Bit(){
-        var base = 4
-        //指定第2位为1
-        assertEquals(6, boolean2Bit(base, 1, true))
+        var base = 0
 
-        base = 6
+        //指定第1位为1
+        base = boolean2Bit(base, 0, true)
+        assertEquals(1, base)
+
+        //指定第2位为1
+        base = boolean2Bit(base, 1, true)
+        assertEquals(3, base)
+
+        //指定第3位为1
+        base = boolean2Bit(base, 2, true)
+        assertEquals(7, base)
+
         //指定第2位为0
-        assertEquals(4, boolean2Bit(base, 1, false))
+        base = boolean2Bit(base, 1, false)
+        assertEquals(5, base)
+
+        //指定第3位为0
+        base = boolean2Bit(base, 2, false)
+        assertEquals(1, base)
+
+        //指定第1位为0
+        base = boolean2Bit(base, 0, false)
+        assertEquals(0, base)
+
     }
 
     /**
@@ -74,7 +93,7 @@ class BitTest {
 
         return if (value) { // 将指定位改为1
             base or (1 shl bit)
-        } else { // 将指定为改为0
+        } else { // 将指定位改为0
             base and (1 shl bit).inv()
         }
     }
