@@ -27,6 +27,7 @@ import android.view.*
 import android.webkit.*
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams
+import collections.forEach
 import com.anthonycr.grant.PermissionsManager
 import com.anthonycr.grant.PermissionsResultAction
 import kotlinx.android.synthetic.main.activity_page.*
@@ -214,13 +215,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 // 如果是往左滑动，则先取出记录存到删除队列中，以备撤销使用
                 val pin = mPins[mCurrentEditorPosition]
                 L.i(TAG, "onSwiped pin position: $mCurrentEditorPosition")
-//                array.put(viewHolder.adapterPosition, pin)
-                array.put(mCurrentEditorPosition, pin)
+                array.put(viewHolder.adapterPosition, pin)
 
                 // 移除该条记录
-                mPins.removeAt(mCurrentEditorPosition)
-                mPinsAdapter.notifyItemRemoved(mCurrentEditorPosition)
-                mPinsAdapter.notifyItemChanged(mCurrentEditorPosition)
+                mPinsAdapter.removeItem(mCurrentEditorPosition)
             }
 
             override fun onMove(srcPosition: Int, targetPosition: Int): Boolean {
@@ -258,19 +256,19 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             fun revoke() {
                 //todo[Checked] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
                 //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
-//                val index = array.size() - 1
-                val position = array.keyAt(0)
-                val pin = array.valueAt(0)
+                val index = array.size() - 1
+                val position = array.keyAt(index)
+                val pin = array.valueAt(index)
 
                 mPinsAdapter.addItem(position, pin)
-                array.removeAt(0)
+                array.removeAt(index)
 
                 L.i(TAG, "revoke array size: ${array.size()}")
 
                 //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
                 //手动将recyclerView滑到顶部可以解决这个bug
                 if (position == 0) {
-                    mPinsRecycler?.smoothScrollToPosition(0)
+                    mPinsRecycler!!.smoothScrollToPosition(0)
                 }
             }
 
@@ -285,11 +283,16 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 * DISMISS_EVENT_ACTION为点击Action导致的消失，本代码中Action执行的动作为撤销，
                 * 因此不能执行删除操作，需要排除掉
                 */
-                if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
+                L.i(TAG, "array size: ${array.size()}")
+                if (event != Snackbar.Callback.DISMISS_EVENT_CONSECUTIVE) {
                     //todo 处理滑动多条数据的删除
-                    val pin = array.valueAt(0)
-                    array.removeAt(0)
-                    L.i(TAG, "array size: ${array.size()}")
+
+                    array.forEach { key, pin ->
+                        L.i(TAG, "position: $key & name: ${pin.title}")
+                    }
+                    array.clear()
+//                    val pin = array.valueAt(0)
+//                    array.removeAt(0)
 //                    doAsync {
 //                        SQLHelper.deletePin(pin)
 //                    }
