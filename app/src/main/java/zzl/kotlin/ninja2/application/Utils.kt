@@ -1,11 +1,16 @@
 package zzl.kotlin.ninja2.application
 
+import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Environment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import android.webkit.URLUtil
 import org.jetbrains.anko.doAsync
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,7 +28,6 @@ object WebUtil {
     const val MIME_TYPE_TEXT_PLAIN = "text/plain"
     const val MIME_TYPE_IMAGE = "image/*"
 
-    const val BASE_URL = "file:///android_asset/"
     val BOOKMARK_TYPE = "<dt><a href=\"{url}\" add_date=\"{time}\">{title}</a>"
     val BOOKMARK_TITLE = "{title}"
     val BOOKMARK_URL = "{url}"
@@ -54,6 +58,7 @@ object Protocol {
     const val PRIVATE_TAB = "ninja2://private/"
     const val NEW_TAB = "ninja2://new_tab/"
 
+    const val ASSET_FILE = "file:///android_asset/"
     const val ABOUT_BLANK = "about:blank"
     const val ABOUT = "about:"
     const val MAIL_TO = "mailto:"
@@ -148,6 +153,58 @@ object AdBlock {
             e.printStackTrace()
             false
         }
+    }
+}
+
+/**
+ * 网页下载工具类
+ * Created by zhongzilu on 2018-10-16
+ */
+object Download {
+
+    /**
+     * 调用浏览器进行下载，如果不存在浏览器，则调用下载管理器进行下载
+     * @param context Context
+     * @param url 下载地址
+     * @param contentDisposition 内容描述
+     * @param mimeType 文件类型
+     */
+    fun inBrowser(context: Context, url: String, contentDisposition: String, mimeType: String) {
+        val intent = Intent(Intent.ACTION_DEFAULT)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .setDataAndType(Uri.parse(url), mimeType)
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            inBackground(context, url, contentDisposition, mimeType)
+        }
+    }
+
+    /**
+     * 使用下载管理器进行下载
+     * @param context Context
+     * @param url 下载地址
+     * @param contentDisposition 内容描述
+     * @param mimeType 文件类型
+     */
+    fun inBackground(context: Context, url: String, contentDisposition: String, mimeType: String) {
+        var guessFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+
+        // 临时解决下载文件后缀名不匹配的问题
+        val suffix = url.substring(url.lastIndexOf("."))
+        guessFileName = guessFileName.replace(".bin", suffix)
+
+        L.i("DownloadUtil-->", "download guessFileName: $guessFileName")
+        val request = DownloadManager.Request(Uri.parse(url)).apply {
+            allowScanningByMediaScanner()
+            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            setTitle(guessFileName)
+            setMimeType(mimeType)
+            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, guessFileName)
+        }
+        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        manager.enqueue(request)
     }
 }
 

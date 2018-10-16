@@ -1,7 +1,6 @@
 package zzl.kotlin.ninja2.widget
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
@@ -27,7 +26,7 @@ import java.io.ByteArrayInputStream
  * Created by zhongzilu on 2018/8/1 0001.
  */
 class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener, DownloadListener {
 
     private val TAG = "PageView-->"
 
@@ -146,7 +145,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
         webViewClient = PageViewClient(context, this)
         webChromeClient = PageChromeClient(this)
-        setDownloadListener(mDownloadListener)
+        setDownloadListener(this)
 
         // AppRTC requires third party cookies to work
         CookieManager.getInstance().acceptThirdPartyCookies(this)
@@ -317,7 +316,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     override fun getContentHeight() = computeVerticalScrollRange()
 
     /**
-     *
+     * PageView代理
      */
     private var _delegate: Delegate? = null
 
@@ -325,11 +324,9 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         _delegate = delegate
     }
 
-    private object mDownloadListener : DownloadListener {
-        override fun onDownloadStart(url: String?, userAgent: String?, contentDisposition: String?, mimetype: String?, contentLength: Long) {
-            L.e(TAG, "onDownloadStart")
-        }
-
+    override fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
+        L.e(TAG, "onDownloadStart \n url: $url \n agent: $userAgent \n contentDisposition: $contentDisposition \n type: $mimetype \n contentLength: $contentLength")
+        _delegate?.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -392,7 +389,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                 url.startsWith(Protocol.FILE) -> false
                 else -> {
                     context.openIntentByDefault(url)
-                    false
+                    true
                 }
             }
         } catch (e: Exception) {
