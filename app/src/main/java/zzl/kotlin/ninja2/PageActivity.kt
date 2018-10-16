@@ -805,7 +805,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
-        //todo 处理下载任务监听
+        //todo[Checked] 处理下载任务监听
+        permission(Manifest.permission.WRITE_EXTERNAL_STORAGE){
+            Download.inBrowser(this, url, contentDisposition, mimetype)
+        }
     }
 
     private var mQuickOptionDialog: QuickOptionDialog? = null
@@ -1391,7 +1394,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             data?.let {
                 try {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
-                    //todo[BUG] 裁剪或缩放或压缩图片大小或尺寸，bitmap过大将不能创建桌面快捷方式
+                    //todo[BUG] bitmap过大将不能创建桌面快捷方式，解决方法：裁剪或缩放或压缩图片的大小或尺寸
                     if (bitmap.width > 192 || bitmap.height > 192) {
                         toast(resources.getString(R.string.toast_select_icon_size_error, 192, 192))
                         return@let
