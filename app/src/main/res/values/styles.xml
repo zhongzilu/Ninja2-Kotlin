@@ -32,13 +32,15 @@
     </style>
 
     <!-- 自定义loaddialogBuilderalog -->
-    <style name="AppTheme.Dialog" parent="android:style/Theme.Dialog">
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/white</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:backgroundDimAmount">0.5</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="AppTheme.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
