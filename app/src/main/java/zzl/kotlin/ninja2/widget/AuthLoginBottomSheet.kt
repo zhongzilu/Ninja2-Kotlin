@@ -98,8 +98,10 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
 
         //set download image option click even
         mLoginBtn.setOnClickListener {
-            _method = mPositiveListener
-            dismiss()
+            if (validate()) {
+                _method = mPositiveListener
+                dismiss()
+            }
         }
 
         //set copyToClipboard url option click even
@@ -113,6 +115,32 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
             _method?.invoke(this@AuthLoginBottomSheet)
             _method = null
         }
+    }
+
+    /**
+     * 验证输入内容
+     */
+    private fun validate(): Boolean {
+        val name = mUserNameEdit.text.toString().trim()
+        if (name.isEmpty()) {
+            mUserNameEdit.apply {
+                error = hint
+                requestFocus()
+            }
+
+            return false
+        }
+
+        val pass = mPasswordEdit.text.toString().trim()
+        if (pass.isEmpty()) {
+            mPasswordEdit.apply {
+                error = hint
+                requestFocus()
+            }
+            return false
+        }
+
+        return true
     }
 
     override fun show() {
