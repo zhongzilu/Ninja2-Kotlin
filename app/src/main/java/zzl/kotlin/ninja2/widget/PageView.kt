@@ -792,6 +792,8 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
      * 苹果为iOS设备配备了apple-touch-icon私有属性，添加该属性，
      * 在iPhone,iPad,iTouch的safari浏览器上可以使用添加到主屏按钮将网站添加到主屏幕上，
      * 方便用户以后访问。apple-touch-icon 标签支持sizes属性，可以用来放置对应不同的设备
+     *
+     * @see https://droidyue.com/blog/2015/01/18/deal-with-touch-icon-in-android/
      */
     override fun onReceivedTouchIconUrl(view: WebView, url: String, precomposed: Boolean) {
         delegate.onReceivedTouchIconUrl(url, precomposed)
