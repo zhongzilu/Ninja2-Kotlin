@@ -38,10 +38,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.application.*
-import zzl.kotlin.ninja2.widget.AddLauncherDialog
-import zzl.kotlin.ninja2.widget.MenuOptionListener
-import zzl.kotlin.ninja2.widget.PageView
-import zzl.kotlin.ninja2.widget.QuickOptionDialog
+import zzl.kotlin.ninja2.widget.*
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -762,7 +759,12 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
-        //todo 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
+        //todo[Checked] 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
+        AuthLoginBottomSheet(this).apply {
+            setTitle(host)
+            setOnPositiveClickListener { handler.proceed(getUserName(), getPassword()) }
+            setOnNegativeClickListener { handler.cancel() }
+        }.show()
     }
 
     override fun onPageStarted(url: String, title: String, icon: Bitmap?) {
