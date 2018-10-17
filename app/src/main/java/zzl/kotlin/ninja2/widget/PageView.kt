@@ -581,8 +581,8 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
     /**
      * 页面加载完成回调方法，获取对应url地址
      */
-    override fun onPageFinished(view: WebView, url: String) {
-        delegate?.onPageFinished(url, view.title, view.favicon)
+    override fun onPageFinished(view: WebView?, url: String) {
+        delegate?.onPageFinished(url, view?.title?:"", view?.favicon)
                 ?: super.onPageFinished(view, url)
     }
 

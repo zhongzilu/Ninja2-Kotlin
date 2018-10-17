@@ -7,10 +7,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.net.MailTo
 import android.net.Uri
 import android.os.Build
@@ -517,6 +514,26 @@ fun Bitmap.save(name: String): File {
     fileOutputStream.flush()
     fileOutputStream.close()
     return file
+}
+
+/**
+ * 对Bitmap进行缩放
+ *
+ * @param w 缩放的目标宽度
+ * @param h 缩放的目标高度
+ * @return 缩放后的Bitmap
+ */
+fun Bitmap.scale(w: Float, h: Float): Bitmap {
+    val temp = copy(config, true)
+    val width = temp.width
+    val height = temp.height
+    val scaleX = w / width
+    val scaleY = h / height
+    val matrix = Matrix()
+    matrix.postScale(scaleX, scaleY)
+    val bitmap = Bitmap.createBitmap(temp, 0, 0, width, height, matrix, false)
+    temp.recycle()
+    return bitmap
 }
 
 /**
