@@ -36,7 +36,7 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
      */
     private var url: String = ""
 
-    fun setUrl(url: String): AddLauncherDialog{
+    fun setUrl(url: String): AddLauncherDialog {
         this.url = url
         return this
     }
@@ -53,7 +53,7 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
      *
      * @return String 桌面图标标题
      */
-    fun getTitle() = mLabelText?.toString()?:""
+    fun getTitle() = mLabelText?.toString() ?: ""
 
     /**
      * 设置桌面图标标题
@@ -93,16 +93,17 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
      *
      * @return Bitmap？桌面图标Bitmap，可能为空
      */
-    fun getIcon(): Bitmap = mLauncherBitmap!!
+    fun getIcon(): Bitmap = mLauncherBitmap
+            ?: Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888)
 
     /**
      * 设置桌面图标Bitmap
      *
      * @param bitmap 桌面图标bitmap
      */
-    fun setIcon(bitmap: Bitmap): AddLauncherDialog {
+    fun setIcon(bitmap: Bitmap?): AddLauncherDialog {
         mLauncherBitmap = bitmap
-        mLauncherIcon?.setImageBitmap(mLauncherBitmap)
+        mLauncherBitmap?.let { mLauncherIcon?.setImageBitmap(it) }
         return this
     }
 

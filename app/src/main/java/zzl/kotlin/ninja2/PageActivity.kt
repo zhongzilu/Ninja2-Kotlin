@@ -1152,7 +1152,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                     }
         }
 
-        //todo[BUG] 当网站未设置favicon图标时，此方法会抛出异常
+        //todo[Checked] 当网站未设置favicon图标时，此方法会抛出异常
         mAddLauncherDialog!!
                 .setUrl(mPageView.url)
                 .setIcon(mPageView.favicon)
