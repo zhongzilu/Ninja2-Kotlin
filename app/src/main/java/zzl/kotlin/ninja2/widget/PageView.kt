@@ -393,8 +393,8 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                 }
                 url.isProtocolUrl() -> false
                 else -> {
-                    context.openIntentByDefault(url)
-                    true
+//                    context.openIntentByDefault(url)
+                    false
                 }
             }
         } catch (e: Exception) {
@@ -451,7 +451,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
-        L.e(TAG, "onGeolocationPermissionsShowPrompt")
+        L.e(TAG, "onGeolocationPermissionsShowPrompt origin: $origin")
         _delegate?.onGeolocationPermissionsShowPrompt(origin, callback)
     }
 

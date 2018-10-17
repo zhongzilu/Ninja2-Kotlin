@@ -806,7 +806,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     override fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
         //todo[Checked] 处理下载任务监听
-        permission(Manifest.permission.WRITE_EXTERNAL_STORAGE){
+        permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
             Download.inBrowser(this, url, contentDisposition, mimetype)
         }
     }
@@ -948,13 +948,12 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 弹出网站请求获取用户地理位置权限的弹窗
      */
     private fun showRequestLocationPermissionDialog(origin: String, callback: GeolocationPermissions.Callback) {
-        //todo[BUG] 容易出现获取host不正确的问题
-        val host = mPageView.url.host()
-
+        //todo[Checked] 容易出现获取host不正确的问题，解决方法：mPageView.url.host()改为使用origin参数
         val builder = SpannableStringBuilder().apply {
-            append(getString(R.string.dialog_message_allow_location_prefix))
-            append(host)
-            setSpan(StyleSpan(android.graphics.Typeface.BOLD), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            val prefix = getString(R.string.dialog_message_allow_location_prefix)
+            append(prefix)
+            append(origin)
+            setSpan(StyleSpan(android.graphics.Typeface.BOLD), prefix.length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             append(getString(R.string.dialog_message_allow_location_suffix))
         }
 
