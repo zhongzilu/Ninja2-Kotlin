@@ -122,5 +122,7 @@
     <string name="text_import_pin">导入书签</string>
     <string name="toast_msg_last_history">已经是最新的历史了</string>
     <string name="toast_msg_url_null">网络地址为空</string>
+    <string name="toast_download_in_background">开始下载 %1$s</string>
+    <string name="toast_no_handle_application">没有可以处理的应用程序</string>
 
 </resources>
