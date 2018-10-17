@@ -122,5 +122,7 @@
     <string name="text_import_pin">導入書籤</string>
     <string name="toast_msg_last_history">已經是最新的曆史了</string>
     <string name="toast_msg_url_null">網絡地址為空</string>
+    <string name="toast_download_in_background">開始下載 %1$s</string>
+    <string name="toast_no_handle_application">沒有可以處理的應用程序</string>
 
 </resources>

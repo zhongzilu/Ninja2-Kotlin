@@ -12,6 +12,8 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.webkit.URLUtil
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
+import zzl.kotlin.ninja2.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URI
@@ -66,7 +68,8 @@ object Protocol {
     const val FTP = "ftp://"
     const val HTTP = "http://"
     const val HTTPS = "https://"
-    const val INTENT = "intent://"
+    const val INTENT = "intent:"
+    const val INTENT_OLD = "#Intent;"
     const val TEL = "tel:"
 }
 
@@ -205,6 +208,7 @@ object Download {
         }
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         manager.enqueue(request)
+        context.toast(context.getString(R.string.toast_download_in_background, guessFileName))
     }
 }
 

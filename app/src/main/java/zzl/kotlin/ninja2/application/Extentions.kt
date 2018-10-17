@@ -37,6 +37,7 @@ import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URISyntaxException
 import java.net.URL
 import java.util.regex.Pattern
 
@@ -188,7 +189,17 @@ fun <T : View> View.findViewOften(viewId: Int): T {
 //==========Context相关==============
 
 fun Context.openIntentByDefault(url: String) {
-    startActivity(Intent.parseUri(url, Intent.URI_INTENT_SCHEME))
+    val intent = url.parseIntent()
+    val component = intent.resolveActivity(packageManager)
+    if (component != null) {
+        if (component.packageName == packageName) {
+            startActivity(intent)
+        } else {
+            invokeApp(component.packageName) {
+                toast(R.string.toast_no_handle_application)
+            }
+        }
+    }
 }
 
 inline fun <reified T : Activity> Context.go() {
@@ -349,7 +360,36 @@ fun String.toColorUrl(): SpannableStringBuilder {
 /**
  * 验证字符串是否是Intent
  */
-fun String.isIntent() = isNotEmpty() && startsWith(Protocol.INTENT)
+fun String.isIntent(): Boolean {
+    if (isEmpty()) return false
+    return startsWith(Protocol.INTENT) || startsWith(Protocol.INTENT_OLD)
+}
+
+/**
+ * 解析网页上的Intent字符串，代码来自：
+ * @see https://droidyue.com/blog/2014/11/23/start-android-application-when-click-a-link/
+ */
+fun String.parseIntent(): Intent {
+    var intent = Intent()
+    // Parse intent URI into Intent Object
+    var flags = 0
+    var isIntentUri = false
+    if (startsWith(Protocol.INTENT)) {
+        isIntentUri = true
+        flags = Intent.URI_INTENT_SCHEME
+    } else if (startsWith(Protocol.INTENT_OLD)) {
+        isIntentUri = true
+    }
+    if (isIntentUri) {
+        try {
+            intent = Intent.parseUri(this, flags)
+        } catch (e: URISyntaxException) {
+            e.printStackTrace()
+        }
+
+    }
+    return intent
+}
 
 /**
  * 扩展属性
@@ -366,6 +406,11 @@ fun String.isProtocolUrl() = pattern.matcher(this).matches()
  * 验证是否带有协议头{@link #Protocol.MAIL_TO}的Url
  */
 fun String.isEmailTo() = isNotEmpty() && startsWith(Protocol.MAIL_TO)
+
+/**
+ * 验证是否带有协议头{@link #Protocol.TEL}的url
+ */
+fun String.isTel() = isNotEmpty() && startsWith(Protocol.TEL)
 
 /**
  * 验证是否是Web路径
@@ -507,7 +552,19 @@ inline fun Context.supportIntent(intent: Intent, todo: (Intent) -> Unit) {
     if (intent.resolveActivity(packageManager) != null) {
         todo(intent)
     } else {
-        toast("没有可以处理的应用程序")
+        toast(R.string.toast_no_handle_application)
+    }
+}
+
+/**
+ * 通过包名启动其他应用，假如应用已经启动了在后台运行，则会将应用切到前台
+ */
+fun Context.invokeApp(pkg: String, todo: () -> Unit) {
+    val intent = packageManager.getLaunchIntentForPackage(pkg)
+    if (intent != null) {
+        startActivity(intent)
+    } else {
+        todo()
     }
 }
 

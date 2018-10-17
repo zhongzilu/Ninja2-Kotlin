@@ -152,46 +152,48 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
         //@see http://www.cnblogs.com/classloader/p/5302784.html
         setOnLongClickListener {
-            hitTestResult.apply {
-                extra?.let { _delegate?.onWebViewLongPress(it) }
-                return@setOnLongClickListener when (type) {
-                    HitTestResult.EDIT_TEXT_TYPE -> {
-                        L.d(TAG, "选中的文字类型: ${this.extra}")
-                        false
-                    }
-                    HitTestResult.PHONE_TYPE -> {
-                        L.d(TAG, "处理拨号: ${this.extra}")
-                        context!!.callPhone(this.extra)
-                        true
-                    }
-                    HitTestResult.EMAIL_TYPE -> {
-                        L.d(TAG, "处理Email: ${this.extra}")
-                        context!!.sendMailTo(this.extra)
-                        true
-                    }
-                    HitTestResult.GEO_TYPE -> {
-                        L.d(TAG, "地图类型: ${this.extra}")
-                        false
-                    }
-                    HitTestResult.SRC_ANCHOR_TYPE -> {
-                        L.d(TAG, "超链接: ${this.extra}")
-                        false
-                    }
-                    HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
-                        L.d(TAG, "带有链接的图片类型: ${this.extra}")
-                        false
-                    }
-                    HitTestResult.IMAGE_TYPE -> {
-                        L.d(TAG, "处理长按图片的菜单项: ${this.extra}")
-                        false
-                    }
-                    else -> {
-                        L.d(TAG, "未知: ${this.extra}")
-                        false
-                    }
+            val result = hitTestResult
+            return@setOnLongClickListener when (result.type) {
+                HitTestResult.EDIT_TEXT_TYPE -> {
+                    L.d(TAG, "选中的文字类型: ${result.extra}")
+                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    false
+                }
+                HitTestResult.PHONE_TYPE -> {
+                    L.d(TAG, "处理拨号: ${result.extra}")
+                    context!!.callPhone(result.extra)
+                    true
+                }
+                HitTestResult.EMAIL_TYPE -> {
+                    L.d(TAG, "处理Email: ${result.extra}")
+                    context!!.sendMailTo(result.extra)
+                    true
+                }
+                HitTestResult.GEO_TYPE -> {
+                    L.d(TAG, "地图类型: ${result.extra}")
+                    false
+                }
+                HitTestResult.SRC_ANCHOR_TYPE -> {
+                    L.d(TAG, "超链接: ${result.extra}")
+                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    false
+                }
+                HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+                    L.d(TAG, "带有链接的图片类型: ${result.extra}")
+                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    false
+                }
+                HitTestResult.IMAGE_TYPE -> {
+                    L.d(TAG, "处理长按图片的菜单项: ${result.extra}")
+                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    false
+                }
+                else -> {
+                    L.d(TAG, "未知: ${result.extra}")
+                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    false
                 }
             }
-            return@setOnLongClickListener false
         }
 
         isAdBlock = SP.adBlock
@@ -385,8 +387,11 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                     context.sendMailTo(url)
                     true
                 }
+                url.isTel() -> {
+                    context.callPhone(url)
+                    true
+                }
                 url.isProtocolUrl() -> false
-                url.startsWith(Protocol.FILE) -> false
                 else -> {
                     context.openIntentByDefault(url)
                     true
