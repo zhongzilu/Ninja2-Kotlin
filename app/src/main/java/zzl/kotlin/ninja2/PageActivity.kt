@@ -505,6 +505,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         if (SP.isShowKeyboard) {
             showKeyboard()
         }
+
+        //todo 地址栏控制
     }
 
     /**
@@ -813,7 +815,11 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     private var mQuickOptionDialog: QuickOptionDialog? = null
-    override fun onWebViewLongPress(url: String) {
+    private val isImage = arrayOf(WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+            WebView.HitTestResult.IMAGE_TYPE
+    )
+
+    override fun onWebViewLongPress(url: String, type: Int) {
         //todo[Checked] 处理网页长按事件，弹出快捷菜单浮窗
         if (mQuickOptionDialog == null) {
             mQuickOptionDialog = QuickOptionDialog(this)
@@ -831,13 +837,15 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                         }
 
                         quickDownloadImg = {
-
+                            permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                                Download.inBackground(this@PageActivity, it, WebUtil.HEADER_CONTENT_DISPOSITION, WebUtil.MIME_TYPE_IMAGE)
+                            }
                         }
                     }
 
         }
 
-        mQuickOptionDialog!!.setUrl(url).show()
+        mQuickOptionDialog!!.setUrl(url).isImageUrl(type in isImage).show()
     }
 
     private var mCustomView: View? = null
