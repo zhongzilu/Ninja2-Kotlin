@@ -20,6 +20,7 @@ object PinTable {
     val ID = "_id"
     val TITLE = "title"
     val URL = "url"
+    val TIME = "time"
     val VISIT = "visit"
 }
 
@@ -52,6 +53,7 @@ class SQL(ctx: Context = App.instance) : ManagedSQLiteOpenHelper(ctx, SQL.DB_NAM
                 PinTable.ID to INTEGER + PRIMARY_KEY,
                 PinTable.TITLE to TEXT,
                 PinTable.URL to TEXT,
+                PinTable.TIME to TEXT,
                 PinTable.VISIT to INTEGER)
 
         //创建历史记录表
@@ -107,6 +109,7 @@ object SQLHelper {
             insert(PinTable.NAME,
                     PinTable.TITLE to pin.title,
                     PinTable.URL to pin.url,
+                    PinTable.TIME to pin.time,
                     PinTable.VISIT to pin.visit)
         }
     }
@@ -122,6 +125,7 @@ object SQLHelper {
             insert(PinTable.NAME,
                     PinTable.TITLE to title,
                     PinTable.URL to url,
+                    PinTable.TIME to System.currentTimeMillis().toString(),
                     PinTable.VISIT to 0)
         }
     }

@@ -21,9 +21,12 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import zzl.kotlin.ninja2.R
 import java.io.BufferedReader
+import java.io.File
+import java.io.FileWriter
 import java.io.InputStreamReader
 import java.net.URI
 import java.net.URISyntaxException
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -35,13 +38,6 @@ object WebUtil {
     const val MIME_TYPE_TEXT_HTML = "text/html"
     const val MIME_TYPE_TEXT_PLAIN = "text/plain"
     const val MIME_TYPE_IMAGE = "image/*"
-
-    val BOOKMARK_TYPE = "<dt><a href=\"{url}\" add_date=\"{time}\">{title}</a>"
-    val BOOKMARK_TITLE = "{title}"
-    val BOOKMARK_URL = "{url}"
-    val BOOKMARK_TIME = "{time}"
-    const val INTRODUCTION_EN = "ninja_introduction_en.html"
-    const val INTRODUCTION_ZH = "ninja_introduction_zh.html"
 
     val SEARCH_ENGINE_GOOGLE = "https://www.google.com/search?q=%s"
     val SEARCH_ENGINE_DUCKDUCKGO = "https://duckduckgo.com/?q=%s"
@@ -222,6 +218,54 @@ object Download {
             e.printStackTrace()
             context.toast(e.localizedMessage)
         }
+    }
+}
+
+object Bookmark {
+
+    val FILE_NAME = "ninja2.%s.html"
+    val ITEM = "<DT><A HREF=\"{url}\" ADD_DATE=\"{time}\">{title}</A></DT>"
+    val TITLE = "{title}"
+    val URL = "{url}"
+    val TIME = "{time}"
+    val TEMPLATE = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
+            "<!-- This is an automatically generated file.\n" +
+            "     It will be read and overwritten.\n" +
+            "     DO NOT EDIT! -->\n" +
+            "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
+            "<TITLE>Bookmarks</TITLE>\n" +
+            "<H1>Bookmarks</H1>\n" +
+            "<DL>%s</DL>"
+
+    fun import() {
+
+    }
+
+    /**
+     * 导出书签方法
+     *
+     * 注意：
+     * 1.该方法未开新线程进行耗时操作，请自行在异步线程调用;
+     * 2.该方法涉及文件写入操作，因此Android 6.0+ (API 23)上需要动态申请存储写入权限
+     */
+    fun export() {
+
+        val stringBuilder = StringBuilder()
+        val pins = SQLHelper.findAllPins()
+        pins.forEach {
+            val item = ITEM.replace(URL, it.url).replace(TIME, it.time).replace(TITLE, it.title)
+            stringBuilder.append(item)
+        }
+
+        val fileString = TEMPLATE.format(stringBuilder)
+
+        val file = File(Environment.getExternalStorageDirectory(),
+                FILE_NAME.format(SimpleDateFormat("yyyy-MM-dd", Locale.CHINA).format(Date())))
+        FileWriter(file).use {
+            it.write(fileString)
+            it.flush()
+        }
+
     }
 }
 
