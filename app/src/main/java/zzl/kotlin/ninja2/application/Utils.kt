@@ -1,5 +1,7 @@
 package zzl.kotlin.ninja2.application
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
@@ -10,6 +12,10 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import android.view.MotionEvent
+import android.view.VelocityTracker
+import android.view.View
+import android.view.ViewConfiguration
 import android.webkit.URLUtil
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
@@ -365,5 +371,133 @@ class DefaultItemTouchHelperCallback(callback: Callback?) : ItemTouchHelper.Call
          * @param viewHolder ViewHolder
          */
         fun clearView(viewHolder: RecyclerView.ViewHolder)
+    }
+}
+
+/**
+ * 源代码来自：https://github.com/mthli/Ninja/blob/master/Ninja/src/io/github/mthli/Ninja/View/SwipeToBoundListener.java
+ * Created by zhongzilu on 2018-10-18
+ */
+class SwipeToBoundListener(private val view: View, private val callback: BoundCallback) : View.OnTouchListener {
+
+    private var targetWidth = 1
+    private val slop: Int
+    private val animTime: Long
+
+    private var downX: Float = 0.toFloat()
+    private var translationX: Float = 0.toFloat()
+    private var swiping: Boolean = false
+    private var swipingLeft: Boolean = false
+    private var canSwitch: Boolean = false
+    private var swipingSlop: Int = 0
+    private var velocityTracker: VelocityTracker? = null
+
+    interface BoundCallback {
+        fun canSwipe(): Boolean
+        fun onSwipe()
+        fun onBound(canSwitch: Boolean, left: Boolean)
+    }
+
+    init {
+        val configuration = ViewConfiguration.get(view.context)
+        slop = configuration.scaledTouchSlop
+        animTime = view.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        swiping = false
+        swipingLeft = false
+        canSwitch = false
+    }
+
+    override fun onTouch(v: View, event: MotionEvent): Boolean {
+        if (!callback.canSwipe()) {
+            return false
+        }
+
+        event.offsetLocation(translationX, 0f)
+        if (targetWidth < 2) {
+            targetWidth = view.width
+        }
+
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                downX = event.rawX
+
+                velocityTracker = VelocityTracker.obtain()
+                velocityTracker!!.addMovement(event)
+
+                return false
+            }
+            MotionEvent.ACTION_UP -> {
+                if (velocityTracker == null) {
+                    return false
+                }
+
+                velocityTracker!!.addMovement(event)
+                velocityTracker!!.computeCurrentVelocity(1000)
+
+                if (swiping) {
+                    view.animate()
+                            .translationX(0f)
+                            .setDuration(animTime)
+                            .setListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    callback.onBound(canSwitch, swipingLeft)
+                                }
+                            })
+                }
+
+                downX = 0f
+                translationX = 0f
+                swiping = false
+                velocityTracker!!.recycle()
+                velocityTracker = null
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                if (velocityTracker == null) {
+                    return false
+                }
+
+                view.animate()
+                        .translationX(0f)
+                        .setDuration(animTime)
+                        .setListener(null)
+
+                downX = 0f
+                translationX = 0f
+                swiping = false
+                velocityTracker!!.recycle()
+                velocityTracker = null
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (velocityTracker == null) {
+                    return false
+                }
+
+                velocityTracker!!.addMovement(event)
+
+                val deltaX = event.rawX - downX
+                if (Math.abs(deltaX) > slop) {
+                    swiping = true
+                    swipingLeft = deltaX < 0
+                    canSwitch = Math.abs(deltaX) >= view.context.dip2px(48f) // Can switch tabs when deltaX >= 48 to prevent misuse
+                    swipingSlop = if (deltaX > 0) slop else -slop
+                    view.parent.requestDisallowInterceptTouchEvent(true)
+
+                    val cancelEvent = MotionEvent.obtainNoHistory(event)
+                    cancelEvent.action = MotionEvent.ACTION_CANCEL or (event.actionIndex shl MotionEvent.ACTION_POINTER_INDEX_SHIFT)
+                    view.onTouchEvent(cancelEvent)
+                    cancelEvent.recycle()
+                }
+
+                if (swiping) {
+                    translationX = deltaX
+                    view.translationX = deltaX - swipingSlop
+                    callback.onSwipe()
+
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 }
