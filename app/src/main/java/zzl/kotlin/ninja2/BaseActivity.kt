@@ -12,6 +12,7 @@ import android.support.v4.graphics.drawable.IconCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import com.anthonycr.grant.PermissionsManager
 import zzl.kotlin.ninja2.application.Protocol
 import zzl.kotlin.ninja2.application.ShortcutAddedReceiver
 import zzl.kotlin.ninja2.application.Type
@@ -157,4 +158,8 @@ abstract class BaseActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionsManager.getInstance().notifyPermissionsChange(permissions, grantResults)
+    }
 }
