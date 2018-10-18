@@ -22,6 +22,7 @@ import zzl.kotlin.ninja2.application.SP
 import zzl.kotlin.ninja2.application.SQLHelper
 import zzl.kotlin.ninja2.application.versionName
 import zzl.kotlin.ninja2.widget.CustomUADialog
+import zzl.kotlin.ninja2.widget.ExportImportBottomSheet
 
 /**
  * 设置页面
@@ -129,6 +130,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         //书签导入导出
             R.string.preference_title_import_export_pin -> {
                 //todo 处理书签的导入/导出
+                showExportImportBottomSheet()
             }
 
         //自定义UA
@@ -149,6 +151,19 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
             }
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference)
+    }
+
+    /**
+     * 弹出导入导出底部菜单栏
+     */
+    private fun showExportImportBottomSheet() {
+        ExportImportBottomSheet(activity)
+                .setOnImportOptionClick {
+                    Toast.makeText(activity, "click import", Toast.LENGTH_SHORT).show()
+                }
+                .setOnExportOptionClick {
+                    Toast.makeText(activity, "click export", Toast.LENGTH_SHORT).show()
+                }.show()
     }
 
     /**

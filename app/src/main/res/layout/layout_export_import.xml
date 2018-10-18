@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <TextView
+        android:id="@+id/exportOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="10dp"
+        android:drawableStart="@drawable/ic_export_gray"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="@string/text_export_pin"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/importOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="10dp"
+        android:drawableStart="@drawable/ic_import_gray"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="@string/text_import_pin"
+        android:textSize="16sp" />
+
+</LinearLayout>
