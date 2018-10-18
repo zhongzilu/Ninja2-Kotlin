@@ -21,6 +21,8 @@ import zzl.kotlin.ninja2.application.*
 import java.io.ByteArrayInputStream
 
 
+
+
 /**
  * 自定义WebView
  * Created by zhongzilu on 2018/8/1 0001.
@@ -314,6 +316,16 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
             else -> settings.userAgentString = userAgent
         }
         reload()
+    }
+
+    /**
+     * 获取访问の历史记录
+     * @param steps 向前: +  向后: -
+     * @return WebHistoryItem
+     */
+    fun getBackOrForwardHistoryItem(steps: Int): WebHistoryItem {
+        val history = copyBackForwardList()
+        return history.getItemAtIndex(history.currentIndex + steps)
     }
 
     /**

@@ -507,8 +507,62 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             showKeyboard()
         }
 
-        //todo 地址栏控制
+        //todo[Checked] 地址栏控制
+        setOmniboxControlListener()
     }
+
+    /**
+     * 设置地址栏控制切换历史的监听器
+     * Created by zhongzilu on 2018-10-18
+     */
+    private fun setOmniboxControlListener() {
+        if (!SP.omniboxCtrl) {
+            mInputBox.setOnTouchListener(null)
+            return
+        }
+
+        mInputBox.setOnTouchListener(SwipeToBoundListener(toolbar, object : SwipeToBoundListener.BoundCallback {
+            private val keyListener = mInputBox.keyListener
+            override fun canSwipe(): Boolean = mBottomSheetBehavior.isCollapsed() && mCurrentMode == Type.MODE_WEB
+
+            override fun onSwipe() {
+                mInputBox.keyListener = null
+                mInputBox.isFocusable = false
+                mInputBox.isFocusableInTouchMode = false
+                mInputBox.clearFocus()
+            }
+
+            override fun onBound(canSwitch: Boolean, left: Boolean) {
+                mInputBox.keyListener = keyListener
+                mInputBox.isFocusable = true
+                mInputBox.isFocusableInTouchMode = true
+                mInputBox.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                mInputBox.clearFocus()
+
+                if (!canSwitch) return
+                val msg: String
+                if (left) {
+                    if (mPageView.canGoBackOrForward(-1)) {
+                        msg = mPageView.getBackOrForwardHistoryItem(-1).title
+                        mPageView.goBack()
+                    } else {
+                        restUiAndStatus()
+                        return
+                    }
+                } else {
+                    if (mPageView.canGoBackOrForward(+1)) {
+                        msg = mPageView.getBackOrForwardHistoryItem(+1).title
+                        mPageView.goForward()
+                    } else {
+                        msg = getString(R.string.toast_msg_last_history)
+                    }
+                }
+                toast(msg)
+            }
+
+        }))
+    }
+
 
     /**
      * 根据Message信息加载网页页面
@@ -666,6 +720,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         //监听地址栏固定设置
             getString(R.string.preference_key_omnibox_fixed) -> setInputBoxNestScroll()
+
+            getString(R.string.preference_key_omnibox_control) -> setOmniboxControlListener()
         }
     }
 
@@ -1277,6 +1333,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mInputBox.setText("")
         mInputBox.hideKeyboard()
 
+        mPinsRecycler?.visible()
         mRecordRecycler?.visibleDo { it.gone() }
         mPageView?.visibleDo { it.gone() }
         mProgress?.visibleDo { it.gone() }
