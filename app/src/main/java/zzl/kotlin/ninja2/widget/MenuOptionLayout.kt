@@ -37,7 +37,7 @@ class MenuOptionLayout : NestedScrollView, SharedPreferences.OnSharedPreferenceC
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == Key.UA){
-            initUserAgent(true)
+            initUserAgent()
         }
     }
 
@@ -56,11 +56,13 @@ class MenuOptionLayout : NestedScrollView, SharedPreferences.OnSharedPreferenceC
 
         //桌面模式菜单
         mDesktopSwitch.setOnCheckedChangeListener { _, isChecked ->
+            SP.enableUA = isChecked
             mListener?.onDesktopCheckedChanged(isChecked)
         }
 
         //自定义UA
         mCustomUASwitch.setOnCheckedChangeListener{_, isChecked ->
+            SP.enableUA = isChecked
             mListener?.onCustomUACheckedChanged(isChecked)
         }
 
@@ -89,21 +91,18 @@ class MenuOptionLayout : NestedScrollView, SharedPreferences.OnSharedPreferenceC
             mListener?.onSettingsClick()
         }
 
-        initUserAgent(false)
+        initUserAgent()
     }
 
-    private fun initUserAgent(check: Boolean) {
+    private fun initUserAgent() {
         if (SP.UA.isEmpty()){
             mDesktopSwitch.visible()
             mCustomUASwitch.gone()
+            mDesktopSwitch.isChecked = SP.enableUA
         } else {
             mDesktopSwitch.gone()
             mCustomUASwitch.visible()
-        }
-
-        if (check){
-            mDesktopSwitch.isChecked = false
-            mCustomUASwitch.isChecked = false
+            mCustomUASwitch.isChecked = SP.enableUA
         }
     }
 

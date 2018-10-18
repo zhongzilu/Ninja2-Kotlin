@@ -112,11 +112,16 @@
 
     <string name="toast_add_to_launcher_successful">Add %1$s to launcher</string>
     <string name="toast_camera_permission_denied">Camera permission denied</string>
-    <string name="toast_clear_cookies">Clear cookies</string>
+    <string name="toast_clear_cookies">Clear cookies?</string>
+    <string name="toast_clear_cookies_success">Clear cookies Success</string>
     <string name="toast_clear_cookies_error">Clear cookies error</string>
     <string name="toast_clear_form_data">Clear form data</string>
-    <string name="toast_clear_history">Clear history</string>
-    <string name="toast_clear_passwords">Clear passwords</string>
+    <string name="toast_clear_form_data_success">Clear form data success</string>
+    <string name="toast_clear_form_data_error">Clear form data error</string>
+    <string name="toast_clear_history">Clear history?</string>
+    <string name="toast_clear_history_success">Clear history success</string>
+    <string name="toast_clear_passwords">Clear passwords?</string>
+    <string name="toast_clear_passwords_success">Clear passwords success</string>
     <string name="toast_copy_url">Copy %1$s</string>
     <string name="toast_download_failed">Download failed</string>
     <string name="toast_downloading">Downloading %1$s</string>
@@ -140,13 +145,14 @@
     <string name="app_licenses_url">https://github.com/mthli/Ninja/blob/master/LICENSE</string>
     <string name="app_name">Ninja2</string>
     <string name="preference_key_adblock">preference_key_adblock</string>
-    <string name="preference_key_back_vibrate">Back vibrate</string>
+    <string name="preference_key_back_vibrate">preference_key_back_vibrate</string>
     <string name="preference_key_clear_cookies">preference_key_clear_cookies</string>
     <string name="preference_key_clear_form_data">preference_key_clear_form_data</string>
     <string name="preference_key_clear_history">preference_key_clear_history</string>
     <string name="preference_key_import_export_pin">preference_key_import_export_pin</string>
     <string name="preference_key_clear_passwords">preference_key_clear_passwords</string>
     <string name="preference_key_custom_user_agent">preference_key_custom_user_agent</string>
+    <string name="preference_key_enable_user_agent">preference_key_enable_user_agent</string>
     <string name="preference_key_enable_multiple_windows">preference_key_enable_multiple_windows</string>
     <string name="preference_key_feedback">preference_key_feedback</string>
     <string name="preference_key_fingerprint_extension">preference_key_fingerprint_extension</string>

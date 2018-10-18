@@ -63,6 +63,12 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     }
 
     private var _method: ((String) -> Unit)? = null
+        get() {
+            val m = field
+            field = null
+            return m
+        }
+
     private fun initEvent() {
 
         //set switch event
@@ -103,10 +109,7 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
         }
 
         //set dismiss listener
-        setOnDismissListener {
-            _method?.invoke(_url)
-            _method = null
-        }
+        setOnDismissListener { _method?.invoke(_url) }
     }
 
     private var _url = ""
@@ -116,7 +119,7 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
      *
      * @url 这里是设置网页上长按获取到的连接
      */
-    fun setUrl(url: String): QuickOptionDialog{
+    fun setUrl(url: String): QuickOptionDialog {
         _url = url.trim()
         return this
     }
@@ -124,7 +127,7 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     /**
      * 设置下载图片菜单选项是否显示
      */
-    fun isImageUrl(bool: Boolean): QuickOptionDialog{
+    fun isImageUrl(bool: Boolean): QuickOptionDialog {
         if (bool) {
             mDownloadImg.visible()
         } else {

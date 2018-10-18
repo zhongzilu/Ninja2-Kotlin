@@ -55,6 +55,11 @@ object SP {
     var UA: String by ctx.preference(Key.UA, "")
 
     /**
+     * 是否开启使用UA，默认为false
+     */
+    var enableUA: Boolean by ctx.preference(Key.ENABLE_UA, false)
+
+    /**
      * 是否开启多窗口
      */
     val isEnableMultipleWindows: Boolean by ctx.preference(Key.MULTIPLE_WINDOW, true)
@@ -103,6 +108,10 @@ object Key {
 
     val UA: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_custom_user_agent)
+    }
+
+    val ENABLE_UA: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_enable_user_agent)
     }
 
     val OPEN_IN_BG: String by lazy(LazyThreadSafetyMode.NONE) {

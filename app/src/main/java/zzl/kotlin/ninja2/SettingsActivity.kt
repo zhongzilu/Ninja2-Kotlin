@@ -10,14 +10,18 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceScreen
 import android.provider.Settings
-import android.support.v7.app.AlertDialog
+import android.support.design.widget.Snackbar
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebViewDatabase
 import android.widget.Toast
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.application.Key
 import zzl.kotlin.ninja2.application.SP
+import zzl.kotlin.ninja2.application.SQLHelper
 import zzl.kotlin.ninja2.application.versionName
+import zzl.kotlin.ninja2.widget.CustomUADialog
 
 /**
  * 设置页面
@@ -49,7 +53,7 @@ class SettingsActivity : BaseActivity() {
     }
 }
 
-class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener{
+class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var isWaiting = false
     fun isWaiting() = isWaiting
@@ -79,60 +83,81 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * 处理设置选项的点击事件
      */
     override fun onPreferenceTreeClick(preferenceScreen: PreferenceScreen?, preference: Preference): Boolean {
-        when(preference.titleRes){
-            //清空Cookies
-            R.string.preference_title_clear_cookies -> CookieManager.getInstance().apply {
+        when (preference.titleRes) {
+        //清空Cookies
+            R.string.preference_title_clear_cookies -> Snackbar(R.string.toast_clear_cookies) {
+                CookieManager.getInstance().apply {
                     flush()
-                    removeAllCookies{ flag ->
-                        if (flag) toast(R.string.toast_clear_cookies)
+                    removeAllCookies { flag ->
+                        if (flag) toast(R.string.toast_clear_cookies_success)
                         else toast(R.string.toast_clear_cookies_error)
                     }
                 }
-
-            //清空表单数据
-            R.string.preference_title_clear_form_data -> dialog(R.string.preference_title_clear_form_data){
-                WebViewDatabase.getInstance(activity).clearFormData()
-                toast(R.string.toast_clear_form_data)
             }
 
-            //清空历史记录
-            R.string.preference_title_clear_history -> dialog(R.string.preference_title_clear_history){
-                //todo 清空历史纪录
+        //清空表单数据
+            R.string.preference_title_clear_form_data -> Snackbar(R.string.toast_clear_form_data) {
+                try {
+                    WebViewDatabase.getInstance(activity).clearFormData()
+                    WebViewDatabase.getInstance(activity).clearUsernamePassword()
+                    toast(R.string.toast_clear_form_data_success)
+                } catch (e: Exception) {
+                    toast(R.string.toast_clear_form_data_error)
+                }
             }
 
-            //清空网站密码
-            R.string.preference_title_clear_passwords -> dialog(R.string.preference_title_clear_passwords){
+        //清空历史记录
+            R.string.preference_title_clear_history -> Snackbar(R.string.toast_clear_history) {
+                //todo[Checked] 清空历史纪录
+                doAsync {
+                    SQLHelper.clearAllRecord()
+                    uiThread { toast(R.string.toast_clear_history_success) }
+                }
+            }
+
+        //清空网站密码
+            R.string.preference_title_clear_passwords -> Snackbar(R.string.toast_clear_passwords) {
                 WebViewDatabase.getInstance(activity).clearHttpAuthUsernamePassword()
-                toast(R.string.toast_clear_passwords)
+                toast(R.string.toast_clear_passwords_success)
             }
 
-            //指纹识别扩展
+        //todo 长按返回时震动
+        //todo 指纹识别扩展
             R.string.preference_title_fingerprint_extension ->
                 activity.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
 
-            //书签导入导出
+        //书签导入导出
             R.string.preference_title_import_export_pin -> {
                 //todo 处理书签的导入/导出
             }
 
-            //自定义UA
+        //自定义UA
             R.string.preference_title_custom_user_agent -> {
-                //todo 实现UA的自定设置
+                //todo[Checked] 实现UA的自定义设置
+                showCustomUADialog()
             }
 
-            //反馈
+        //反馈
             R.string.preference_title_feedback -> openUrl(getString(R.string.app_feedback_url))
 
-            //开源协议
+        //开源协议
             R.string.preference_title_licenses -> openUrl(getString(R.string.app_licenses_url))
 
-            //版本
+        //版本
             R.string.preference_title_version -> {
                 //todo 应用版本的问题
             }
         }
-
         return super.onPreferenceTreeClick(preferenceScreen, preference)
+    }
+
+    /**
+     * 弹出自定义UA编辑框
+     */
+    private fun showCustomUADialog() {
+        CustomUADialog(activity).setUA(SP.UA)
+                .setOnPositiveClickListener { SP.UA = it.getUA() }
+                .show()
     }
 
     /**
@@ -140,7 +165,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      */
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 
-        when(key){
+        when (key) {
             Key.SCREENSHOT -> {
                 if (SP.canScreenshot) {
                     val manager = activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -158,21 +183,28 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         }
     }
 
-    private var mAlertDialog: AlertDialog.Builder? = null
-    private fun dialog(msg: Int, confirm: () -> Unit){
-        if (mAlertDialog == null) {
-            mAlertDialog = AlertDialog.Builder(activity)
-                    .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-        }
+//    private var mAlertDialog: AlertDialog.Builder? = null
+//    private fun dialog(msg: Int, confirm: () -> Unit) {
+//        if (mAlertDialog == null) {
+//            mAlertDialog = AlertDialog.Builder(activity)
+//                    .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
+//                        dialog.dismiss()
+//                    }
+//        }
+//
+//        mAlertDialog!!
+//                .setMessage(msg)
+//                .setPositiveButton(R.string.dialog_button_confirm) { _, _ ->
+//                    confirm()
+//                }.show()
+//
+//    }
 
-        mAlertDialog!!
-                .setMessage(msg)
-                .setPositiveButton(R.string.dialog_button_confirm) { _, _ ->
+    private fun Snackbar(msg: Int, confirm: () -> Unit) {
+        Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
+                .setAction(R.string.dialog_button_confirm) {
                     confirm()
                 }.show()
-
     }
 
     /**
@@ -190,7 +222,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         findPreference(getString(R.string.preference_key_version)).summary = activity.versionName()
     }
 
-    private fun setSearchEngines(){
+    private fun setSearchEngines() {
         //todo 动态添加搜索引擎
         val engines: ListPreference = findPreference(getString(R.string.preference_key_search_engine_id)) as ListPreference
 //        engines.entries
@@ -199,11 +231,11 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     /**
      * 设置Cookie大小的摘要文字
      */
-    private fun setCookieSummary(){
+    private fun setCookieSummary() {
         findPreference(getString(R.string.preference_key_clear_cookies)).summary = "0Mb"
     }
 
-    private fun toast(msg: Int){
+    private fun toast(msg: Int) {
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
     }
 
@@ -211,9 +243,9 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * 以新页面打开网络地址
      * @param url 目标访问地址
      */
-    private fun openUrl(url: String){
+    private fun openUrl(url: String) {
         val target = activity
-        if (target is BaseActivity){
+        if (target is BaseActivity) {
             target.openUrl(url)
         }
     }
