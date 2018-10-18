@@ -221,6 +221,10 @@ object Download {
     }
 }
 
+/**
+ * 书签导入导出辅助工具类
+ * Created by zhongzilu on 2018-10-09
+ */
 object Bookmark {
 
     val FILE_NAME = "ninja2.%s.html"
