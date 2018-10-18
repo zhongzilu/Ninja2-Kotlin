@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.content_bottom_sheet.*
 import kotlinx.android.synthetic.main.content_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.application.*
@@ -721,12 +722,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      */
     override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
         //todo[Checked] 处理HTTPS的网站加载HTTP的内容安全问题
-        val host = mPageView.url.host()
+        val host = error.url.host()
 
         val builder = SpannableStringBuilder().apply {
-            append(getString(R.string.dialog_message_ssl_error_prefix))
+            val prefix = getString(R.string.dialog_message_ssl_error_prefix)
+            append(prefix)
             append(host)
-            setSpan(StyleSpan(android.graphics.Typeface.BOLD), length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(android.graphics.Typeface.BOLD), prefix.length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             append(getString(R.string.dialog_message_ssl_error_middle))
             append(getSslErrorMsg(error))
         }
@@ -785,7 +787,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         //show progress
         mProgress.visible()
-        mProgress.progress = 0
+//        mProgress.progress = 0
 
         //set menu item
         showMenu(stop = true)
@@ -815,7 +817,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     private var mQuickOptionDialog: QuickOptionDialog? = null
-    private val isImage = arrayOf(WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
+    private val mImageType = arrayOf(WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE,
             WebView.HitTestResult.IMAGE_TYPE
     )
 
@@ -845,7 +847,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         }
 
-        mQuickOptionDialog!!.setUrl(url).isImageUrl(type in isImage).show()
+        mQuickOptionDialog!!.setUrl(url).isImageUrl(type in mImageType).show()
     }
 
     private var mCustomView: View? = null
@@ -1013,7 +1015,9 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
         //todo[Checked] 处理网站上的alert弹窗
-        jsResponseDialog(url, message, result)
+//        jsResponseDialog(url, message, result)
+        longToast(message)
+        result.confirm()
         return true
     }
 
@@ -1036,7 +1040,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
         //todo[Checked] 处理请求主应用程序创建一个新窗口
         App.MESSAGE = resultMsg
-        openUrl("", this.isPrivate, taskId)
+        openUrl("", isPrivate, taskId)
         return true
     }
 
@@ -1078,16 +1082,18 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mInputBox.clearFocus()
         mMaskView.setOnTouchListener(null)
 
-        _closedTodo?.let {
-            it.invoke()
-            _closedTodo = null
-        }
+        _closedTodo?.invoke()
     }
 
     /**
      * 关闭底部菜单后执行任务
      */
     private var _closedTodo: (() -> Unit)? = null
+        get() {
+            val m = field
+            field = null
+            return m
+        }
 
     private fun closeBottomSheet(todo: (() -> Unit)? = null) {
         _closedTodo = todo

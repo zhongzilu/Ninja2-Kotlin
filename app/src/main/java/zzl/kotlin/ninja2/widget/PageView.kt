@@ -96,9 +96,18 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         initWebView()
         initWebSetting()
         settingMultipleWindow()
+        initUserAgent()
         setWebContentsDebuggingEnabled(true)
         PreferenceManager.getDefaultSharedPreferences(context)
                 .registerOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun initUserAgent() {
+        if (SP.enableUA){
+            val ua = SP.UA
+            if (ua.isNotEmpty()) settings.userAgentString = ua
+            else settings.userAgentString = WebUtil.UA_DESKTOP
+        }
     }
 
     override fun onResume() {

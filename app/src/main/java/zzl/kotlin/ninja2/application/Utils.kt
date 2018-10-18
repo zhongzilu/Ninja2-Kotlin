@@ -200,16 +200,21 @@ object Download {
         guessFileName = guessFileName.replace(".bin", suffix)
 
         L.i("DownloadUtil-->", "download guessFileName: $guessFileName")
-        val request = DownloadManager.Request(Uri.parse(url)).apply {
-            allowScanningByMediaScanner()
-            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            setTitle(guessFileName)
-            setMimeType(mimeType)
-            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, guessFileName)
+        try {
+            val request = DownloadManager.Request(Uri.parse(url)).apply {
+                allowScanningByMediaScanner()
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setTitle(guessFileName)
+                setMimeType(mimeType)
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, guessFileName)
+            }
+            val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            manager.enqueue(request)
+            context.toast(context.getString(R.string.toast_download_in_background, guessFileName))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            context.toast(e.localizedMessage)
         }
-        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        manager.enqueue(request)
-        context.toast(context.getString(R.string.toast_download_in_background, guessFileName))
     }
 }
 
