@@ -41,6 +41,7 @@ object WebUtil {
     val SEARCH_ENGINE_DUCKDUCKGO = "https://duckduckgo.com/?q=%s"
     val SEARCH_ENGINE_BING = "http://www.bing.com/search?q=%s"
     val SEARCH_ENGINE_BAIDU = "http://www.baidu.com/s?wd=%s"
+    val SEARCH_ENGINE_GITHUB = "https://github.com/search?q=%s&ref=opensearch"
 
     const val UA_DESKTOP = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     const val URL_ENCODE = "UTF-8"

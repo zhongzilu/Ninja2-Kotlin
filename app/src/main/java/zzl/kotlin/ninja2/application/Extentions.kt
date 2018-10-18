@@ -449,6 +449,7 @@ fun String.parseUrl(): String {
                 Type.SEARCH_DUCKDUCKGO -> WebUtil.SEARCH_ENGINE_DUCKDUCKGO
                 Type.SEARCH_BING -> WebUtil.SEARCH_ENGINE_BING
                 Type.SEARCH_BAIDU -> WebUtil.SEARCH_ENGINE_BAIDU
+                Type.SEARCH_GITHUB -> WebUtil.SEARCH_ENGINE_GITHUB
                 else -> ""
             }
 

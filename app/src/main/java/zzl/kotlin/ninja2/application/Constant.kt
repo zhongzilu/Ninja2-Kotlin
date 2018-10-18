@@ -15,10 +15,11 @@ object Type {
     const val UA_DESKTOP    = 1 //桌面式UserAgent
     const val UA_CUSTOM     = 2 //自定义UserAgent
 
-    const val SEARCH_GOOGLE = "0"
-    const val SEARCH_DUCKDUCKGO = "1"
-    const val SEARCH_BING = "2"
-    const val SEARCH_BAIDU = "3"
+    const val SEARCH_GOOGLE = "0"       //Google
+    const val SEARCH_DUCKDUCKGO = "1"   //DuckDuckGo
+    const val SEARCH_BING = "2"         //Bing
+    const val SEARCH_BAIDU = "3"        //Baidu
+    const val SEARCH_GITHUB = "4"       //Github
 
     const val EXTRA_SHORTCUT_BROADCAST = "name" //添加桌面图标的广播Intent Extra标识
 }
