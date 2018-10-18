@@ -75,7 +75,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
         fun onPermissionRequestCanceled(request: PermissionRequest)
 
-        fun onWebViewLongPress(url: String)
+        fun onWebViewLongPress(url: String, type: Int)
 
         fun onJsConfirm(url: String, message: String, result: JsResult): Boolean
 
@@ -156,7 +156,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
             return@setOnLongClickListener when (result.type) {
                 HitTestResult.EDIT_TEXT_TYPE -> {
                     L.d(TAG, "选中的文字类型: ${result.extra}")
-                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+//                    result.extra?.let { _delegate?.onWebViewLongPress(it, result.type) }
                     false
                 }
                 HitTestResult.PHONE_TYPE -> {
@@ -175,22 +175,22 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                 }
                 HitTestResult.SRC_ANCHOR_TYPE -> {
                     L.d(TAG, "超链接: ${result.extra}")
-                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    result.extra?.let { _delegate?.onWebViewLongPress(it, result.type) }
                     false
                 }
                 HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
                     L.d(TAG, "带有链接的图片类型: ${result.extra}")
-                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    result.extra?.let { _delegate?.onWebViewLongPress(it, result.type) }
                     false
                 }
                 HitTestResult.IMAGE_TYPE -> {
                     L.d(TAG, "处理长按图片的菜单项: ${result.extra}")
-                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    result.extra?.let { _delegate?.onWebViewLongPress(it, result.type) }
                     false
                 }
                 else -> {
                     L.d(TAG, "未知: ${result.extra}")
-                    result.extra?.let { _delegate?.onWebViewLongPress(it) }
+                    result.extra?.let { _delegate?.onWebViewLongPress(it, result.type) }
                     false
                 }
             }

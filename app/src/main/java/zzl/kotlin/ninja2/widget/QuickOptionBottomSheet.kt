@@ -124,12 +124,13 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     /**
      * 设置下载图片菜单选项是否显示
      */
-    fun isImageUrl(bool: Boolean){
+    fun isImageUrl(bool: Boolean): QuickOptionDialog{
         if (bool) {
             mDownloadImg.visible()
         } else {
             mDownloadImg.gone()
         }
+        return this
     }
 
     /**

@@ -50,6 +50,7 @@ object WebUtil {
     const val URL_PREFIX_GOOGLE_PLUS = "plus.url.google.com/url?q="
     const val URL_SUFFIX_GOOGLE_PLUS = "&rct"
 
+    const val HEADER_CONTENT_DISPOSITION = "Content-Disposition: attachment;"
 }
 
 /**
