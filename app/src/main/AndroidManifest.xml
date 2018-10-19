@@ -110,11 +110,24 @@
             android:label="@string/label_settings"
             android:theme="@style/SettingsActivityTheme" />
 
+        <!--桌面快捷方式广播接收器-->
         <receiver android:name=".application.ShortcutAddedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
             </intent-filter>
         </receiver>
+
+        <!--无障碍服务-->
+        <service
+            android:name=".application.FingerprintService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility" />
+        </service>
 
     </application>
 

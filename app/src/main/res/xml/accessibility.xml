@@ -4,4 +4,4 @@
     android:accessibilityFeedbackType="feedbackGeneric"
     android:description="@string/app_intro_accessibility"
     android:notificationTimeout="100"
-    android:packageNames="com.zzl.ninja" />
+    android:packageNames="zzl.kotlin.ninja2" />
