@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.ListPreference
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceScreen
@@ -259,11 +258,11 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         findPreference(getString(R.string.preference_key_version)).summary = activity.versionName()
     }
 
-    private fun setSearchEngines() {
+//    private fun setSearchEngines() {
         //todo 动态添加搜索引擎
-        val engines: ListPreference = findPreference(getString(R.string.preference_key_search_engine_id)) as ListPreference
+//        val engines: ListPreference = findPreference(getString(R.string.preference_key_search_engine_id)) as ListPreference
 //        engines.entries
-    }
+//    }
 
     /**
      * 设置Cookie大小的摘要文字
