@@ -1,5 +1,7 @@
 package zzl.kotlin.ninja2
 
+import android.Manifest
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -17,10 +19,7 @@ import android.webkit.WebViewDatabase
 import android.widget.Toast
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import zzl.kotlin.ninja2.application.Key
-import zzl.kotlin.ninja2.application.SP
-import zzl.kotlin.ninja2.application.SQLHelper
-import zzl.kotlin.ninja2.application.versionName
+import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.CustomUADialog
 import zzl.kotlin.ninja2.widget.ExportImportBottomSheet
 
@@ -158,12 +157,35 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      */
     private fun showExportImportBottomSheet() {
         ExportImportBottomSheet(activity)
-                .setOnImportOptionClick {
-                    Toast.makeText(activity, "click import", Toast.LENGTH_SHORT).show()
+                .setOnImportOptionClick { importPins() }
+                .setOnExportOptionClick { exportPins() }.show()
+    }
+
+    /**
+     * 导入书签文件
+     */
+    private fun importPins() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "text/html"
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        startActivityForResult(intent, Type.CODE_CHOOSE_FILE)
+    }
+
+    /**
+     * 导出书签文件
+     */
+    private fun exportPins() {
+        activity.permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+            doAsync {
+                try {
+                    val file = Bookmark.export()
+                    uiThread { toast(getString(R.string.toast_export_pin_success, file.path)) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    uiThread { toast(R.string.toast_export_pin_failed) }
                 }
-                .setOnExportOptionClick {
-                    Toast.makeText(activity, "click export", Toast.LENGTH_SHORT).show()
-                }.show()
+            }
+        }
     }
 
     /**
@@ -254,6 +276,10 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
     }
 
+    private fun toast(msg: String) {
+        Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
+    }
+
     /**
      * 以新页面打开网络地址
      * @param url 目标访问地址
@@ -264,4 +290,28 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
             target.openUrl(url)
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) return
+
+        if (requestCode == Type.CODE_CHOOSE_FILE) {
+            val uri = data?.data ?: return
+            if (!uri.path.endsWith(Bookmark.SUFFIX)) {
+                toast(R.string.toast_import_pin_failed)
+                return
+            }
+
+            doAsync {
+                try {
+                    Bookmark.import(uri)
+                    uiThread { toast(R.string.toast_import_pin_success) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    uiThread { toast(R.string.toast_import_pin_failed) }
+                }
+            }
+        }
+    }
+
 }

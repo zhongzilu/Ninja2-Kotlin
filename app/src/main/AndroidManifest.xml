@@ -23,19 +23,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--<meta-data android:name="DATABASE" android:value="ninja2.db" />-->
-        <!--<meta-data android:name="VERSION" android:value="1" />-->
-        <!--<meta-data android:name="QUERY_LOG" android:value="true" />-->
-        <!--<meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="zzl.kotlin.ninja2" />-->
-
         <activity
             android:name=".RouteActivity"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/MainActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
@@ -51,6 +46,7 @@
 
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.WEB_SEARCH" />
@@ -60,6 +56,44 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
+            <!--支持HTML文档查阅-->
+            <!--https://blog.csdn.net/pandarick/article/details/7228461-->
+            <!--http://www.cnblogs.com/newcj/archive/2011/08/10/2134305.html-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:mimeType="text/html"
+                    android:scheme="file" />
+
+            </intent-filter>
+
+            <!--支持MarkDown文档查阅-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VIEW" />-->
+                <!--<action android:name="android.intent.action.EDIT" />-->
+
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<category android:name="android.intent.category.BROWSABLE" />-->
+
+                <!--<data-->
+                    <!--android:host="*"-->
+                    <!--android:mimeType="*/*"-->
+                    <!--android:pathPattern=".*\\.md"-->
+                    <!--android:scheme="file" />-->
+
+                <!--<data-->
+                    <!--android:host="*"-->
+                    <!--android:mimeType="application/pdf"-->
+                    <!--android:pathPattern=".*\\.pdf"-->
+                    <!--android:scheme="file" />-->
+
+            <!--</intent-filter>-->
         </activity>
 
         <activity
@@ -68,7 +102,7 @@
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize"
             android:hardwareAccelerated="true"
             android:theme="@style/PageActivityTheme"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".SettingsActivity"
@@ -78,7 +112,7 @@
 
         <receiver android:name=".application.ShortcutAddedReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
             </intent-filter>
         </receiver>
 

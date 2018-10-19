@@ -20,10 +20,7 @@ import android.webkit.URLUtil
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import zzl.kotlin.ninja2.R
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileWriter
-import java.io.InputStreamReader
+import java.io.*
 import java.net.URI
 import java.net.URISyntaxException
 import java.text.SimpleDateFormat
@@ -227,22 +224,39 @@ object Download {
  */
 object Bookmark {
 
-    val FILE_NAME = "ninja2.%s.html"
-    val ITEM = "<DT><A HREF=\"{url}\" ADD_DATE=\"{time}\">{title}</A></DT>"
-    val TITLE = "{title}"
-    val URL = "{url}"
-    val TIME = "{time}"
-    val TEMPLATE = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
+    const val SUFFIX = ".html"
+    const val FILE_NAME = "Ninja2.%s.html"
+    const val ITEM = "<DT><A HREF=\"{url}\" ADD_DATE=\"{time}\">{title}</A>\n"
+    const val TITLE = "{title}"
+    const val URL = "{url}"
+    const val TIME = "{time}"
+    const val TEMPLATE = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
             "<!-- This is an automatically generated file.\n" +
             "     It will be read and overwritten.\n" +
             "     DO NOT EDIT! -->\n" +
             "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
+            "<META NAME=\"viewport\" CONTENT=\"width=device-width, initial-scale=1.0\">\n" +
             "<TITLE>Bookmarks</TITLE>\n" +
             "<H1>Bookmarks</H1>\n" +
-            "<DL>%s</DL>"
+            "<DL>\n%s</DL>"
 
-    fun import() {
+    /**
+     * 导入书签
+     *
+     * 注意：该方法未开新线程进行文件IO耗时操作，请自行在异步线程调用
+     */
+    fun import(uri: Uri) {
+        val file = File(URI(uri.toString()))
 
+        FileReader(file).forEachLine {
+            if (it.trim().startsWith("<DT><A ", true)) {
+
+                val title = readTitle(it)
+                val url = readUrl(it)
+
+                SQLHelper.savePin(title, url)
+            }
+        }
     }
 
     /**
@@ -252,7 +266,7 @@ object Bookmark {
      * 1.该方法未开新线程进行耗时操作，请自行在异步线程调用;
      * 2.该方法涉及文件写入操作，因此Android 6.0+ (API 23)上需要动态申请存储写入权限
      */
-    fun export() {
+    fun export(): File {
 
         val stringBuilder = StringBuilder()
         val pins = SQLHelper.findAllPins()
@@ -270,6 +284,27 @@ object Bookmark {
             it.flush()
         }
 
+        return file
+    }
+
+    /**
+     * 读取书签标题
+     */
+    private fun readTitle(line: String): String {
+        val split = line.removeSuffix("</A>").split(">")
+        return split[split.size - 1]
+    }
+
+    /**
+     * 读取书签Url
+     */
+    private fun readUrl(line: String): String {
+        line.split(" ").forEach {
+            if (it.startsWith("HREF=\"", true)) {
+                return it.substring(6, it.length - 1)
+            }
+        }
+        return ""
     }
 }
 
