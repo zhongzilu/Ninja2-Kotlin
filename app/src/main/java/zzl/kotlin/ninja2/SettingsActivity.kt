@@ -302,13 +302,15 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 return
             }
 
-            doAsync {
-                try {
-                    Bookmark.import(uri)
-                    uiThread { toast(R.string.toast_import_pin_success) }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    uiThread { toast(R.string.toast_import_pin_failed) }
+            activity.permission(Manifest.permission.READ_EXTERNAL_STORAGE) {
+                doAsync {
+                    try {
+                        Bookmark.import(uri)
+                        uiThread { toast(R.string.toast_import_pin_success) }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        uiThread { toast(R.string.toast_import_pin_failed) }
+                    }
                 }
             }
         }
