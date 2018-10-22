@@ -127,7 +127,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
         //书签导入导出
             R.string.preference_title_import_export_pin -> {
-                //todo 处理书签的导入/导出
+                //todo[Checked] 处理书签的导入/导出
                 showExportImportBottomSheet()
             }
 

@@ -188,9 +188,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         val callback = DefaultItemTouchHelperCallback(object : DefaultItemTouchHelperCallback.Callback {
 
             //保存被删除item信息，用于撤销操作
-            //这里使用队列数据结构，当连续滑动删除几个item时可能会保存多个item数据，并需要记录删除循序。
-//            val queue = ArrayBlockingQueue<Pin>(2)
-//            val array = SparseArray<Pin>()
             val array = ArrayList<Pair<Int, Pin>>(2)
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -204,10 +201,9 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 }
 
                 // 如果是往左滑动，则先取出记录存到删除队列中，以备撤销使用
-                val pin = mPins[mCurrentEditorPosition]
+                val pin = mPinsAdapter.mList[mCurrentEditorPosition]
                 L.i(TAG, "onSwiped pin position: $mCurrentEditorPosition")
-//                array.put(viewHolder.adapterPosition, pin)
-                array.add(viewHolder.adapterPosition to pin)
+                array.add(mCurrentEditorPosition to pin)
 
                 array.forEach {
                     L.i(TAG, "key: ${it.first} & pin: ${it.second.title}")
@@ -260,6 +256,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 L.i(TAG, "before revoke array size: ${array.size}")
                 mPinsAdapter.addItem(position, pin)
                 array.removeAt(index)
+
                 L.i(TAG, "after revoked array size: ${array.size}")
 
                 //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
@@ -280,19 +277,23 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 * DISMISS_EVENT_ACTION为点击Action导致的消失，本代码中Action执行的动作为撤销，
                 * 因此不能执行删除操作，需要排除掉
                 */
-                if (event != Snackbar.Callback.DISMISS_EVENT_CONSECUTIVE) {
-                    L.i(TAG, "array size: ${array.size}")
+                if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
                     //todo 处理滑动多条数据的删除
-
+                    L.i(TAG, "before delete array size: ${array.size}")
                     array.forEach {
                         L.i(TAG, "position: ${it.first} & name: ${it.second.title}")
                     }
-                    array.clear()
-//                    val pin = array.valueAt(0)
-//                    array.removeAt(0)
-//                    doAsync {
-//                        SQLHelper.deletePin(pin)
-//                    }
+                    doAsync {
+                        val pin = array[0].second
+                        SQLHelper.deletePin(pin)
+                        array.removeAt(0)
+
+                        L.i(TAG, "after delete array size: ${array.size}")
+                        array.forEach {
+                            L.i(TAG, "position: ${it.first} & name: ${it.second.title}")
+                        }
+                    }
+
                 }
             }
 
