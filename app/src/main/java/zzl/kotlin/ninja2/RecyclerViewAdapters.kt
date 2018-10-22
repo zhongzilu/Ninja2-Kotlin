@@ -71,15 +71,12 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
             mList.add(pin)
             notifyItemInserted(position)
             notifyItemRangeChanged(0, mList.size)
-//            notifyItemChanged(position)
             return
         }
 
         mList.add(position, pin)
         notifyItemInserted(position)
         notifyItemChanged(position)
-//        notifyItemRangeChanged(0, mList.size)
-
     }
 
     /**
