@@ -67,16 +67,19 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
     fun addItem(position: Int, pin: Pin) {
         L.i("-->", "position: $position")
         L.i("-->", "size: ${mList.size}")
-        if (position == mList.size){
+        if (position >= mList.size){
             mList.add(pin)
             notifyItemInserted(position)
             notifyItemRangeChanged(0, mList.size)
+//            notifyItemChanged(position)
             return
         }
 
         mList.add(position, pin)
         notifyItemInserted(position)
         notifyItemChanged(position)
+//        notifyItemRangeChanged(0, mList.size)
+
     }
 
     /**
@@ -87,6 +90,17 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
         mList.removeAt(position)
         notifyItemRemoved(position)
         notifyItemChanged(position)
+    }
+
+    /**
+     * 批量添加数据
+     * @param pins 待添加的数据集合
+     * @param clear 添加之前是否要清除原有数据，默认为false
+     */
+    fun addAll(pins: List<Pin>, clear: Boolean = false){
+        if (clear) mList.clear()
+        mList.addAll(pins)
+        notifyItemRangeChanged(0, mList.size)
     }
 
 }

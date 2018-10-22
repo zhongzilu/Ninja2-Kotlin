@@ -22,12 +22,10 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.*
 import android.text.style.StyleSpan
-import android.util.SparseArray
 import android.view.*
 import android.webkit.*
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams
-import collections.forEach
 import com.anthonycr.grant.PermissionsManager
 import com.anthonycr.grant.PermissionsResultAction
 import kotlinx.android.synthetic.main.activity_page.*
@@ -147,13 +145,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     private fun loadPinsData() {
         doAsync {
             val pins = SQLHelper.findAllPins()
-
-            uiThread {
-                mPins.clear()
-                mPins.addAll(pins)
-                mPinsAdapter.notifyDataSetChanged()
-//                mPinsAdapter.notifyItemRangeChanged(0, mPins.size)
-            }
+            mPinsAdapter.addAll(pins, true)
         }
     }
 
@@ -197,8 +189,9 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
             //保存被删除item信息，用于撤销操作
             //这里使用队列数据结构，当连续滑动删除几个item时可能会保存多个item数据，并需要记录删除循序。
-            //val queue = ArrayBlockingQueue<Pin>(2)
-            val array = SparseArray<Pin>()
+//            val queue = ArrayBlockingQueue<Pin>(2)
+//            val array = SparseArray<Pin>()
+            val array = ArrayList<Pair<Int, Pin>>(2)
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 mCurrentEditorPosition = viewHolder.adapterPosition
@@ -213,7 +206,12 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 // 如果是往左滑动，则先取出记录存到删除队列中，以备撤销使用
                 val pin = mPins[mCurrentEditorPosition]
                 L.i(TAG, "onSwiped pin position: $mCurrentEditorPosition")
-                array.put(viewHolder.adapterPosition, pin)
+//                array.put(viewHolder.adapterPosition, pin)
+                array.add(viewHolder.adapterPosition to pin)
+
+                array.forEach {
+                    L.i(TAG, "key: ${it.first} & pin: ${it.second.title}")
+                }
 
                 // 移除该条记录
                 mPinsAdapter.removeItem(mCurrentEditorPosition)
@@ -239,8 +237,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             }
 
             override fun clearView(viewHolder: RecyclerView.ViewHolder) {
-                L.i(TAG, "clearView array size: ${array.size()}")
-                if (array.size() > 0) {
+                if (array.size > 0) {
+                    L.i(TAG, "clearView array size: ${array.size}")
                     //如果队列中有数据，说明刚才有删掉一些item
                     Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
                             .setAction(R.string.snackBar_button_repeal) { revoke() }
@@ -254,14 +252,15 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             fun revoke() {
                 //todo[Checked] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
                 //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
-                val index = array.size() - 1
-                val position = array.keyAt(index)
-                val pin = array.valueAt(index)
+                val index = array.size - 1
+                val item = array[index]
+                val position = item.first
+                val pin = item.second
 
+                L.i(TAG, "before revoke array size: ${array.size}")
                 mPinsAdapter.addItem(position, pin)
                 array.removeAt(index)
-
-                L.i(TAG, "revoke array size: ${array.size()}")
+                L.i(TAG, "after revoked array size: ${array.size}")
 
                 //实际开发中遇到一个bug：删除第一个item再撤销出现的视图延迟
                 //手动将recyclerView滑到顶部可以解决这个bug
@@ -281,12 +280,12 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 * DISMISS_EVENT_ACTION为点击Action导致的消失，本代码中Action执行的动作为撤销，
                 * 因此不能执行删除操作，需要排除掉
                 */
-                L.i(TAG, "array size: ${array.size()}")
                 if (event != Snackbar.Callback.DISMISS_EVENT_CONSECUTIVE) {
+                    L.i(TAG, "array size: ${array.size}")
                     //todo 处理滑动多条数据的删除
 
-                    array.forEach { key, pin ->
-                        L.i(TAG, "position: $key & name: ${pin.title}")
+                    array.forEach {
+                        L.i(TAG, "position: ${it.first} & name: ${it.second.title}")
                     }
                     array.clear()
 //                    val pin = array.valueAt(0)
