@@ -26,6 +26,11 @@ class FingerprintService : AccessibilityService() {
     private val ACTION_RECENT = 0         //打开最近任务Action
     private val ACTION_SCREEN_SPLIT = 1   //分屏Action
 
+    companion object {
+        //标记应用是否在前台
+        var isForeground = false
+    }
+
     override fun onInterrupt() {
         L.i(TAG, "onInterrupt")
     }
@@ -81,7 +86,7 @@ class FingerprintService : AccessibilityService() {
      */
     @SuppressLint("NewApi")
     @Synchronized
-    fun registerFingerprint() {
+    private fun registerFingerprint() {
 
         initFingerprintManager()
 
@@ -117,7 +122,7 @@ class FingerprintService : AccessibilityService() {
      * 只有存在的情况下才能初始化{@link #mFingerprintManager}
      */
     private fun checkFingerprintManager() {
-        if (!SP.isFirstInstall) return
+//        if (!SP.isFirstInstall) return
 
         try {
             // 通过反射判断是否存在该类
@@ -206,6 +211,9 @@ class FingerprintService : AccessibilityService() {
      * 发送本地广播
      */
     private fun doAction(action: Int) {
+
+        if (!isForeground) return
+
         when (action) {
             ACTION_RECENT -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
 
