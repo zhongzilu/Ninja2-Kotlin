@@ -1341,6 +1341,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     override fun onResume() {
         mPageView.onResume()
+        FingerprintService.isForeground = true
         super.onResume()
     }
 
@@ -1355,6 +1356,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         mInputBox.removeTextChangedListener(mTextWatcher)
         mMenuOptionWidget.setMenuOptionListener(null)
         unregisterReceiver(mNetworkBroadcastReceiver)
+        FingerprintService.isForeground = false
         super.onDestroy()
     }
 
