@@ -166,6 +166,7 @@
     <string name="preference_key_first_install">preference_key_first_install</string>
     <string name="preference_key_omnibox_control">preference_key_omnibox_control</string>
     <string name="preference_key_omnibox_fixed">preference_key_omnibox_fixed</string>
+    <string name="preference_key_fingerprint">preference_key_fingerprint</string>
 
     <string name="snackBar_button_repeal">repeal</string>
     <string name="snackBar_message_delete_pin">Delete Pin Record</string>

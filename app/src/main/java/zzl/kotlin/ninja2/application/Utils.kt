@@ -40,7 +40,7 @@ object WebUtil {
     val SEARCH_ENGINE_DUCKDUCKGO = "https://duckduckgo.com/?q=%s"
     val SEARCH_ENGINE_BING = "http://www.bing.com/search?q=%s"
     val SEARCH_ENGINE_BAIDU = "http://www.baidu.com/s?wd=%s"
-    val SEARCH_ENGINE_GITHUB = "https://github.com/search?q=%s&ref=opensearch"
+    val SEARCH_ENGINE_GITHUB = "https://github.com/search?q=%s"
 
     const val UA_DESKTOP = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     const val URL_ENCODE = "UTF-8"
@@ -243,7 +243,9 @@ object Bookmark {
     /**
      * 导入书签
      *
-     * 注意：该方法未开新线程进行文件IO耗时操作，请自行在异步线程调用
+     * 注意：
+     * 1.该方法未开新线程进行文件IO耗时操作，请自行在异步线程调用
+     * 2.该方法涉及文件读取操作，因此Android 6.0+ (API 23)上需要动态申请存储读取权限
      */
     fun import(uri: Uri) {
         val file = File(URI(uri.toString()))

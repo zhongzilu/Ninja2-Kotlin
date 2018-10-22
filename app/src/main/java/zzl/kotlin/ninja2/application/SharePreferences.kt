@@ -73,6 +73,11 @@ object SP {
      * 是否首次安装应用启动，默认为false
      */
     var isFirstInstall: Boolean by ctx.preference(Key.FIRST_INSTALL, true)
+
+    /**
+     * 是否存在FingerprintManager Api，默认为false
+     */
+    var hasFingerprintManager: Boolean by ctx.preference(Key.FINGERPRINT, false)
 }
 
 object Key {
@@ -128,5 +133,9 @@ object Key {
 
     val FIRST_INSTALL: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_first_install)
+    }
+
+    val FINGERPRINT: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_fingerprint)
     }
 }

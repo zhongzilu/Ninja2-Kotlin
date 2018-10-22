@@ -1466,11 +1466,6 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 try {
                     var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
                     //todo[Checked] bitmap过大将不能创建桌面快捷方式，解决方法：裁剪或缩放或压缩图片的大小或尺寸
-//                    if (bitmap.width > 512 || bitmap.height > 512) {
-//                        toast(resources.getString(R.string.toast_select_icon_size_error, 512, 512))
-//                        return@let
-//                    }
-
                     if (bitmap.width > 192 || bitmap.height > 192) {
                         bitmap = bitmap.scale(192f, 192f)
                     }
