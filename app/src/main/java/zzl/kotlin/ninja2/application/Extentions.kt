@@ -435,11 +435,11 @@ fun String.parseUrl(): String {
     when {
         matcher.matches() -> {
             val group0 = matcher.group(0)
-            System.out.println("group0: $group0")
+            println("group0: $group0")
             val group1 = matcher.group(1)
-            System.out.println("group1: $group1")
+            println("group1: $group1")
             val group2 = matcher.group(2)
-            System.out.println("group2: $group2")
+            println("group2: $group2")
             return trim.replace(" ", "%20")
         }
         Patterns.WEB_URL.matcher(trim).matches() -> return URLUtil.guessUrl(trim)
@@ -450,6 +450,7 @@ fun String.parseUrl(): String {
                 Type.SEARCH_BING -> WebUtil.SEARCH_ENGINE_BING
                 Type.SEARCH_BAIDU -> WebUtil.SEARCH_ENGINE_BAIDU
                 Type.SEARCH_GITHUB -> WebUtil.SEARCH_ENGINE_GITHUB
+                Type.SEARCH_JUEJIN -> WebUtil.SEARCH_ENGINE_JUEJIN
                 else -> ""
             }
 
