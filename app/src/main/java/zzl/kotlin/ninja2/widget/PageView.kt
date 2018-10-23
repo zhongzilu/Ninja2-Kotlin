@@ -21,8 +21,6 @@ import zzl.kotlin.ninja2.application.*
 import java.io.ByteArrayInputStream
 
 
-
-
 /**
  * 自定义WebView
  * Created by zhongzilu on 2018/8/1 0001.
@@ -105,7 +103,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     private fun initUserAgent() {
-        if (SP.enableUA){
+        if (SP.enableUA) {
             val ua = SP.UA
             if (ua.isNotEmpty()) settings.userAgentString = ua
             else settings.userAgentString = WebUtil.UA_DESKTOP
@@ -387,12 +385,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onPageStarted(url: String, title: String, icon: Bitmap?) {
-        L.e(TAG, "onPageStarted $url : $title")
+        L.e(TAG, "onPageStarted $url : $title | ${icon != null}")
         _delegate?.onPageStarted(url, title, icon)
     }
 
     override fun onPageFinished(url: String, title: String, icon: Bitmap?) {
-        L.e(TAG, "onPageFinished $url : $title")
+        L.e(TAG, "onPageFinished $url : $title | ${icon != null}")
         _delegate?.onPageFinished(url, title, icon)
     }
 
@@ -480,6 +478,9 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     override fun onReceivedTitle(url: String, title: String) {
         L.e(TAG, "onReceivedTitle $url : $title")
         _delegate?.onReceivedTitle(url, title)
+        evaluateJavascript(WebUtil.EVALUATE_SCRIPT) {
+            L.d(TAG, "evaluate JSON: $it")
+        }
     }
 
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
@@ -604,7 +605,7 @@ class PageViewClient(val context: Context, val delegate: Delegate?) : WebViewCli
      * 页面加载完成回调方法，获取对应url地址
      */
     override fun onPageFinished(view: WebView?, url: String) {
-        delegate?.onPageFinished(url, view?.title?:"", view?.favicon)
+        delegate?.onPageFinished(url, view?.title ?: "", view?.favicon)
                 ?: super.onPageFinished(view, url)
     }
 
