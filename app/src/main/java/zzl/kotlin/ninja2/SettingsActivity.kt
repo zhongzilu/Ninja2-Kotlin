@@ -190,10 +190,16 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     /**
      * 弹出自定义UA编辑框
      */
+    private var mUADialog: CustomUADialog? = null
+
     private fun showCustomUADialog() {
-        CustomUADialog(activity).setUA(SP.UA)
-                .setOnPositiveClickListener { SP.UA = it.getUA() }
-                .show()
+        if (mUADialog == null) {
+            L.i("-->", "create custom UA dialog")
+            mUADialog = CustomUADialog(activity)
+                    .setOnPositiveClickListener { doAsync { SP.UA = it.getUA() } }
+        }
+
+        mUADialog!!.setUA(SP.UA).show()
     }
 
     /**
