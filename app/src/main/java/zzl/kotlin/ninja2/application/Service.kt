@@ -42,6 +42,7 @@ class FingerprintService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
 
+        initFingerprintManager()
         registerFingerprint()
 
         L.i(TAG, "Service started")
@@ -60,7 +61,7 @@ class FingerprintService : AccessibilityService() {
      * 必须执行{@link #checkFingerprintManager}方法，
      * 之所以不用{@link #FingerprintManagerCompat}类，
      * 是因为该类默认在Android 6.0一下无指纹识别，但市面上仍然存在Android 5.0的机型上存在指纹识别器。
-     * 为了兼容，因此利用反射去检查是否系统中是否存在FingerprintManager Api,
+     * 为了兼容，因此利用反射去检查系统中是否存在FingerprintManager Api,
      * 如果存在才能进行初始化操作，不然会抛出异常
      */
     @SuppressLint("InlinedApi")
@@ -83,12 +84,11 @@ class FingerprintService : AccessibilityService() {
 
     /**
      * 注册指纹监听器
+     * 检查是否存在FingerprintManager Api,存在的话再检查是否拥有指纹权限，
+     * 最后检查是否有录入指纹，这些都通过了的情况下才开始注册监听指纹的识别结果
      */
     @SuppressLint("NewApi")
-    @Synchronized
     private fun registerFingerprint() {
-
-        initFingerprintManager()
 
         if (!SP.hasFingerprintManager) {
             L.i(TAG, "have no fingerprint manager")
@@ -118,7 +118,9 @@ class FingerprintService : AccessibilityService() {
     }
 
     /**
-     * 检查是否存在FingerprintManager Api，
+     * 检查是否存在FingerprintManager Api，通过反射来查找相关Api类是否存在
+     * 为了避免每次都进行反射查找，就采用将第一次查询结果存储在SharePreference中,
+     * 如果存在则存为true,不存在则存为false。
      * 只有存在的情况下才能初始化{@link #mFingerprintManager}
      */
     private fun checkFingerprintManager() {
@@ -190,7 +192,7 @@ class FingerprintService : AccessibilityService() {
     private val DELAY = 10000L // 10s
 
     /**
-     * 初始化Handler，用于循环开启指纹识别功能，因为为了省电，
+     * 初始化Handler，用于循环开启指纹识别功能，为了省电，
      * 指纹识别器无论识别成功或失败，都会关闭传感器一段时间，网上说时间为30s,
      * 但我觉得有点长，于是改为了10s
      */
@@ -208,7 +210,9 @@ class FingerprintService : AccessibilityService() {
     }
 
     /**
-     * 发送本地广播
+     * 执行相关打开最近任务栏或分屏的操作，
+     * 在Android 7.0+以上的系统，会直接进入分屏，
+     * 而在Android 6.0上则是打开最近任务栏
      */
     private fun doAction(action: Int) {
 

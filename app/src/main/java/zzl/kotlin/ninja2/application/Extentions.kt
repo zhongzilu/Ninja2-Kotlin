@@ -523,6 +523,8 @@ fun Bitmap.save(name: String): File {
  * @param w 缩放的目标宽度
  * @param h 缩放的目标高度
  * @return 缩放后的Bitmap
+ *
+ * @see http://www.cnblogs.com/fighter/archive/2012/02/20/android-bitmap-drawable.html
  */
 fun Bitmap.scale(w: Float, h: Float): Bitmap {
     val temp = copy(config, true)

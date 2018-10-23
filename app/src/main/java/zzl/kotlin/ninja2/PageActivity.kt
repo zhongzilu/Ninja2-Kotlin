@@ -2,9 +2,11 @@ package zzl.kotlin.ninja2
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.net.http.SslError
@@ -15,6 +17,7 @@ import android.provider.MediaStore
 import android.security.KeyChain
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -725,7 +728,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
     }
 
-    override fun onReceivedWebThemeColor(str: String) {
+        override fun onReceivedWebThemeColor(str: String) {
         //todo 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
     }
 
@@ -1043,15 +1046,66 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onReceivedTitle(url: String, title: String) {
-        //todo 处理接收到的网站标题
+        //todo[Checked] 处理接收到的网站标题
+        onReceivedIcon(url, title, null)
     }
 
+    /**
+     * 回调处理网页上的Favicon图标，
+     */
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
-        //todo 处理接收到网站图标
+        //todo[Checked] 处理接收到网站图标
+        setAppTaskDescription(title, icon)
     }
 
+    /**
+     * 该方法回调处理网页上设置的苹果图标，该方法可能会有多次回调，
+     * 这里可以用接收到的图标地址，下载后转为Bitmap，用做最近任务栏的图标，
+     * 或者用来作为网站添加到桌面的快捷图标
+     *
+     * 详情查看{@link PageChromeClient#onReceivedTouchIconUrl}
+     *
+     * 推荐博客：https://droidyue.com/blog/2015/01/18/deal-with-touch-icon-in-android/
+     */
     override fun onReceivedTouchIconUrl(url: String, precomposed: Boolean) {
         //todo 处理接收到网站设置的苹果图标资源
+    }
+
+    private var mAppName: String? = null
+    private var mAppIcon: Bitmap? = null
+    private var mAppColor: Int = -1
+
+    /**
+     * 设置应用最近任务栏的样式
+     * 该方法是{@link #Build.VERSION_CODES.LOLLIPOP}新增的API，
+     * 用来修改应用在最近任务栏的默认样式，这里用来实现对应网页在最近任务栏的不同样式。
+     *
+     * @param title 网站的标题。如果没有标题，则默认使用应用的名称
+     * @param icon  网站的favicon图标。网站有可能没有设置favicon图标，如果没有则默认使用应用的桌面图标
+     * @param color 网站的主题色。网站极大可能没有设置主题色，因此此参数默认为-1，
+     *              在没有网站主题色的情况下，默认使用应用的主题色{@link #R.color.colorPrimary}
+     */
+    private fun setAppTaskDescription(title: String, icon: Bitmap?, color: Int = -1) {
+        var label = title
+        var bitmap = icon
+        var color2 = color
+
+        if (title.isEmpty()) {
+            if (mAppName == null) mAppName = getString(R.string.app_name)
+            label = mAppName!!
+        }
+
+        if (bitmap == null) {
+            if (mAppIcon == null) mAppIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+            bitmap = mAppIcon
+        }
+
+        if (color <= 0) {
+            if (mAppColor == -1) mAppColor = ActivityCompat.getColor(this, R.color.colorPrimary)
+            color2 = mAppColor
+        }
+
+        setTaskDescription(ActivityManager.TaskDescription(label, bitmap, color2))
     }
 
     /**
@@ -1409,7 +1463,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      */
     private var mLoadingView: View? = null
 
-    fun showLoading() {
+    private fun showLoading() {
         if (mLoadingView == null) {
             mLoadingView = mLoadingStub.inflate()
         }
@@ -1420,7 +1474,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     /**
      * 隐藏截图等待视图
      */
-    fun hideLoading() {
+    private fun hideLoading() {
         mLoadingView?.hide()
     }
 

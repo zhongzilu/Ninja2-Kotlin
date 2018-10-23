@@ -261,6 +261,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
     override fun loadUrl(url: String) {
         if (!shouldOverrideUrlLoading(url)) {
+            stopLoading()
             super.loadUrl(url.parseUrl())
         }
     }
@@ -477,12 +478,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     }
 
     override fun onReceivedTitle(url: String, title: String) {
-        L.e(TAG, "onReceivedTitle $title")
+        L.e(TAG, "onReceivedTitle $url : $title")
         _delegate?.onReceivedTitle(url, title)
     }
 
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
-        L.e(TAG, "onReceivedIcon ${icon == null}")
+        L.e(TAG, "onReceivedIcon $url : $title | ${icon != null}")
         _delegate?.onReceivedIcon(url, title, icon)
     }
 
