@@ -19,8 +19,11 @@ import android.view.ViewConfiguration
 import android.webkit.URLUtil
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import org.json.JSONObject
 import zzl.kotlin.ninja2.R
-import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 import java.net.URI
 import java.net.URISyntaxException
 import java.text.SimpleDateFormat
@@ -53,7 +56,156 @@ object WebUtil {
 
     const val HEADER_CONTENT_DISPOSITION = "Content-Disposition: attachment;"
 
-    const val EVALUATE_SCRIPT = "(function(){const a={themeColor:\"\",manifest:\"\",icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed\");var j=g.length;for(var e=0;e<j;e++){var f={size:\"\",rel:\"\",href:\"\"};var h=g[e];if(h.hasAttribute(\"sizes\")){f.size=h.sizes[0]}f.rel=h.rel;f.href=h.href;a.icons.push(f)}}function b(){var e=document.querySelector('meta[name=\"theme-color\"]');if(e){a.themeColor=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return JSON.stringify(a)})();\n"
+//    const val EVALUATE_SCRIPT = "(function(){const a={themeColor:\"\",manifest:\"\",icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed\");var j=g.length;for(var e=0;e<j;e++){var f={size:\"\",rel:\"\",href:\"\"};var h=g[e];if(h.hasAttribute(\"sizes\")){f.size=h.sizes[0]}f.rel=h.rel;f.href=h.href;a.icons.push(f)}}function b(){var e=document.querySelector('meta[name=\"theme-color\"]');if(e){a.themeColor=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return JSON.stringify(a)})();\n"
+}
+
+/**
+ * 脚本注入工具类，包含注入脚本字符串和返回结果的解析方法
+ * Created by zhongzilu on 2018-10-24
+ */
+object Evaluate {
+    const val SCRIPT = "(function(){const a={theme_color:\"\",manifest:\"\",icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed\");var j=g.length;for(var e=0;e<j;e++){var f={sizes:\"\",type:\"\",src:\"\"};var h=g[e];if(h.hasAttribute(\"sizes\")){f.sizes=h.sizes[0]}f.type=h.rel;f.src=h.href;a.icons.push(f)}}function b(){var e=document.querySelector('meta[name=\"theme-color\"]');if(e){a.theme_color=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return a})();"
+
+    private const val THEME_NAME = "theme_color"
+    private const val ICONS_NAME = "icons"
+    private const val MANIFEST_NAME = "manifest"
+    private const val ICON_SRC_NAME = "src"
+    private const val ICON_SIZE_NAME = "sizes"
+    private const val ICON_TYPE_NAME = "type"
+
+    /**
+     * 该数据类是对应{@link Evaluate#SCRIPT}脚本注入之后返回的json字符串，
+     * 该数据类包含网站主题色配置、网站favicon不同尺寸图标的集合、针对Android平台设置的配置json文件路径
+     */
+    data class Result(
+            var theme_color: String,
+            var manifest: String,
+            var icons: ArrayList<Icon>
+    )
+
+    /**
+     * 网站针对Android平台特有的配置化文件，配置文件格式由谷歌制定，
+     * 采用类似<link rel="manifest" href="http://www.example.com/xxx/manifest.json"/>的标签格式进行添加。
+     * 截至2018-10-24，大部分网站都没有添加该配置，
+     * 且不同网站的manifest.json文件中的配置字段可能不太一样，这里数据类的字段是根据
+     * <a href="http://www.juejin.com/" target="_blank">掘金</a>网站的配置信息进行编写的，
+     * 仅供参考！
+     */
+    data class Manifest(
+//            var name: String,
+            var icons: ArrayList<Icon>,
+//            var background_color: String,
+//            var display: String,
+            var theme_color: String
+    )
+
+    /**
+     * 网站图标数据类，包含图标地址，图标的尺寸信息，以及图标类型。
+     * 该数据类中的{@link Icon#type}并没有使用到，可以考虑去掉；
+     * {@link Icon#sizes}字段的格式为：NxN。比如：32x32，该尺寸信息需要再次处理后才能使用；
+     * {@link Icon#src}字段为图标的网络地址，可以直接用于ImageView的显示
+     */
+    data class Icon(
+            var src: String,
+            var sizes: String,
+            var type: String
+    )
+
+    /**
+     * 用来解析脚本{@link #SCRIPT}注入之后返回的JSON数据.
+     * JSON数据主要包括网站主题色、网站图标集合、Android端特有的manifest.json配置文件。
+     *
+     * 由于manifest.json文件中已经定义了很全面的配置信息，因此如果网站上有该配置，
+     * 则不需要再获取其他配置信息了。
+     *
+     * @param json
+     * @return Evaluate#Result
+     */
+    fun parseResult(json: String?): Result {
+        val result = Result("", "", arrayListOf())
+        json?.apply { if (isEmpty()) return result } ?: return result
+
+        JSONObject(json).apply {
+            //parse manifest
+            optString(MANIFEST_NAME).apply {
+                if (isNotEmpty()) {
+                    result.manifest = this
+                    return result
+                }
+            }
+
+            //parse theme color
+            result.theme_color = optString(THEME_NAME)
+
+            //parse icons
+            optJSONArray(ICONS_NAME)?.apply {
+                for (i in 0 until length()) {
+                    result.icons.add(parseIcon(this[i] as JSONObject))
+                }
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * 将字符串解析成Icon对象，
+     * 该方法可以用来解析manifest.json文件中的icon集合，
+     * 也可以用来解析脚本{@link #SCRIPT}注入之后返回的{@link #ICONS_NAME}字段数据
+     *
+     * @param json
+     * @return Evaluate#Icon
+     */
+    fun parseIcon(json: JSONObject?): Icon {
+        val icon = Icon("", "", "")
+        if (json == null) return icon
+
+        json.apply {
+            icon.src = optString(ICON_SRC_NAME)
+            icon.sizes = optString(ICON_SIZE_NAME)
+            icon.type = optString(ICON_TYPE_NAME)
+        }
+
+        return icon
+    }
+
+    /**
+     * 解析manifest.json文件中的字段，该方法只解析了网站主题色字段以及网站favicon图标集合
+     * 如要添加解析字段，可以自行添加修改
+     */
+    fun parseManifest(json: String): Manifest {
+        val result = Manifest(arrayListOf(), "")
+        if (json.isEmpty()) return result
+
+        JSONObject(json).apply {
+            result.theme_color = optString(THEME_NAME)
+
+            // parse manifest icons
+            optJSONArray(ICONS_NAME)?.apply {
+                for (i in 0 until length()) {
+                    result.icons.add(parseIcon(this[i] as JSONObject))
+                }
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * 解析{@link Evaluate#Icon}的{@link Icon#sizes}字段，将NxN格式的字段串解析并截取出尺寸信息。
+     * 例：32x32的字符串，解析后将返回整数型32
+     *
+     * @param size 尺寸信息字段串，该字符串符合格式：NxN
+     * @return 解析出的尺寸信息
+     */
+    fun parseSize(size: String): Int {
+        return try {
+            size.split("x")[0].toInt()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0
+        }
+    }
 }
 
 /**
@@ -128,13 +280,16 @@ object AdBlock {
         if (hostSet.isNotEmpty()) return
 
         doAsync {
-            val bufferedReader = BufferedReader(InputStreamReader(context.assets.open(FILE_NAME)))
-            while (true) {
-                val readLine = bufferedReader.readLine()
-                if (readLine != null) {
-                    hostSet.add(readLine.toLowerCase(locale))
-                } else break
+            context.assets.open(FILE_NAME).reader().useLines {
+                hostSet.add(it.toString().toLowerCase(locale))
             }
+//            val bufferedReader = BufferedReader(InputStreamReader(context.assets.open(FILE_NAME)))
+//            while (true) {
+//                val readLine = bufferedReader.readLine()
+//                if (readLine != null) {
+//                    hostSet.add(readLine.toLowerCase(locale))
+//                } else break
+//            }
         }
     }
 

@@ -728,8 +728,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
     }
 
-        override fun onReceivedWebThemeColor(str: String) {
+    override fun onReceivedWebThemeColor(str: String) {
         //todo 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
+        L.d(TAG, "onReceivedWebThemeColor: $str")
+//        toolbar.setBackgroundColor(Color.parseColor(str))
     }
 
     override fun onFormResubmission(dontResend: Message, resend: Message) {
