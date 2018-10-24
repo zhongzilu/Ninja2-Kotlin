@@ -7,6 +7,7 @@ import android.content.*
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.net.http.SslError
@@ -17,7 +18,6 @@ import android.provider.MediaStore
 import android.security.KeyChain
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -866,7 +866,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             if (isGone()) visible()
             this.progress = progress
 
-            if (progress >= 99) gone()
+            if (progress >= 80) gone()
         }
     }
 
@@ -1049,7 +1049,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     override fun onReceivedTitle(url: String, title: String) {
         //todo[Checked] 处理接收到的网站标题
-        onReceivedIcon(url, title, null)
+        setAppTaskDescription(title, null)
     }
 
     /**
@@ -1057,7 +1057,18 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      */
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
         //todo[Checked] 处理接收到网站图标
-        setAppTaskDescription(title, icon)
+//        setAppTaskDescription(title, icon)
+    }
+
+    /**
+     * 回调处理网页上的配置化信息，该接口为自定义接口，所传参数的值也是通过js注入来获取的,
+     * 因此回调处理上会有时间差，尽量不要用来实现需要即时性的功能，如果对时间要求不太严格，
+     * 可以用来实现一些针对不同网站配置呈现不同视觉效果的功能，比如这里用来更改最近任务栏的样式
+     */
+    override fun onReceivedWebConfig(title: String, icon: Bitmap?, color: String) {
+        //todo[Checked] 处理接收到的网站配置
+        L.d(TAG, "onReceivedWebConfig $title : $color | ${icon != null}")
+        setAppTaskDescription(title, icon, color)
     }
 
     /**
@@ -1075,7 +1086,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     private var mAppName: String? = null
     private var mAppIcon: Bitmap? = null
-    private var mAppColor: Int = -1
+    private fun defaultThemeColor(): Int = if (isPrivate) Color.BLACK else Color.WHITE
 
     /**
      * 设置应用最近任务栏的样式
@@ -1084,13 +1095,14 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      *
      * @param title 网站的标题。如果没有标题，则默认使用应用的名称
      * @param icon  网站的favicon图标。网站有可能没有设置favicon图标，如果没有则默认使用应用的桌面图标
-     * @param color 网站的主题色。网站极大可能没有设置主题色，因此此参数默认为-1，
-     *              在没有网站主题色的情况下，默认使用应用的主题色{@link #R.color.colorPrimary}
+     * @param color 网站的主题色。网站极大可能没有设置主题色，因此此参数默认为空字符串，
+     *              在没有网站主题色的情况下，如果当前为隐私模式时，主题色为{@link Color#BLACK}
+     *              如果为普通模式时，主题色为{@link Color#WHITE}
      */
-    private fun setAppTaskDescription(title: String, icon: Bitmap?, color: Int = -1) {
+    private fun setAppTaskDescription(title: String, icon: Bitmap?, color: String = "") {
         var label = title
         var bitmap = icon
-        var color2 = color
+        var color2 = defaultThemeColor()
 
         if (title.isEmpty()) {
             if (mAppName == null) mAppName = getString(R.string.app_name)
@@ -1102,9 +1114,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             bitmap = mAppIcon
         }
 
-        if (color <= 0) {
-            if (mAppColor == -1) mAppColor = ActivityCompat.getColor(this, R.color.colorPrimary)
-            color2 = mAppColor
+        if (color.isNotEmpty()) {
+            color2 = Color.parseColor(color)
         }
 
         setTaskDescription(ActivityManager.TaskDescription(label, bitmap, color2))

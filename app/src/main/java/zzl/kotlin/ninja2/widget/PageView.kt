@@ -22,10 +22,14 @@ import zzl.kotlin.ninja2.R
 import zzl.kotlin.ninja2.application.*
 import java.io.ByteArrayInputStream
 import java.net.URL
+import java.util.*
 
 
 /**
- * 自定义WebView
+ * 自定义WebView，关于WebView，迄今为止我所觉得写得最好的博客为以下
+ * @see <a href="https://hacpai.com/article/1519975549750">如何设计一个优雅健壮的 Android WebView</a>
+ * 有很多可以学习和借鉴的地方，也是写得比较全面和系统化的文章，【墙裂推荐】
+ *
  * Created by zhongzilu on 2018/8/1 0001.
  */
 class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
@@ -59,6 +63,8 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         fun onReceivedTitle(url: String, title: String)
 
         fun onReceivedIcon(url: String, title: String, icon: Bitmap?)
+
+        fun onReceivedWebConfig(title: String, icon: Bitmap?, color: String)
 
         fun onPageStarted(url: String, title: String, icon: Bitmap?)
 
@@ -453,6 +459,67 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         return null
     }
 
+    private fun evaluateScript() {
+        evaluateJavascript(Evaluate.SCRIPT) {
+            L.d(TAG, "evaluate JSON: $it")
+
+            doAsync {
+                val res = Evaluate.parseResult(it)
+
+                //handle manifest.json
+                res.manifest.apply {
+                    if (isEmpty()) return@apply
+
+                    val json = URL(this).readText()
+
+                    Evaluate.parseManifest(json).apply {
+                        if (theme_color.isNotEmpty()) {
+                            uiThread { _delegate?.onReceivedWebThemeColor(theme_color) }
+                        }
+
+                        //handle website icons
+                        sortIcons(icons)
+
+                        var bitmap: Bitmap? = null
+                        if (icons.size > 0) {
+                            bitmap = BitmapFactory.decodeStream(URL(icons[0].src).openStream())
+                        }
+                        uiThread { _delegate?.onReceivedWebConfig(title, bitmap, theme_color) }
+                    }
+
+                    return@doAsync
+                }
+
+                //handle theme color
+                if (res.theme_color.isNotEmpty()) {
+                    uiThread { _delegate?.onReceivedWebThemeColor(res.theme_color) }
+                }
+
+                //handle website favicon
+                sortIcons(res.icons)
+
+                var bitmap: Bitmap? = null
+                if (res.icons.size > 0) {
+                    bitmap = BitmapFactory.decodeStream(URL(res.icons[0].src).openStream())
+                }
+                uiThread { _delegate?.onReceivedWebConfig(title, bitmap, res.theme_color) }
+            }
+        }
+    }
+
+    /**
+     * 排序Icon，将Icon集合按尺寸进行从大到小的排序
+     */
+    private fun sortIcons(icons: ArrayList<Evaluate.Icon>) {
+        icons.forEach { L.i(TAG, "before size: ${it.sizes}") }
+        val newList = icons.filter { Evaluate.parseSize(it.sizes) in 72..192 }
+                .sortedByDescending { it.sizes }
+
+        icons.clear()
+        icons.addAll(newList)
+        icons.forEach { L.i(TAG, "after size: ${it.sizes}") }
+    }
+
     override fun onCloseWindow() {
         L.e(TAG, "onCloseWindow")
         _delegate?.onCloseWindow()
@@ -481,59 +548,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     override fun onReceivedTitle(url: String, title: String) {
         L.e(TAG, "onReceivedTitle $url : $title")
         _delegate?.onReceivedTitle(url, title)
-        evaluateJavascript(Evaluate.SCRIPT) {
-            L.d(TAG, "evaluate JSON: $it")
-
-            doAsync {
-                val res = Evaluate.parseResult(it)
-
-                //handle manifest.json
-                res.manifest.apply {
-                    if (isNotEmpty()) {
-                        val json = URL(this@apply).readText()
-
-                        Evaluate.parseManifest(json).apply {
-                            if (theme_color.isNotEmpty()) {
-                                uiThread { _delegate?.onReceivedWebThemeColor(theme_color) }
-                            }
-
-                            //handle website icons
-                            icons.forEach { L.i(TAG, "before size: ${it.sizes}") }
-                            icons.apply {
-                                filter {
-                                    val size = Evaluate.parseSize(it.sizes)
-                                    size > 192 || size < 72
-                                }
-                                sortByDescending { it.sizes }
-                            }
-                            icons.forEach { L.i(TAG, "after size: ${it.sizes}") }
-//                            val bitmap = BitmapFactory.decodeStream(URL(icons[0].src).openStream())
-//                            uiThread { onReceivedIcon(getUrl(), getTitle(), bitmap) }
-                        }
-
-                        return@doAsync
-                    }
-                }
-
-                //handle theme color
-                if (res.theme_color.isNotEmpty()) {
-                    uiThread { _delegate?.onReceivedWebThemeColor(res.theme_color) }
-                }
-
-                //handle website favicon
-                res.icons.forEach { L.i(TAG, "before size: ${it.sizes}") }
-                res.icons.apply {
-                    filter {
-                        val size = Evaluate.parseSize(it.sizes)
-                        size > 192 || size < 72
-                    }
-                    sortByDescending { it.sizes }
-                }
-                res.icons.forEach { L.i(TAG, "after size: ${it.sizes}") }
-//                val bitmap = BitmapFactory.decodeStream(URL(res.icons[0].src).openStream())
-//                uiThread { onReceivedIcon(getUrl(), getTitle(), bitmap) }
-            }
-        }
+        evaluateScript()
     }
 
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
@@ -838,13 +853,6 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
      */
     override fun getDefaultVideoPoster(): Bitmap {
         return BitmapFactory.decodeResource(App.instance.resources, R.drawable.poster)
-    }
-
-    /**
-     * 获取访问的历史纪录列表
-     */
-    override fun getVisitedHistory(callback: ValueCallback<Array<String>>?) {
-        super.getVisitedHistory(callback)
     }
 
     /**
