@@ -161,7 +161,7 @@ object SQLHelper {
      *
      * @param pin 待删除的数据对象
      */
-    fun deletePin(pin: Pin){
+    fun deletePin(pin: Pin) {
         SQL.instance.use {
             delete(PinTable.NAME, "_id = {id}", "id" to pin._id)
         }
@@ -181,20 +181,21 @@ object SQLHelper {
     fun saveOrUpdateRecord(title: String, url: String) {
         SQL.instance.use {
 
-            val records = select(RecordTable.NAME).parseList(classParser<Record>())
+            val records = select(RecordTable.NAME)
+                    .whereArgs("url = {url}", "url" to url)
+                    .limit(1)
+                    .parseList(classParser<Record>())
             records.forEach {
-                if (it.url == url) {
-                    //update record data
-                    update(RecordTable.NAME,
-                            RecordTable.TITLE to title,
-                            RecordTable.URL to url,
-                            RecordTable.TIME to System.currentTimeMillis(),
-                            RecordTable.VISIT to it.visit.inc())
-                            .whereArgs("url = {url}", "url" to it.url)
-                            .exec()
+                //update record data
+                update(RecordTable.NAME,
+                        RecordTable.TITLE to title,
+                        RecordTable.URL to url,
+                        RecordTable.TIME to System.currentTimeMillis(),
+                        RecordTable.VISIT to it.visit.inc())
+                        .whereArgs("url = {url}", "url" to it.url)
+                        .exec()
 
-                    return@use
-                }
+                return@use
             }
 
             insert(RecordTable.NAME,
