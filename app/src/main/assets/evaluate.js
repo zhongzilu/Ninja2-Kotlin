@@ -1,6 +1,6 @@
 (function () {
     const result = {
-        themeColor: "",
+        theme_color: "",
         manifest: "",
         icons: []
     };
@@ -10,21 +10,21 @@
         var length = iconElement.length;
         for (var i = 0; i < length; i++) {
             var icon = {
-                size: '',
-                rel: '',
-                href: ''
+                sizes: '',
+                type: '',
+                src: ''
             };
             var item = iconElement[i];
-            if (item.hasAttribute('sizes')) icon.size = item.sizes[0];
-            icon.rel = item.rel;
-            icon.href = item.href;
+            if (item.hasAttribute('sizes')) icon.sizes = item.sizes[0];
+            icon.type = item.rel;
+            icon.src = item.href;
             result.icons.push(icon);
         }
     }
 
     function obtainThemeColor() {
         var meta = document.querySelector('meta[name=\"theme-color\"]');
-        if (meta) result.themeColor = meta.content;
+        if (meta) result.theme_color = meta.content;
     }
 
     function obtainManifest() {
@@ -44,5 +44,5 @@
     //        var info = JSON.stringify(result);
     //        window.app_native.onReceivedTouchIcons(document.URL, JSON.stringify(result));
     //        console.log(result);
-    return JSON.stringify(result);
+    return result
 })();

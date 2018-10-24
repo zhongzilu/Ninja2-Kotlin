@@ -15,10 +15,13 @@ import android.util.AttributeSet
 import android.view.View
 import android.webkit.*
 import android.webkit.WebChromeClient.FileChooserParams
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
 import zzl.kotlin.ninja2.application.*
 import java.io.ByteArrayInputStream
+import java.net.URL
 
 
 /**
@@ -478,8 +481,58 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     override fun onReceivedTitle(url: String, title: String) {
         L.e(TAG, "onReceivedTitle $url : $title")
         _delegate?.onReceivedTitle(url, title)
-        evaluateJavascript(WebUtil.EVALUATE_SCRIPT) {
+        evaluateJavascript(Evaluate.SCRIPT) {
             L.d(TAG, "evaluate JSON: $it")
+
+            doAsync {
+                val res = Evaluate.parseResult(it)
+
+                //handle manifest.json
+                res.manifest.apply {
+                    if (isNotEmpty()) {
+                        val json = URL(this@apply).readText()
+
+                        Evaluate.parseManifest(json).apply {
+                            if (theme_color.isNotEmpty()) {
+                                uiThread { _delegate?.onReceivedWebThemeColor(theme_color) }
+                            }
+
+                            //handle website icons
+                            icons.forEach { L.i(TAG, "before size: ${it.sizes}") }
+                            icons.apply {
+                                filter {
+                                    val size = Evaluate.parseSize(it.sizes)
+                                    size > 192 || size < 72
+                                }
+                                sortByDescending { it.sizes }
+                            }
+                            icons.forEach { L.i(TAG, "after size: ${it.sizes}") }
+//                            val bitmap = BitmapFactory.decodeStream(URL(icons[0].src).openStream())
+//                            uiThread { onReceivedIcon(getUrl(), getTitle(), bitmap) }
+                        }
+
+                        return@doAsync
+                    }
+                }
+
+                //handle theme color
+                if (res.theme_color.isNotEmpty()) {
+                    uiThread { _delegate?.onReceivedWebThemeColor(res.theme_color) }
+                }
+
+                //handle website favicon
+                res.icons.forEach { L.i(TAG, "before size: ${it.sizes}") }
+                res.icons.apply {
+                    filter {
+                        val size = Evaluate.parseSize(it.sizes)
+                        size > 192 || size < 72
+                    }
+                    sortByDescending { it.sizes }
+                }
+                res.icons.forEach { L.i(TAG, "after size: ${it.sizes}") }
+//                val bitmap = BitmapFactory.decodeStream(URL(res.icons[0].src).openStream())
+//                uiThread { onReceivedIcon(getUrl(), getTitle(), bitmap) }
+            }
         }
     }
 
