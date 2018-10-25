@@ -293,6 +293,10 @@ object AdBlock {
         }
     }
 
+    /**
+     * 获取url的Host地址，有一定的概率会获取失败，抛出异常
+     * @throws URISyntaxException 如果{@link java.net.URI}类解析失败，则会抛出该异常
+     */
     @Throws(URISyntaxException::class)
     private fun getHost(url: String): String {
         val hostUrl = url.toLowerCase(locale)
@@ -305,6 +309,8 @@ object AdBlock {
 
     /**
      * 验证是否为广告链接地址
+     *
+     * @throws NullPointerException 如果再调用该方法前没有调用init()方法的话，就会抛出该异常
      */
     fun isAd(url: String): Boolean {
         return try {
@@ -401,9 +407,9 @@ object Bookmark {
     /**
      * 导入书签
      *
-     * 注意：
+     * <p><b>注意：
      * 1.该方法未开新线程进行文件IO耗时操作，请自行在异步线程调用
-     * 2.该方法涉及文件读取操作，因此Android 6.0+ (API 23)上需要动态申请存储读取权限
+     * 2.该方法涉及文件读取操作，因此Android 6.0+ (API 23)上需要动态申请存储读取权限</b></p>
      */
     fun import(uri: Uri) {
         val file = File(URI(uri.toString()))
@@ -422,9 +428,9 @@ object Bookmark {
     /**
      * 导出书签方法
      *
-     * 注意：
+     * <p><b>注意：
      * 1.该方法未开新线程进行耗时操作，请自行在异步线程调用;
-     * 2.该方法涉及文件写入操作，因此Android 6.0+ (API 23)上需要动态申请存储写入权限
+     * 2.该方法涉及文件写入操作，因此Android 6.0+ (API 23)上需要动态申请存储写入权限</b></p>
      */
     fun export(): File {
 
