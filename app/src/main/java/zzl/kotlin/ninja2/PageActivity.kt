@@ -91,9 +91,15 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     private var mTargetUrl: String? = null
 
     /**
+     * 父任务窗口的TaskId，用于寻找和回退到父任务窗口
+     */
+    private var mParentTaskId: Int = 0
+
+    /**
      * 检查Intent传递的参数
      */
     private fun checkExtra() {
+        mParentTaskId = intent.getIntExtra(EXTRA_TASK_ID, 0)
         isPrivate = intent.getBooleanExtra(EXTRA_PRIVATE, false)
         mPageView.setupViewMode(isPrivate)
 
@@ -1503,8 +1509,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             return
         }
 
-        finishAndRemoveTask()
-        super.onBackPressed()
+        //todo 处理多任务窗口，如果后台打开了多个窗口，可以从当前窗口回到上一个窗口
+        listAppTask()
+
+//        super.onBackPressed()
     }
 
     /**
@@ -1616,4 +1624,29 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         return super.onKeyLongPress(keyCode, event)
     }
 
+    private var mActivityManager: ActivityManager? = null
+
+    /**
+     * 罗列本应用的所有进程任务，如果存在多个后台任务窗口，则寻找打开该任务的上一个窗口（以下称为前窗口），
+     * 如果存在前窗口，则将前窗口呈现出来，然后关闭本任务窗口；
+     * 如果不存在前窗口，则呈现任务栈顶的窗口，然后关闭本任务窗口；
+     * 其他情况，默认调用{@link super.onBackPress}方法来处理
+     */
+    private fun listAppTask() {
+        if (mActivityManager == null) {
+            mActivityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        }
+
+        mActivityManager!!.appTasks.forEach {
+            L.i(TAG, "listAppTask taskInfo id: " + it.taskInfo.id)
+            if (it.taskInfo.id == mParentTaskId) {
+                finishAndRemoveTask()
+                it.moveToFront()
+                return
+            }
+        }
+
+        finishAndRemoveTask()
+        super.onBackPressed()
+    }
 }
