@@ -20,7 +20,6 @@ object Type {
     const val SEARCH_BING = "2"         //Bing
     const val SEARCH_BAIDU = "3"        //Baidu
     const val SEARCH_GITHUB = "4"       //Github
-    const val SEARCH_JUEJIN = "5"       //Juejin
 
-    const val EXTRA_SHORTCUT_BROADCAST = "name" //添加桌面图标的广播Intent Extra标识
+    const val EXTRA_SHORTCUT_BROADCAST = "shortcutName" //添加桌面图标的广播Intent Extra标识
 }

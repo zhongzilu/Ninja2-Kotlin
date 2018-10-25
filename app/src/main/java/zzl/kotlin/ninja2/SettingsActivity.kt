@@ -120,22 +120,15 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 toast(R.string.toast_clear_passwords_success)
             }
 
-        //todo 长按返回时震动
-        //todo 指纹识别扩展
+        //todo[Checked] 指纹识别扩展
             R.string.preference_title_fingerprint_extension ->
                 activity.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
 
-        //书签导入导出
-            R.string.preference_title_import_export_pin -> {
-                //todo[Checked] 处理书签的导入/导出
-                showExportImportBottomSheet()
-            }
+        //todo[Checked] 处理书签的导入/导出
+            R.string.preference_title_import_export_pin -> showExportImportBottomSheet()
 
-        //自定义UA
-            R.string.preference_title_custom_user_agent -> {
-                //todo[Checked] 实现UA的自定义设置
-                showCustomUADialog()
-            }
+        //todo[Checked] 实现UA的自定义设置
+            R.string.preference_title_custom_user_agent -> showCustomUADialog()
 
         //反馈
             R.string.preference_title_feedback -> openUrl(getString(R.string.app_feedback_url))
