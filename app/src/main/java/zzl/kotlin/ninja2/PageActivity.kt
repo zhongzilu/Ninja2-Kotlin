@@ -11,8 +11,7 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.net.http.SslError
-import android.os.Bundle
-import android.os.Message
+import android.os.*
 import android.preference.PreferenceManager
 import android.provider.MediaStore
 import android.security.KeyChain
@@ -413,6 +412,30 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 .registerOnSharedPreferenceChangeListener(this)
 
         registerNetworkChangeBroadcastReceiver()
+
+        registerVibrator()
+    }
+
+    private var mVibrator: Vibrator? = null
+    private fun registerVibrator() {
+        if (!SP.vibrate) return
+        mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+
+    private fun vibrate() {
+        mVibrator?.apply {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // This ignores all exceptions to stay compatible with pre-O implementations.
+                    vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    vibrate(50)
+                }
+            } catch (iae: IllegalArgumentException) {
+                L.e(TAG, "Failed to create VibrationEffect")
+                iae.printStackTrace()
+            }
+        }
     }
 
     /**
@@ -724,14 +747,21 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         //监听地址栏固定设置
             getString(R.string.preference_key_omnibox_fixed) -> setInputBoxNestScroll()
 
+        //地址栏控制设置发生变化
             getString(R.string.preference_key_omnibox_control) -> setOmniboxControlListener()
+
+        //长按震动设置发生变化
+            getString(R.string.preference_key_back_vibrate) -> registerVibrator()
         }
     }
 
     override fun onReceivedWebThemeColor(str: String) {
-        //todo 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
+        //todo[Checked] 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
         L.d(TAG, "onReceivedWebThemeColor: $str")
-//        toolbar.setBackgroundColor(Color.parseColor(str))
+//        window.apply {
+//            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+//            statusBarColor = if (str.isNotEmpty()) Color.parseColor(str) else Color.BLACK
+//        }
     }
 
     override fun onFormResubmission(dontResend: Message, resend: Message) {
@@ -1395,14 +1425,20 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         showMenu(refresh = true)
 
         //rest inputBox
-        mInputBox.setHint(R.string.hint_input_normal)
-        mInputBox.clearFocus()
-        mInputBox.setText("")
-        mInputBox.hideKeyboard()
+        mInputBox.apply {
+            setHint(R.string.hint_input_normal)
+            clearFocus()
+            setText("")
+            hideKeyboard()
+        }
+
+        mPageView?.apply {
+            visibleDo { it.gone() }
+            clearHistory()
+        }
 
         mPinsRecycler?.visible()
         mRecordRecycler?.visibleDo { it.gone() }
-        mPageView?.visibleDo { it.gone() }
         mProgress?.visibleDo { it.gone() }
     }
 
@@ -1568,4 +1604,16 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                     dialog.dismiss()
                 }.create().show()
     }
+
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent): Boolean {
+        if (mCurrentMode == Type.MODE_WEB) {
+            //todo[Checked] 长按返回时震动
+            vibrate()
+            restUiAndStatus()
+            return true
+        }
+
+        return super.onKeyLongPress(keyCode, event)
+    }
+
 }

@@ -450,7 +450,6 @@ fun String.parseUrl(): String {
                 Type.SEARCH_BING -> WebUtil.SEARCH_ENGINE_BING
                 Type.SEARCH_BAIDU -> WebUtil.SEARCH_ENGINE_BAIDU
                 Type.SEARCH_GITHUB -> WebUtil.SEARCH_ENGINE_GITHUB
-                Type.SEARCH_JUEJIN -> WebUtil.SEARCH_ENGINE_JUEJIN
                 else -> ""
             }
 
@@ -463,7 +462,7 @@ fun String.parseUrl(): String {
 
 fun View.toBitmap(w: Float, h: Float, scroll: Boolean = false): Bitmap {
     //todo[BUG] Genymotion Android 6.0上截图只能显示一屏的内容
-    /*该方法在Android 8.0、7.0、5.0上没问题，但在Genymotion Android 6.0上有问题，真机6.0.1的系统没有问题*/
+    /*该方法在Android 8.0、7.0、5.0上没问题，但在Genymotion Android 6.0上有问题，真机6.0的系统没有问题*/
     if (!isDrawingCacheEnabled) isDrawingCacheEnabled = true
 
     var left = left
