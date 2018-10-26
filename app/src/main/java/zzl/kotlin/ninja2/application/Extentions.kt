@@ -188,14 +188,18 @@ fun <T : View> View.findViewOften(viewId: Int): T {
 fun Context.openIntentByDefault(url: String) {
     val intent = url.parseIntent()
     val component = intent.resolveActivity(packageManager)
-    if (component != null) {
-        if (component.packageName == packageName) {
-            startActivity(intent)
-        } else {
-            invokeApp(component.packageName) {
-                toast(R.string.toast_no_handle_application)
-            }
-        }
+    if (component == null) {
+        toast(R.string.toast_no_handle_application)
+        return
+    }
+
+    if (component.packageName == packageName) {
+        startActivity(intent)
+        return
+    }
+
+    invokeApp(component.packageName) {
+        toast(R.string.toast_no_handle_application)
     }
 }
 
@@ -367,7 +371,7 @@ fun String.isIntent(): Boolean {
  * @see https://droidyue.com/blog/2014/11/23/start-android-application-when-click-a-link/
  */
 fun String.parseIntent(): Intent {
-    var intent = Intent()
+    var intent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
     // Parse intent URI into Intent Object
     var flags = 0
     var isIntentUri = false
@@ -398,6 +402,11 @@ val String.pattern
  * 验证是否是带有协议头的Url
  */
 fun String.isProtocolUrl() = pattern.matcher(this).matches()
+
+/**
+ * 验证自定义App协议头，如果百度App的协议头为：baiduboxapp://xxxxxx
+ */
+fun String.isAppProtocolUrl() = Pattern.compile("[a-zA-z]+://[^\\s]*").matcher(this).matches()
 
 /**
  * 验证是否带有协议头{@link #Protocol.MAIL_TO}的Url

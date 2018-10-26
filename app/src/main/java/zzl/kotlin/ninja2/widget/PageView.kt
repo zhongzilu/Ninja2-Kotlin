@@ -421,10 +421,11 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                     true
                 }
                 url.isProtocolUrl() -> false
-                else -> {
-//                    context.openIntentByDefault(url)
-                    false
+                url.isAppProtocolUrl() -> {
+                    context.openIntentByDefault(url)
+                    true
                 }
+                else -> false
             }
         } catch (e: Exception) {
             e.printStackTrace()

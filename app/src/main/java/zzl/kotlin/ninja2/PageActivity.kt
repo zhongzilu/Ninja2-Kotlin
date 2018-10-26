@@ -424,7 +424,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     private var mVibrator: Vibrator? = null
     private fun registerVibrator() {
-        if (!SP.vibrate) return
+        if (!SP.vibrate) {
+            mVibrator = null
+            return
+        }
         mVibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
@@ -574,19 +577,19 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 if (!canSwitch) return
                 val msg: String
                 if (left) {
+                    if (mPageView.canGoBackOrForward(+1)) {
+                        msg = mPageView.getBackOrForwardHistoryItem(+1).title
+                        mPageView.goForward()
+                    } else {
+                        msg = getString(R.string.toast_msg_last_history)
+                    }
+                } else {
                     if (mPageView.canGoBackOrForward(-1)) {
                         msg = mPageView.getBackOrForwardHistoryItem(-1).title
                         mPageView.goBack()
                     } else {
                         restUiAndStatus()
                         return
-                    }
-                } else {
-                    if (mPageView.canGoBackOrForward(+1)) {
-                        msg = mPageView.getBackOrForwardHistoryItem(+1).title
-                        mPageView.goForward()
-                    } else {
-                        msg = getString(R.string.toast_msg_last_history)
                     }
                 }
                 toast(msg)
@@ -1439,7 +1442,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
         }
 
         mPageView?.apply {
-            visibleDo { it.gone() }
+            onBackPressed()
             clearHistory()
         }
 
@@ -1509,7 +1512,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             return
         }
 
-        //todo 处理多任务窗口，如果后台打开了多个窗口，可以从当前窗口回到上一个窗口
+        //todo[Checked] 处理多任务窗口，如果后台打开了多个窗口，可以从当前窗口回到上一个窗口
         listAppTask()
 
 //        super.onBackPressed()
@@ -1613,7 +1616,39 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 }.create().show()
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode != KeyEvent.KEYCODE_BACK) {
+            return super.onKeyDown(keyCode, event)
+        }
+
+        //处理部分 Android N(7.0+)以上系统不回调onKeyLongPress的问题
+        supportN {
+            CountDown.with { handleKeyLongPress() }.start()
+        }
+
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            CountDown.cancle()
+        }
+
+        return super.onKeyUp(keyCode, event)
+    }
+
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent): Boolean {
+        L.d(TAG, "onKeyLongPress")
+
+        if (handleKeyLongPress()) return true
+
+        return super.onKeyLongPress(keyCode, event)
+    }
+
+    /**
+     * 处理长按返回，需要根据配置进行震动反馈，并初始化页面UI
+     */
+    private fun handleKeyLongPress(): Boolean {
         if (mCurrentMode == Type.MODE_WEB) {
             //todo[Checked] 长按返回时震动
             vibrate()
@@ -1621,7 +1656,26 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             return true
         }
 
-        return super.onKeyLongPress(keyCode, event)
+        return false
+    }
+
+    private object CountDown : CountDownTimer(500L, 500L) {
+
+        override fun onFinish() {
+            _todo?.invoke()
+        }
+
+        override fun onTick(millisUntilFinished: Long) {}
+
+        private var _todo: (() -> Unit)? = null
+        fun with(f: (() -> Unit)): CountDown {
+            _todo = f
+            return this
+        }
+
+        fun cancle() {
+            _todo = null
+        }
     }
 
     private var mActivityManager: ActivityManager? = null
