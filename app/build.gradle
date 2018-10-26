@@ -36,6 +36,11 @@ dependencies {
         exclude group: "com.android.support"
     }
 
+    //ZXingLite
+    implementation('com.king.zxing:zxing-lite:1.0.2') {
+        exclude group: "com.android.support"
+    }
+
     //测试
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support:appcompat-v7:27.1.1'
