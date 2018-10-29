@@ -35,6 +35,13 @@
         tools:visibility="visible" />
 
     <TextView
+        android:id="@+id/decodeQRImg"
+        style="@style/MenuOptionItemStyle"
+        android:text="@string/options_extract_qr_code"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
         android:id="@+id/copyUrl"
         style="@style/MenuOptionItemStyle"
         android:text="@string/options_copy_url" />

@@ -37,6 +37,7 @@
     <string name="options_background">在後台打開標簽頁</string>
     <string name="options_copy_url">複制鏈接</string>
     <string name="options_download_image">下載圖片</string>
+    <string name="options_extract_qr_code">識別圖中二維碼</string>
     <string name="options_foreground">在前台打開標簽頁</string>
     <string name="options_new_tab">新建標簽頁</string>
     <string name="options_private">新建無痕浏覽</string>
