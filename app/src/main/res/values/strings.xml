@@ -51,6 +51,7 @@
     <string name="options_background">Open tab in background</string>
     <string name="options_copy_url">Copy URL</string>
     <string name="options_download_image">Download image</string>
+    <string name="options_extract_qr_code">Extract QR Code</string>
     <string name="options_foreground">Open tab in foreground</string>
     <string name="options_new_tab">New tab</string>
     <string name="options_private">New private tab</string>

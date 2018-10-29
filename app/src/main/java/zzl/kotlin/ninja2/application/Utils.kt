@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
 import android.support.v7.widget.GridLayoutManager
@@ -17,6 +19,9 @@ import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.webkit.URLUtil
+import com.google.zxing.*
+import com.google.zxing.common.HybridBinarizer
+import com.king.zxing.DecodeFormatManager
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.json.JSONObject
@@ -26,6 +31,7 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.net.URI
 import java.net.URISyntaxException
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -227,6 +233,8 @@ object Protocol {
     const val INTENT = "intent:"
     const val INTENT_OLD = "#Intent;"
     const val TEL = "tel:"
+
+    const val BASE64 = "data:image/"
 }
 
 /**
@@ -471,6 +479,82 @@ object Bookmark {
             }
         }
         return ""
+    }
+}
+
+/**
+ * 二维码辅助工具类，用于解析二维码内容和判断网络地址是否为二维码图片，
+ */
+object QR {
+
+    /**
+     * 解析Bitmap，判断是否为二维码图片
+     * @param bitmap 图片Bitmap
+     * @return String? 如果bitmap为二维码则返回解析结果，否则返回null
+     */
+    fun decodeBitmap(bitmap: Bitmap): String? {
+        val hints = HashMap<DecodeHintType, Any>()
+
+        //添加可以解析的编码类型
+        hints[DecodeHintType.POSSIBLE_FORMATS] = Vector<BarcodeFormat>().apply {
+            addAll(DecodeFormatManager.ONE_D_FORMATS)
+            addAll(DecodeFormatManager.QR_CODE_FORMATS)
+            addAll(DecodeFormatManager.DATA_MATRIX_FORMATS)
+            addAll(DecodeFormatManager.AZTEC_FORMATS)
+            addAll(DecodeFormatManager.PDF417_FORMATS)
+        }
+
+        return parseCode(bitmap, hints)
+    }
+
+    /**
+     * 解析图片地址，判断是否为二维码图片,该图片地址有可能为base64格式的字符串，
+     * @param url 图片网络地址
+     * @return String? 如果为二维码图片则返回解析结果，如果不是二维码图片则返回null
+     */
+    fun decodeUrl(url: String): String? {
+        var bitmap = url.base64ToBitmap()
+
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeStream(URL(url).openStream())
+        }
+
+        if (bitmap == null) return null
+
+        return decodeBitmap(bitmap)
+    }
+
+    /**
+     * 解析一维码/二维码图片
+     * @param bitmap
+     * @param hints 解析编码类型
+     * @return String? 解析的字符串可能为空k
+     */
+    fun parseCode(bitmap: Bitmap, hints: Map<DecodeHintType, Any>): String? {
+        try {
+            val reader = MultiFormatReader()
+            reader.setHints(hints)
+            return reader.decodeWithState(getBinaryBitmap(bitmap)).text
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    /**
+     * 获取二进制图片
+     * @param bitmap
+     * @return
+     */
+    private fun getBinaryBitmap(bitmap: Bitmap): BinaryBitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val pixels = IntArray(width * height)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        val source = RGBLuminanceSource(width, height, pixels)
+        //得到二进制图片
+        return BinaryBitmap(HybridBinarizer(source))
     }
 }
 

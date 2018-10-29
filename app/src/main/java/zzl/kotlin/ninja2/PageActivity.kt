@@ -940,14 +940,42 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
                         quickDownloadImg = {
                             permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                                Download.inBackground(this@PageActivity, it, WebUtil.HEADER_CONTENT_DISPOSITION, WebUtil.MIME_TYPE_IMAGE)
+                                if (it.isEmpty()) return@permission
+                                startDownloadImg(it)
                             }
                         }
-                    }
 
+                        quickExtractQR = {
+                            toast(it)
+                            if (SP.isOpenInBackground)
+                                openUrlOverviewScreen(it, taskId = taskId)
+                            else openUrl(it, taskId = taskId)
+                        }
+                    }
         }
 
         mQuickOptionDialog!!.setUrl(url).isImageUrl(type in mImageType).show()
+    }
+
+    /**
+     * 开始下载图片，如果图片地址为base64格式的字符串，则将字符串转换成Bitmap后保存
+     */
+    private fun startDownloadImg(it: String) {
+        if (it.isBase64Url()) {
+            doAsync {
+                it.base64ToBitmap()?.apply {
+                    val file = save(System.currentTimeMillis().toString())
+                    file.mediaScan(this@PageActivity)
+                    uiThread { toast(getString(R.string.toast_save_to_path, file.absolutePath)) }
+                    return@doAsync
+                }
+
+                uiThread { toast(R.string.toast_download_failed) }
+            }
+            return
+        }
+
+        Download.inBackground(this, it, WebUtil.HEADER_CONTENT_DISPOSITION, WebUtil.MIME_TYPE_IMAGE)
     }
 
     private var mCustomView: View? = null

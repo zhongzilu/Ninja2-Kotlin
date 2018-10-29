@@ -20,6 +20,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
+import android.util.Base64
 import android.util.Patterns
 import android.util.SparseArray
 import android.view.View
@@ -424,6 +425,11 @@ fun String.isTel() = isNotEmpty() && startsWith(Protocol.TEL)
 fun String.isWebUrl() = Patterns.WEB_URL.matcher(this).matches()
 
 /**
+ * 验证是否是Base64格式的图片字符串
+ */
+fun String.isBase64Url() = isNotEmpty() && startsWith(Protocol.BASE64)
+
+/**
  * 获取Url的主机地址部分
  */
 fun String.host(): String {
@@ -465,6 +471,19 @@ fun String.parseUrl(): String {
             return URLUtil.composeSearchUrl(trim, search, "%s")
         }
     }
+}
+
+/**
+ * 将Base64的图片格式转化成Bitmap，必须是以{@link Protocol#BASE64}开头的字符串
+ * @return Bitmap? 如果是以{@link Protocol#BASE64}开头的字符串，则转换为bitmap，
+ *          否则返回null
+ */
+fun String.base64ToBitmap(): Bitmap? {
+    if (isBase64Url()) {
+        val byteArray = Base64.decode(split(",")[1], Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    }
+    return null
 }
 
 //==========其他==========

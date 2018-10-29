@@ -5,7 +5,9 @@ import android.support.design.widget.BottomSheetDialog
 import android.widget.Switch
 import android.widget.TextView
 import kotlinx.android.synthetic.main.layout_quick_option.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.R
 import zzl.kotlin.ninja2.application.*
 
@@ -39,9 +41,14 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     private lateinit var mNewPrivateTab: TextView
 
     /**
-     * 下载图片菜单选项，默认为不可见{@link View.GONE}
+     * 下载图片菜单选项，默认为不可见{@link View#GONE}
      */
     private lateinit var mDownloadImg: TextView
+
+    /**
+     * 识别二维码菜单选项，默认为不可见{@link View#GONE}
+     */
+    private lateinit var mExtractQRImg: TextView
 
     /**
      * 拷贝链接菜单选项
@@ -58,6 +65,7 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
         mNewTab = newTab
         mNewPrivateTab = privateTab
         mDownloadImg = downloadImg
+        mExtractQRImg = decodeQRImg
         mCopyUrl = copyUrl
         mShareUrl = shareUrl
     }
@@ -96,6 +104,12 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
             dismiss()
         }
 
+        //set extract QR code option click event
+        mExtractQRImg.setOnClickListener {
+            baseCallback?.quickExtractQR?.invoke(mExtractRes)
+            dismiss()
+        }
+
         //set copyToClipboard url option click even
         mCopyUrl.setOnClickListener {
             baseCallback?.let { _method = it.quickCopyUrl }
@@ -121,11 +135,29 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
      */
     fun setUrl(url: String): QuickOptionDialog {
         _url = url.trim()
+        parseUrl(url)
         return this
     }
 
+    private var isQRImage = false
+    private var mExtractRes = ""
+    private fun parseUrl(url: String) {
+        doAsync {
+            val res = QR.decodeUrl(url)
+            if (res == null) {
+                isQRImage = false
+                mExtractRes = ""
+                uiThread { mExtractQRImg.gone() }
+            } else {
+                isQRImage = true
+                mExtractRes = res
+                uiThread { mExtractQRImg.visible() }
+            }
+        }
+    }
+
     /**
-     * 设置下载图片菜单选项是否显示
+     * 设置下载图片菜单选项显示
      */
     fun isImageUrl(bool: Boolean): QuickOptionDialog {
         if (bool) {
@@ -159,6 +191,7 @@ class QuickCallbackWrap {
     var quickNewTab: ((String) -> Unit) = {}
     var quickNewPrivateTab: ((String) -> Unit) = {}
     var quickDownloadImg: ((String) -> Unit) = {}
+    var quickExtractQR: ((String) -> Unit) = {}
     var quickCopyUrl: ((String) -> Unit) = {
         context.copyToClipboard(it)
     }
