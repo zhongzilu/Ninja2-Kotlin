@@ -35,6 +35,7 @@ import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
 import java.io.File
 import java.io.FileOutputStream
+import java.math.BigDecimal
 import java.net.URISyntaxException
 import java.net.URL
 import java.util.regex.Pattern
@@ -484,6 +485,47 @@ fun String.base64ToBitmap(): Bitmap? {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
     return null
+}
+
+/**
+ * 将文件大小转换为格式化的文件大小
+ */
+fun Long.formatSize(): String {
+    val kiloByte = this / 1024
+    if (kiloByte < 1) {
+        return "0K"
+    }
+
+    val megaByte = kiloByte / 1024
+    if (megaByte < 1) {
+        val result1 = BigDecimal(kiloByte.toString())
+        return result1.setScale(2, BigDecimal.ROUND_HALF_UP)
+                .toPlainString() + "K"
+    }
+
+    val gigaByte = megaByte / 1024
+    if (gigaByte < 1) {
+        val result2 = BigDecimal(megaByte.toString())
+        return result2.setScale(2, BigDecimal.ROUND_HALF_UP)
+                .toPlainString() + "M"
+    }
+
+    val teraBytes = gigaByte / 1024
+    if (teraBytes < 1) {
+        val result3 = BigDecimal(gigaByte.toString())
+        return result3.setScale(2, BigDecimal.ROUND_HALF_UP)
+                .toPlainString() + "GB"
+    }
+    val result4 = BigDecimal(teraBytes)
+    return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "TB"
+}
+
+/**
+ * 将字符串中间部分变为星号(*)，保留[start]和[end]长度的字符
+ */
+fun String.toMask(start: Int = 3, end: Int = 2, replace: String = "****"): String {
+    if (length <= (start + 1)) return this
+    return substring(0, start) + replace + substring(length - end, length)
 }
 
 //==========其他==========

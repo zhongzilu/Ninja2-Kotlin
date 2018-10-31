@@ -126,6 +126,7 @@
     <string name="toast_copy_url">Copy %1$s</string>
     <string name="toast_download_failed">Download failed</string>
     <string name="toast_downloading">Downloading %1$s</string>
+    <string name="toast_download_confirm">Download %1$s ?\n%2$s</string>
     <string name="toast_location_permission_denied">Location permission denied</string>
     <string name="toast_pin_to_homepage">Pin %1$s</string>
     <string name="toast_record_audio_permission_denied">Record audio permission denied</string>
