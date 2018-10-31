@@ -21,7 +21,6 @@ import android.view.ViewConfiguration
 import android.webkit.URLUtil
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
-import com.king.zxing.DecodeFormatManager
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.json.JSONObject
@@ -50,7 +49,6 @@ object WebUtil {
     val SEARCH_ENGINE_BING = "http://www.bing.com/search?q=%s"
     val SEARCH_ENGINE_BAIDU = "http://www.baidu.com/s?wd=%s"
     val SEARCH_ENGINE_GITHUB = "https://github.com/search?q=%s"
-    val SEARCH_ENGINE_JUEJIN = "https://juejin.im/search?query=%s"
 
     const val UA_DESKTOP = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     const val URL_ENCODE = "UTF-8"
@@ -62,7 +60,6 @@ object WebUtil {
 
     const val HEADER_CONTENT_DISPOSITION = "Content-Disposition: attachment;"
 
-//    const val EVALUATE_SCRIPT = "(function(){const a={themeColor:\"\",manifest:\"\",icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed\");var j=g.length;for(var e=0;e<j;e++){var f={size:\"\",rel:\"\",href:\"\"};var h=g[e];if(h.hasAttribute(\"sizes\")){f.size=h.sizes[0]}f.rel=h.rel;f.href=h.href;a.icons.push(f)}}function b(){var e=document.querySelector('meta[name=\"theme-color\"]');if(e){a.themeColor=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return JSON.stringify(a)})();\n"
 }
 
 /**
@@ -70,7 +67,7 @@ object WebUtil {
  * Created by zhongzilu on 2018-10-24
  */
 object Evaluate {
-    const val SCRIPT = "(function(){const a={theme_color:\"\",manifest:\"\",icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed\");var j=g.length;for(var e=0;e<j;e++){var f={sizes:\"\",type:\"\",src:\"\"};var h=g[e];if(h.hasAttribute(\"sizes\")){f.sizes=h.sizes[0]}f.type=h.rel;f.src=h.href;a.icons.push(f)}}function b(){var e=document.querySelector('meta[name=\"theme-color\"]');if(e){a.theme_color=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return a})();"
+    const val SCRIPT = "(function(){const a={theme_color:'',manifest:'',icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed']\");var j=g.length;for(var e=0;e<j;e++){var f={sizes:'',type:'',src:''};var h=g[e];if(h.hasAttribute('sizes')){f.sizes=h.sizes[0]}f.type=h.rel;f.src=h.href;a.icons.push(f)}}function b(){var e=document.querySelector(\"meta[name='theme-color']\");if(e){a.theme_color=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return a})();"
 
     private const val THEME_NAME = "theme_color"
     private const val ICONS_NAME = "icons"
