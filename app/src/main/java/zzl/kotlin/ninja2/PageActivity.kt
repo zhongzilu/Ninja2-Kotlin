@@ -864,7 +864,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
         //todo[Checked] 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
-        AuthLoginBottomSheet(this).apply {
+        AuthLoginDialog(this).apply {
             setTitle(host)
             setOnPositiveClickListener { handler.proceed(getUserName(), getPassword()) }
             setOnNegativeClickListener { handler.cancel() }
