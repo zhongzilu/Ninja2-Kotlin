@@ -136,10 +136,8 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         //开源协议
             R.string.preference_title_licenses -> openUrl(getString(R.string.app_licenses_url))
 
-        //版本
-            R.string.preference_title_version -> {
-                //todo 应用版本的问题
-            }
+        //todo[Checked] 应用版本的问题
+            R.string.preference_title_version -> openUrl(getString(R.string.app_release_url))
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference)
     }
