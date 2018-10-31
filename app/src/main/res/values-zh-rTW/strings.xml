@@ -69,7 +69,7 @@
     <string name="preference_summary_omnibox_fixed">關閉地址欄跟隨滑動顯示/隱藏</string>
 
     <string name="preference_title_adblock">廣告屏蔽</string>
-    <string name="preference_title_back_vibrate">返回時震動</string>
+    <string name="preference_title_back_vibrate">長按返回時震動</string>
     <string name="preference_title_clear_cookies">清空 Cookies</string>
     <string name="preference_title_clear_form_data">清空表單數據</string>
     <string name="preference_title_clear_history">清空曆史記錄</string>

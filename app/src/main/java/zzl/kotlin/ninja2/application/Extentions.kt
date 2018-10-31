@@ -410,12 +410,12 @@ fun String.isProtocolUrl() = pattern.matcher(this).matches()
 fun String.isAppProtocolUrl() = Pattern.compile("[a-zA-z]+://[^\\s]*").matcher(this).matches()
 
 /**
- * 验证是否带有协议头{@link #Protocol.MAIL_TO}的Url
+ * 验证是否带有协议头[Protocol.MAIL_TO]的Url
  */
 fun String.isEmailTo() = isNotEmpty() && startsWith(Protocol.MAIL_TO)
 
 /**
- * 验证是否带有协议头{@link #Protocol.TEL}的url
+ * 验证是否带有协议头[Protocol.TEL]的url
  */
 fun String.isTel() = isNotEmpty() && startsWith(Protocol.TEL)
 
@@ -457,7 +457,7 @@ fun String.parseUrl(): String {
             println("group2: $group2")
             return trim.replace(" ", "%20")
         }
-        Patterns.WEB_URL.matcher(trim).matches() -> return URLUtil.guessUrl(trim)
+        trim.isWebUrl() -> return URLUtil.guessUrl(trim)
         else -> {
             val search = when (SP.searchEngine) {
                 Type.SEARCH_GOOGLE -> WebUtil.SEARCH_ENGINE_GOOGLE
@@ -474,8 +474,8 @@ fun String.parseUrl(): String {
 }
 
 /**
- * 将Base64的图片格式转化成Bitmap，必须是以{@link Protocol#BASE64}开头的字符串
- * @return Bitmap? 如果是以{@link Protocol#BASE64}开头的字符串，则转换为bitmap，
+ * 将Base64的图片格式转化成Bitmap，必须是以[Protocol.BASE64]开头的字符串
+ * @return Bitmap? 如果是以[Protocol.BASE64]开头的字符串，则转换为bitmap，
  *          否则返回null
  */
 fun String.base64ToBitmap(): Bitmap? {
@@ -658,7 +658,7 @@ fun <T : TextView> T.drawableBottom(resId: Int) {
 }
 
 /**
- * 给TextView或继承自TextView的组件设置{@link #TextView.addTextChangedListener}
+ * 给TextView或继承自TextView的组件设置[TextView.addTextChangedListener]
  */
 fun <T : TextView> T.addTextWatcher(watcher: (text: String) -> Unit) {
     this.addTextChangedListener(object : TextWatcher {

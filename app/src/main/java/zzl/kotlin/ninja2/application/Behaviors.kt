@@ -11,7 +11,7 @@ import zzl.kotlin.ninja2.R
 /**
  * 地址栏嵌套滑动的Behavior，该Behavior只能作用于带有
  * {@link app:layout_behavior="@string/bottom_sheet_behavior"}的节点，
- * 并且直接父布局为{@link #android.support.design.widget.CoordinatorLayout}
+ * 并且直接父布局为[android.support.design.widget.CoordinatorLayout]
  * Created by zhongzilu on 2018/9/27
  */
 class InputBoxBehavior(var context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<View>(context, attrs) {

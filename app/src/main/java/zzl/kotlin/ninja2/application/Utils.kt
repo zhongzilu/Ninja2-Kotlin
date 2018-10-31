@@ -77,7 +77,7 @@ object Evaluate {
     private const val ICON_TYPE_NAME = "type"
 
     /**
-     * 该数据类是对应{@link Evaluate#SCRIPT}脚本注入之后返回的json字符串，
+     * 该数据类是对应[SCRIPT]脚本注入之后返回的json字符串，
      * 该数据类包含网站主题色配置、网站favicon不同尺寸图标的集合、针对Android平台设置的配置json文件路径
      */
     data class Result(
@@ -104,9 +104,9 @@ object Evaluate {
 
     /**
      * 网站图标数据类，包含图标地址，图标的尺寸信息，以及图标类型。
-     * 该数据类中的{@link Icon#type}并没有使用到，可以考虑去掉；
-     * {@link Icon#sizes}字段的格式为：NxN。比如：32x32，该尺寸信息需要再次处理后才能使用；
-     * {@link Icon#src}字段为图标的网络地址，可以直接用于ImageView的显示
+     * 该数据类中的[Icon.type]并没有使用到，可以考虑去掉；
+     * [Icon.sizes]字段的格式为：NxN。比如：32x32，该尺寸信息需要再次处理后才能使用；
+     * [Icon.src]字段为图标的网络地址，可以直接用于ImageView的显示
      */
     data class Icon(
             var src: String,
@@ -115,7 +115,7 @@ object Evaluate {
     )
 
     /**
-     * 用来解析脚本{@link #SCRIPT}注入之后返回的JSON数据.
+     * 用来解析脚本[SCRIPT]注入之后返回的JSON数据.
      * JSON数据主要包括网站主题色、网站图标集合、Android端特有的manifest.json配置文件。
      *
      * 由于manifest.json文件中已经定义了很全面的配置信息，因此如果网站上有该配置，
@@ -154,7 +154,7 @@ object Evaluate {
     /**
      * 将字符串解析成Icon对象，
      * 该方法可以用来解析manifest.json文件中的icon集合，
-     * 也可以用来解析脚本{@link #SCRIPT}注入之后返回的{@link #ICONS_NAME}字段数据
+     * 也可以用来解析脚本[SCRIPT]注入之后返回的[ICONS_NAME]字段数据
      *
      * @param json
      * @return Evaluate#Icon
@@ -195,7 +195,7 @@ object Evaluate {
     }
 
     /**
-     * 解析{@link Evaluate#Icon}的{@link Icon#sizes}字段，将NxN格式的字段串解析并截取出尺寸信息。
+     * 解析[Evaluate.Icon]的[Icon.sizes]字段，将NxN格式的字段串解析并截取出尺寸信息。
      * 例：32x32的字符串，解析后将返回整数型32
      *
      * @param size 尺寸信息字段串，该字符串符合格式：NxN
@@ -279,7 +279,7 @@ object AdBlock {
     private val locale = Locale.getDefault()
 
     /**
-     * 初始化广告拦截名单，如果{@link #hostSet}不为空，则忽略，不再重新加载数据
+     * 初始化广告拦截名单，如果[hostSet]不为空，则忽略，不再重新加载数据
      */
     fun init(context: Context) {
         if (hostSet.isNotEmpty()) return
@@ -300,7 +300,7 @@ object AdBlock {
 
     /**
      * 获取url的Host地址，有一定的概率会获取失败，抛出异常
-     * @throws URISyntaxException 如果{@link java.net.URI}类解析失败，则会抛出该异常
+     * @throws URISyntaxException 如果[java.net.URI]类解析失败，则会抛出该异常
      */
     @Throws(URISyntaxException::class)
     private fun getHost(url: String): String {

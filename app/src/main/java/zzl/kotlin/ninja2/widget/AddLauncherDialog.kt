@@ -60,10 +60,7 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
      *
      * @param title 标题
      */
-    fun setLabel(title: CharSequence?): AddLauncherDialog {
-        mLabelText = title
-        return this
-    }
+    fun setLabel(title: CharSequence?) = apply { mLabelText = title }
 
     /**
      * 设置桌面图标标题
@@ -101,10 +98,9 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
      *
      * @param bitmap 桌面图标bitmap
      */
-    fun setIcon(bitmap: Bitmap?): AddLauncherDialog {
+    fun setIcon(bitmap: Bitmap?) = apply {
         mLauncherBitmap = bitmap
         mLauncherBitmap?.let { mLauncherIcon?.setImageBitmap(it) }
-        return this
     }
 
     private fun initView() {
@@ -153,25 +149,20 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
     /**
      * 设置选择更换图标的监听器
      */
-    fun setOnSelectListener(todo: () -> Unit): AddLauncherDialog {
-        _selectListener = todo
-        return this
-    }
+    fun setOnSelectListener(todo: () -> Unit) = apply { _selectListener = todo }
 
     private var mPositiveListener: ((v: AddLauncherDialog) -> Unit)? = null
     private var mPositiveBtnText: String = "确定"
-    fun setOnPositiveClickListener(text: String = "确定", todo: ((v: AddLauncherDialog) -> Unit)?): AddLauncherDialog {
+    fun setOnPositiveClickListener(text: String = "确定", todo: ((v: AddLauncherDialog) -> Unit)?) = apply {
         mPositiveBtnText = text
         mPositiveListener = todo
-        return this
     }
 
     private var mNegativeListener: ((v: AddLauncherDialog) -> Unit)? = null
     private var mNegativeBtnText: String = "取消"
-    fun setOnNegativeClickListener(text: String = "取消", todo: ((v: AddLauncherDialog) -> Unit)?): AddLauncherDialog {
+    fun setOnNegativeClickListener(text: String = "取消", todo: ((v: AddLauncherDialog) -> Unit)?) = apply {
         mNegativeBtnText = text
         mNegativeListener = todo
-        return this
     }
 
     override fun show() {
