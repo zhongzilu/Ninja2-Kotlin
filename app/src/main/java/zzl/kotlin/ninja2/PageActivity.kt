@@ -70,7 +70,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     /**
-     * If {@link Intent#FLAG_ACTIVITY_MULTIPLE_TASK} has not been used this Activity
+     * If [Intent.FLAG_ACTIVITY_MULTIPLE_TASK] has not been used this Activity
      * will be reused.
      */
     override fun onNewIntent(intent: Intent?) {
@@ -708,7 +708,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     /**
      * 底部菜单的展开/关闭状态监听器
-     * 当拖拽底部菜单时，需要动态改变灰色背景{@link #mMaskView}的透明度
+     * 当拖拽底部菜单时，需要动态改变灰色背景[mMaskView]的透明度
      */
     private val mBottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
 
@@ -1143,7 +1143,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 这里可以用接收到的图标地址，下载后转为Bitmap，用做最近任务栏的图标，
      * 或者用来作为网站添加到桌面的快捷图标
      *
-     * 详情查看{@link PageChromeClient#onReceivedTouchIconUrl}
+     * 详情查看[PageChromeClient.onReceivedTouchIconUrl]
      *
      * 推荐博客：https://droidyue.com/blog/2015/01/18/deal-with-touch-icon-in-android/
      */
@@ -1157,14 +1157,14 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     /**
      * 设置应用最近任务栏的样式
-     * 该方法是{@link #Build.VERSION_CODES.LOLLIPOP}新增的API，
+     * 该方法是[Build.VERSION_CODES.LOLLIPOP]新增的API，
      * 用来修改应用在最近任务栏的默认样式，这里用来实现对应网页在最近任务栏的不同样式。
      *
      * @param title 网站的标题。如果没有标题，则默认使用应用的名称
      * @param icon  网站的favicon图标。网站有可能没有设置favicon图标，如果没有则默认使用应用的桌面图标
      * @param color 网站的主题色。网站极大可能没有设置主题色，因此此参数默认为空字符串，
-     *              在没有网站主题色的情况下，如果当前为隐私模式时，主题色为{@link Color#BLACK}
-     *              如果为普通模式时，主题色为{@link Color#WHITE}
+     * 在没有网站主题色的情况下，如果当前为隐私模式时，主题色为[Color.BLACK],
+     * 如果为普通模式时，主题色为[Color.WHITE]
      */
     private fun setAppTaskDescription(title: String, icon: Bitmap?, color: String = "") {
         var label = title
@@ -1712,7 +1712,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 罗列本应用的所有进程任务，如果存在多个后台任务窗口，则寻找打开该任务的上一个窗口（以下称为前窗口），
      * 如果存在前窗口，则将前窗口呈现出来，然后关闭本任务窗口；
      * 如果不存在前窗口，则呈现任务栈顶的窗口，然后关闭本任务窗口；
-     * 其他情况，默认调用{@link super.onBackPress}方法来处理
+     * 其他情况，默认调用{@link super.onBackPressed}方法来处理
      */
     private fun listAppTask() {
         if (mActivityManager == null) {

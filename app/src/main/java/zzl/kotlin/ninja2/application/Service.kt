@@ -58,8 +58,8 @@ class FingerprintService : AccessibilityService() {
 
     /**
      * 初始化指纹识别服务,在初始化FingerprintManager前，
-     * 必须执行{@link #checkFingerprintManager}方法，
-     * 之所以不用{@link #FingerprintManagerCompat}类，
+     * 必须执行[checkFingerprintManager]方法，
+     * 之所以不用[android.support.v4.hardware.fingerprint.FingerprintManagerCompat]类，
      * 是因为该类默认在Android 6.0一下无指纹识别，但市面上仍然存在Android 5.0的机型上存在指纹识别器。
      * 为了兼容，因此利用反射去检查系统中是否存在FingerprintManager Api,
      * 如果存在才能进行初始化操作，不然会抛出异常
@@ -91,12 +91,12 @@ class FingerprintService : AccessibilityService() {
     private fun registerFingerprint() {
 
         if (!SP.hasFingerprintManager) {
-            L.i(TAG, "have no fingerprint manager")
+            L.w(TAG, "have no fingerprint manager")
             return
         }
 
         if (!hadFingerprintPermission()) {
-            L.i(TAG, "have no permission")
+            L.w(TAG, "have no permission")
             return
         }
 
@@ -105,7 +105,7 @@ class FingerprintService : AccessibilityService() {
             mCancellationSignal = CancellationSignal()
             mFingerprintManager.authenticate(null, mCancellationSignal, 0, _authenticationCallback, null)
         } else {
-            L.i(TAG, "Fingerprint have no enrolled")
+            L.w(TAG, "Fingerprint have no enrolled")
         }
     }
 
@@ -121,7 +121,7 @@ class FingerprintService : AccessibilityService() {
      * 检查是否存在FingerprintManager Api，通过反射来查找相关Api类是否存在
      * 为了避免每次都进行反射查找，就采用将第一次查询结果存储在SharePreference中,
      * 如果存在则存为true,不存在则存为false。
-     * 只有存在的情况下才能初始化{@link #mFingerprintManager}
+     * 只有存在的情况下才能初始化[mFingerprintManager]
      */
     private fun checkFingerprintManager() {
 //        if (!SP.isFirstInstall) return
@@ -147,7 +147,7 @@ class FingerprintService : AccessibilityService() {
         // 当出现错误的时候回调此函数，比如多次尝试都失败了的时候，errString是错误信息
         override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
             super.onAuthenticationError(errMsgId, errString)
-            L.i(TAG, "onAuthenticationError: $errString")
+            L.w(TAG, "onAuthenticationError: $errString")
             mHandler.sendEmptyMessageDelayed(0, DELAY)
             cancelSignal()
         }
@@ -170,7 +170,7 @@ class FingerprintService : AccessibilityService() {
         // 当指纹验证失败的时候会回调此函数，失败之后允许多次尝试，失败次数过多会停止响应一段时间然后再停止sensor的工作
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            L.i(TAG, "onAuthenticationFailed")
+            L.w(TAG, "onAuthenticationFailed")
 
             doAction(ACTION_SCREEN_SPLIT)
         }

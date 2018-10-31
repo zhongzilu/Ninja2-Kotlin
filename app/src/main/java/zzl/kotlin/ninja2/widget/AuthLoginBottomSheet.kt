@@ -29,7 +29,7 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
     private var mTitleText: CharSequence? = null
 
     /**
-     * 标题文本，默认隐藏状态{@link #View.GONE}
+     * 标题文本，默认隐藏状态[android.view.View.GONE]
      */
     private lateinit var mTitle: TextView
 
@@ -155,14 +155,8 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
     }
 
     private var mPositiveListener: ((v: AuthLoginBottomSheet) -> Unit)? = null
-    fun setOnPositiveClickListener(todo: ((v: AuthLoginBottomSheet) -> Unit)?): AuthLoginBottomSheet {
-        mPositiveListener = todo
-        return this
-    }
+    fun setOnPositiveClickListener(todo: ((v: AuthLoginBottomSheet) -> Unit)?) = apply { mPositiveListener = todo }
 
     private var mNegativeListener: ((v: AuthLoginBottomSheet) -> Unit)? = null
-    fun setOnNegativeClickListener(todo: ((v: AuthLoginBottomSheet) -> Unit)?): AuthLoginBottomSheet {
-        mNegativeListener = todo
-        return this
-    }
+    fun setOnNegativeClickListener(todo: ((v: AuthLoginBottomSheet) -> Unit)?) = apply { mNegativeListener = todo }
 }

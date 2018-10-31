@@ -143,7 +143,7 @@
 
     <string name="app_feedback_url">https://github.com/zhongzilu/Ninja2-Kotlin/issues</string>
     <string name="app_intro_url">http://mthli.github.io/Ninja2-Introduction</string>
-    <string name="app_licenses_url">https://github.com/mthli/Ninja/blob/master/LICENSE</string>
+    <string name="app_licenses_url">https://github.com/zhongzilu/Ninja2-Kotlin/blob/master/LICENSE</string>
     <string name="app_name">Ninja2</string>
     <string name="preference_key_adblock">preference_key_adblock</string>
     <string name="preference_key_back_vibrate">preference_key_back_vibrate</string>

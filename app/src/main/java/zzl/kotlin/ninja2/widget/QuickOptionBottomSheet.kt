@@ -41,12 +41,12 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     private lateinit var mNewPrivateTab: TextView
 
     /**
-     * 下载图片菜单选项，默认为不可见{@link View#GONE}
+     * 下载图片菜单选项，默认为不可见[android.view.View.GONE]
      */
     private lateinit var mDownloadImg: TextView
 
     /**
-     * 识别二维码菜单选项，默认为不可见{@link View#GONE}
+     * 识别二维码菜单选项，默认为不可见[android.view.View.GONE]
      */
     private lateinit var mExtractQRImg: TextView
 
@@ -133,10 +133,9 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
      *
      * @url 这里是设置网页上长按获取到的连接
      */
-    fun setUrl(url: String): QuickOptionDialog {
+    fun setUrl(url: String) = apply {
         _url = url.trim()
         parseUrl(url)
-        return this
     }
 
     private var isQRImage = false
@@ -159,13 +158,12 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     /**
      * 设置下载图片菜单选项显示
      */
-    fun isImageUrl(bool: Boolean): QuickOptionDialog {
+    fun isImageUrl(bool: Boolean) = apply {
         if (bool) {
             mDownloadImg.visible()
         } else {
             mDownloadImg.gone()
         }
-        return this
     }
 
     /**
@@ -176,11 +174,10 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     /**
      * 设置各个选项的监听器回调
      */
-    fun setQuickListener(init: (QuickCallbackWrap.() -> Unit)): QuickOptionDialog {
+    fun setQuickListener(init: (QuickCallbackWrap.() -> Unit)) = apply {
         baseCallback = QuickCallbackWrap()
         baseCallback!!.context = context
         baseCallback!!.init() // 执行闭包，完成数据填充
-        return this // 用于返回
     }
 }
 

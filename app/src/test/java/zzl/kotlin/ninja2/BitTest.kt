@@ -41,7 +41,7 @@ class BitTest {
     }
 
     /**
-     * 判断32位整数的二进制{@link #bit}位是否为1，为1返回true，为0返回false
+     * 判断32位整数的二进制[bit]位是否为1，为1返回true，为0返回false
      * @param base      计算的基础整数
      * @param bit       指定二进制的第几位，该值必须为0～31闭区间的整数
      */

@@ -58,14 +58,8 @@ class ExportImportBottomSheet(context: Context) : BottomSheetDialog(context, R.s
     }
 
     private var mExportEvent: (() -> Unit)? = null
-    fun setOnExportOptionClick(todo: (() -> Unit)?): ExportImportBottomSheet {
-        mExportEvent = todo
-        return this
-    }
+    fun setOnExportOptionClick(todo: (() -> Unit)?) = apply { mExportEvent = todo }
 
     private var mImportEvent: (() -> Unit)? = null
-    fun setOnImportOptionClick(todo: (() -> Unit)?): ExportImportBottomSheet {
-        mImportEvent = todo
-        return this
-    }
+    fun setOnImportOptionClick(todo: (() -> Unit)?) = apply { mImportEvent = todo }
 }

@@ -962,7 +962,7 @@ class PageChromeClient(val delegate: Delegate) : WebChromeClient() {
     }
 
     /**
-     * 通知主应用程序，用先前对{@link #onGeolocationPermissionsShowPrompt}的调用进行的地理位置权限请求已被取消
+     * 通知主应用程序，用先前对[onGeolocationPermissionsShowPrompt]的调用进行的地理位置权限请求已被取消
      */
     override fun onGeolocationPermissionsHidePrompt() {
         delegate.onGeolocationPermissionsHidePrompt()

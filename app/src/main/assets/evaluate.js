@@ -1,12 +1,12 @@
 (function () {
     const result = {
-        theme_color: "",
-        manifest: "",
+        theme_color: '',
+        manifest: '',
         icons: []
     };
 
     function obtainTouchIcons() {
-        var iconElement = document.querySelectorAll("link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed");
+        var iconElement = document.querySelectorAll("link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed']");
         var length = iconElement.length;
         for (var i = 0; i < length; i++) {
             var icon = {
@@ -23,7 +23,7 @@
     }
 
     function obtainThemeColor() {
-        var meta = document.querySelector('meta[name=\"theme-color\"]');
+        var meta = document.querySelector("meta[name='theme-color']");
         if (meta) result.theme_color = meta.content;
     }
 

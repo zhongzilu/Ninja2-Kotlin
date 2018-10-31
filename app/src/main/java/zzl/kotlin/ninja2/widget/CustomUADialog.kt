@@ -49,10 +49,7 @@ class CustomUADialog(context: Context) : Dialog(context, R.style.AppTheme_Dialog
     fun getUA(): String = mUAEdit.text.toString().trim()
 
     private var mUA: String? = null
-    fun setUA(ua: String): CustomUADialog {
-        mUA = ua
-        return this
-    }
+    fun setUA(ua: String) = apply { mUA = ua }
 
     override fun show() {
         mUA?.let { mUAEdit.setText(it) }
@@ -82,14 +79,8 @@ class CustomUADialog(context: Context) : Dialog(context, R.style.AppTheme_Dialog
     }
 
     private var mPositiveListener: ((v: CustomUADialog) -> Unit)? = null
-    fun setOnPositiveClickListener(todo: ((v: CustomUADialog) -> Unit)?): CustomUADialog {
-        mPositiveListener = todo
-        return this
-    }
+    fun setOnPositiveClickListener(todo: ((v: CustomUADialog) -> Unit)?) = apply { mPositiveListener = todo }
 
     private var mNegativeListener: ((v: CustomUADialog) -> Unit)? = null
-    fun setOnNegativeClickListener(todo: ((v: CustomUADialog) -> Unit)?): CustomUADialog {
-        mNegativeListener = todo
-        return this
-    }
+    fun setOnNegativeClickListener(todo: ((v: CustomUADialog) -> Unit)?) = apply { mNegativeListener = todo }
 }

@@ -109,10 +109,10 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     /**
-     * Returns an new {@link Intent} to start {@link PageActivity} as a new document in
+     * Returns an new [Intent] to start [PageActivity] as a new document in
      * overview menu.
      *
-     * To start a new document task {@link Intent#FLAG_ACTIVITY_NEW_DOCUMENT} must be used. The
+     * To start a new document task [Intent.FLAG_ACTIVITY_NEW_DOCUMENT] must be used. The
      * system will search through existing tasks for one whose Intent matches the Intent component
      * name and the Intent data. If it finds one then that task will be brought to the front and the
      * new Intent will be passed to onNewIntent().
@@ -127,14 +127,14 @@ abstract class BaseActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
 
             /*
-            When {@linkIntent#FLAG_ACTIVITY_NEW_DOCUMENT} is used with {@link Intent#FLAG_ACTIVITY_MULTIPLE_TASK}
+            When {@link Intent#FLAG_ACTIVITY_NEW_DOCUMENT} is used with {@link Intent#FLAG_ACTIVITY_MULTIPLE_TASK}
             the system will always create a new task with the target activity as the root. This allows the same
             document to be opened in more than one task.
             */
             addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
 
             supportN {
-                //                    addFlags(CodedOutputStream.DEFAULT_BUFFER_SIZE); //4096
+                //addFlags(CodedOutputStream.DEFAULT_BUFFER_SIZE); //4096
                 addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
             }
         }
