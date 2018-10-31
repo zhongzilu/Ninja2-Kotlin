@@ -5,7 +5,7 @@ Ninja2-Kotlin LTS
 
 一款简约、轻量级的安卓浏览器。原型及创意来源于[Ninja2](https://github.com/mthli/Ninja2 "mthli/Ninja2")，由于Ninja2未开源，于是打算自己写一个版本，并在原有基础上增加一些实用的功能，该版本将受到长期支持。
 
-[戳此下载最新版本APK](https://github.com/zhongzilu/Ninja2-Kotlin/releases/download/v1.0.0/Ninja2-preview.1.0.apk "Ninja2-preview.1.0.apk")
+[戳此下载最新版本APK](https://github.com/zhongzilu/Ninja2-Kotlin/releases/download/v1.0.1/Ninja2-preview.1.0.1.apk "Ninja2-preview.1.0.1.apk")
 
 __由于使用了一些Android新版本的特性，故没有做Android 5.0版本以下的兼容。__
 
