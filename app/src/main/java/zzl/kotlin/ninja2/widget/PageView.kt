@@ -257,7 +257,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         //false不需要请求控制直接播放媒体文件即可以自动播放音乐
         mediaPlaybackRequiresUserGesture = true
         //支持插件
-//        pluginState = WebSettings.PluginState.ON
+        pluginState = WebSettings.PluginState.ON
     }
 
     private fun settingMultipleWindow() {
