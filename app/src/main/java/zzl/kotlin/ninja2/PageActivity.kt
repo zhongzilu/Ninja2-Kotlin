@@ -771,6 +771,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     private fun setStatusBarColor(color: String) {
+        if (isPrivate) return
         window.apply {
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             statusBarColor = if (color.isNotEmpty()) Color.parseColor(color) else Color.BLACK
@@ -1196,7 +1197,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             bitmap = mAppIcon
         }
 
-        if (color.isNotEmpty()) {
+        if (color.isNotEmpty() && !isPrivate) {
             color2 = Color.parseColor(color)
         }
 
