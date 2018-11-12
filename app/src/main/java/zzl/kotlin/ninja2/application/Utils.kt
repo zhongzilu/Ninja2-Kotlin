@@ -362,12 +362,7 @@ object Download {
      * @param mimeType 文件类型
      */
     fun inBackground(context: Context, url: String, contentDisposition: String, mimeType: String) {
-        var guessFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
-
-        // 临时解决下载文件后缀名不匹配的问题
-        val suffix = url.substring(url.lastIndexOf("."))
-        guessFileName = guessFileName.replace(".bin", suffix)
-
+        val guessFileName = parseFileName(url, contentDisposition, mimeType)
         L.i("DownloadUtil-->", "download guessFileName: $guessFileName")
         try {
             val request = DownloadManager.Request(Uri.parse(url)).apply {
@@ -383,6 +378,22 @@ object Download {
         } catch (e: Exception) {
             e.printStackTrace()
             context.toast(e.localizedMessage)
+        }
+    }
+
+    /**
+     * 解析下载文件的文件名
+     * @param url 下载地址
+     * @param contentDisposition 内容描述
+     * @param mimeType 文件类型
+     */
+    fun parseFileName(url: String, contentDisposition: String, mimeType: String): String {
+        return URLUtil.guessFileName(url, contentDisposition, mimeType).apply {
+            if (endsWith(".bin") && url.indexOf(".") > 0) {
+                // 临时解决下载文件后缀名不匹配的问题
+                val suffix = url.substring(url.lastIndexOf("."))
+                replace(".bin", suffix)
+            }
         }
     }
 }

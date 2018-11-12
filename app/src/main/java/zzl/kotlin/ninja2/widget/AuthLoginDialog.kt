@@ -13,7 +13,7 @@ import zzl.kotlin.ninja2.application.visible
  * 网页认证登录弹出框
  * Created by zhongzilu on 2018-10-16
  */
-class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_Dialog) {
+class AuthLoginDialog(context: Context) : Dialog(context, R.style.AppTheme_Dialog) {
 
     init {
         setContentView(R.layout.layout_auth_login)
@@ -91,7 +91,7 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
      */
     fun getPassword(): String = mPasswordEdit.text.toString().trim()
 
-    private var _method: ((v: AuthLoginBottomSheet) -> Unit)? = null
+    private var _method: ((v: AuthLoginDialog) -> Unit)? = null
     private fun initEvent() {
 
         setCancelable(false)
@@ -112,7 +112,7 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
 
         //set dismiss listener
         setOnDismissListener {
-            _method?.invoke(this@AuthLoginBottomSheet)
+            _method?.invoke(this@AuthLoginDialog)
             _method = null
         }
     }
@@ -154,9 +154,9 @@ class AuthLoginBottomSheet(context: Context) : Dialog(context, R.style.AppTheme_
         super.show()
     }
 
-    private var mPositiveListener: ((v: AuthLoginBottomSheet) -> Unit)? = null
-    fun setOnPositiveClickListener(todo: ((v: AuthLoginBottomSheet) -> Unit)?) = apply { mPositiveListener = todo }
+    private var mPositiveListener: ((v: AuthLoginDialog) -> Unit)? = null
+    fun setOnPositiveClickListener(todo: ((v: AuthLoginDialog) -> Unit)?) = apply { mPositiveListener = todo }
 
-    private var mNegativeListener: ((v: AuthLoginBottomSheet) -> Unit)? = null
-    fun setOnNegativeClickListener(todo: ((v: AuthLoginBottomSheet) -> Unit)?) = apply { mNegativeListener = todo }
+    private var mNegativeListener: ((v: AuthLoginDialog) -> Unit)? = null
+    fun setOnNegativeClickListener(todo: ((v: AuthLoginDialog) -> Unit)?) = apply { mNegativeListener = todo }
 }

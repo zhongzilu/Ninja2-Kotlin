@@ -868,7 +868,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
         //todo[Checked] 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
-        AuthLoginBottomSheet(this).apply {
+        AuthLoginDialog(this).apply {
             setTitle(host)
             setOnPositiveClickListener { handler.proceed(getUserName(), getPassword()) }
             setOnNegativeClickListener { handler.cancel() }
@@ -916,7 +916,17 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
         //todo[Checked] 处理下载任务监听
         permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-            Download.inBrowser(this, url, contentDisposition, mimetype)
+
+            var fileName = Download.parseFileName(url, contentDisposition, mimetype)
+
+            if (fileName.length > 30) {
+                fileName = fileName.toMask(10, 10)
+            }
+
+            Snackbar.make(mInputBox, getString(R.string.toast_download_confirm, fileName, contentLength.formatSize()), Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.dialog_button_confirm) {
+                        Download.inBrowser(this, url, contentDisposition, mimetype)
+                    }.show()
         }
     }
 
