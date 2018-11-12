@@ -767,10 +767,14 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onReceivedWebThemeColor(str: String) {
         //todo[Checked] 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
         L.d(TAG, "onReceivedWebThemeColor: $str")
-//        window.apply {
-//            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-//            statusBarColor = if (str.isNotEmpty()) Color.parseColor(str) else Color.BLACK
-//        }
+        setStatusBarColor(str)
+    }
+
+    private fun setStatusBarColor(color: String) {
+        window.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = if (color.isNotEmpty()) Color.parseColor(color) else Color.BLACK
+        }
     }
 
     override fun onFormResubmission(dontResend: Message, resend: Message) {
@@ -1135,6 +1139,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onReceivedWebConfig(title: String, icon: Bitmap?, color: String) {
         //todo[Checked] 处理接收到的网站配置
         L.d(TAG, "onReceivedWebConfig $title : $color | ${icon != null}")
+        setStatusBarColor(color)
         setAppTaskDescription(title, icon, color)
     }
 
