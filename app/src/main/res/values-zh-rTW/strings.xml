@@ -110,6 +110,7 @@
     <string name="toast_copy_url">已複制 %1$s</string>
     <string name="toast_download_failed">下載失敗</string>
     <string name="toast_downloading">正在下載 %1$s</string>
+    <string name="toast_download_confirm">是否下載 %1$s ?\n%2$s</string>
     <string name="toast_location_permission_denied">定位權限已被阻止</string>
     <string name="toast_pin_to_homepage">已添加 %1$s 到主頁</string>
     <string name="toast_record_audio_permission_denied">錄音權限已被阻止</string>
