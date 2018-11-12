@@ -67,9 +67,9 @@ object WebUtil {
  * Created by zhongzilu on 2018-10-24
  */
 object Evaluate {
-    const val SCRIPT = "(function(){const a={theme_color:'',manifest:'',icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed']\");var j=g.length;for(var e=0;e<j;e++){var f={sizes:'',type:'',src:''};var h=g[e];if(h.hasAttribute('sizes')){f.sizes=h.sizes[0]}f.type=h.rel;f.src=h.href;a.icons.push(f)}}function b(){var e=document.querySelector(\"meta[name='theme-color']\");if(e){a.theme_color=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}if(!c()){b();d()}return a})();"
+    const val SCRIPT = "(function(){const a={themeColor:'',manifest:'',icons:[]};function d(){var g=document.querySelectorAll(\"link[rel='apple-touch-icon'],link[rel='apple-touch-icon-precomposed']\");var j=g.length;for(var e=0;e<j;e++){var f={sizes:'',type:'',src:''};var h=g[e];if(h.hasAttribute('sizes')){f.sizes=h.sizes[0]}f.type=h.rel;f.src=h.href;a.icons.push(f)}}function b(){var e=document.querySelector(\"meta[name='theme-color']\");if(e){a.themeColor=e.content}}function c(){var e=document.querySelector(\"link[rel='manifest']\");if(e){a.manifest=e.href;return true}return false}c();b();d();return a})();"
 
-    private const val THEME_NAME = "theme_color"
+    private const val THEME_NAME = "themeColor"
     private const val ICONS_NAME = "icons"
     private const val MANIFEST_NAME = "manifest"
     private const val ICON_SRC_NAME = "src"
@@ -81,7 +81,7 @@ object Evaluate {
      * 该数据类包含网站主题色配置、网站favicon不同尺寸图标的集合、针对Android平台设置的配置json文件路径
      */
     data class Result(
-            var theme_color: String,
+            var themeColor: String,
             var manifest: String,
             var icons: ArrayList<Icon>
     )
@@ -99,7 +99,7 @@ object Evaluate {
             var icons: ArrayList<Icon>,
 //            var background_color: String,
 //            var display: String,
-            var theme_color: String
+            var themeColor: String
     )
 
     /**
@@ -133,12 +133,11 @@ object Evaluate {
             optString(MANIFEST_NAME).apply {
                 if (isNotEmpty()) {
                     result.manifest = this
-                    return result
                 }
             }
 
             //parse theme color
-            result.theme_color = optString(THEME_NAME)
+            result.themeColor = optString(THEME_NAME)
 
             //parse icons
             optJSONArray(ICONS_NAME)?.apply {
@@ -181,7 +180,7 @@ object Evaluate {
         if (json.isEmpty()) return result
 
         JSONObject(json).apply {
-            result.theme_color = optString(THEME_NAME)
+            result.themeColor = optString(THEME_NAME)
 
             // parse manifest icons
             optJSONArray(ICONS_NAME)?.apply {

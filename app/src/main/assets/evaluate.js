@@ -1,6 +1,6 @@
 (function () {
     const result = {
-        theme_color: '',
+        themeColor: '',
         manifest: '',
         icons: []
     };
@@ -24,7 +24,7 @@
 
     function obtainThemeColor() {
         var meta = document.querySelector("meta[name='theme-color']");
-        if (meta) result.theme_color = meta.content;
+        if (meta) result.themeColor = meta.content;
     }
 
     function obtainManifest() {
@@ -36,13 +36,8 @@
         return false;
     }
 
-    if (!obtainManifest()) {
-        obtainThemeColor();
-        obtainTouchIcons();
-    }
-
-    //        var info = JSON.stringify(result);
-    //        window.app_native.onReceivedTouchIcons(document.URL, JSON.stringify(result));
-    //        console.log(result);
+    obtainManifest()
+    obtainThemeColor();
+    obtainTouchIcons();
     return result
 })();
