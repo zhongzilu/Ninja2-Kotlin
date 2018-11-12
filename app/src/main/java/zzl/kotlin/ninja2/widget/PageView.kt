@@ -474,8 +474,8 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                     val json = URL(this).readText()
 
                     Evaluate.parseManifest(json).apply {
-                        if (theme_color.isNotEmpty()) {
-                            uiThread { _delegate?.onReceivedWebThemeColor(theme_color) }
+                        if (themeColor.isNotEmpty()) {
+                            uiThread { _delegate?.onReceivedWebThemeColor(themeColor) }
                         }
 
                         //handle website icons
@@ -485,15 +485,13 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                         if (icons.size > 0) {
                             bitmap = BitmapFactory.decodeStream(URL(icons[0].src).openStream())
                         }
-                        uiThread { _delegate?.onReceivedWebConfig(title, bitmap, theme_color) }
+                        uiThread { _delegate?.onReceivedWebConfig(title, bitmap, themeColor) }
                     }
-
-                    return@doAsync
                 }
 
                 //handle theme color
-                if (res.theme_color.isNotEmpty()) {
-                    uiThread { _delegate?.onReceivedWebThemeColor(res.theme_color) }
+                if (res.themeColor.isNotEmpty()) {
+                    uiThread { _delegate?.onReceivedWebThemeColor(res.themeColor) }
                 }
 
                 //handle website favicon
@@ -503,7 +501,7 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
                 if (res.icons.size > 0) {
                     bitmap = BitmapFactory.decodeStream(URL(res.icons[0].src).openStream())
                 }
-                uiThread { _delegate?.onReceivedWebConfig(title, bitmap, res.theme_color) }
+                uiThread { _delegate?.onReceivedWebConfig(title, bitmap, res.themeColor) }
             }
         }
     }
