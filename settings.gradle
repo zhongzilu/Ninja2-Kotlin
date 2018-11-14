@@ -1,1 +1,1 @@
-include ':app', ':crosswalkwebview17464601'
+include ':app'
