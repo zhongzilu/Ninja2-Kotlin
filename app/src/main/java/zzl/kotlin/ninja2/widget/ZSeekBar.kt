@@ -23,19 +23,12 @@ class ZSeekBar : SeekBar {
 
     private var mStep: Int = 1
     private var mMin: Int = 0
-    private var mMax: Int = 0
     private var _progress: Int = 1
 
     init {
-        mMax = max
-        max = (mMax - mMin) / mStep
-        _progress = progress
-
-        progress = (mMax - mMin) / _progress
-
         super.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                _progress = progress / mStep + mMin
+                _progress = progress * mStep + mMin
                 _listener?.invoke(_progress)
                 mSeekChangeListener?.onProgressChanged(seekBar, _progress, fromUser)
             }
@@ -74,19 +67,4 @@ class ZSeekBar : SeekBar {
     fun setStep(step: Int) {
         mStep = step
     }
-
-    override fun getMax() = mMax
-
-    override fun setMax(max: Int) {
-        mMax = max
-    }
-
-    override fun getMin() = mMin
-
-    override fun setMin(min: Int) {
-        mMin = min
-    }
-
-    override fun getProgress() = _progress / mStep + mMin
-
 }

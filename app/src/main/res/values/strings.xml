@@ -1,4 +1,13 @@
 <resources>
+    <string name="app_name">Ninja2</string>
+    <string name="app_feedback_url">https://github.com/zhongzilu/Ninja2-Kotlin/issues</string>
+    <string name="app_intro_url">https://github.com/zhongzilu/Ninja2-Kotlin/blob/master/README.md</string>
+    <string name="app_licenses_url">https://github.com/zhongzilu/Ninja2-Kotlin/blob/master/LICENSE</string>
+    <string name="app_release_url">https://github.com/zhongzilu/Ninja2-Kotlin/releases</string>
+    <string name="app_intro_accessibility">Working for Ninja2, no dirty things run in background. \n\n- Quick swipe fingerprint sensor to recents(Android M+). \n\n- Fingerprint confirm to split screen(Android N+). \n\nAbove actions will not work when fingerprint sensor encounter unrecoverable error, unfortunately. Wait record minute and try again.</string>
+    <string name="app_intro_title">Instruction</string>
+
+
     <string name="text_welcome_message">Welcome to Android Tutorials Hub</string>
     <string name="text_dialog_bottom_sheet">Dialog Bottom Sheet</string>
     <string name="text_expand_me">Expand Me</string>
@@ -10,8 +19,6 @@
     <string name="text_select_icon">Select icon</string>
     <string name="action_settings">Setting</string>
 
-    <string name="app_intro_accessibility">Working for Ninja2, no dirty things run in background. \n\n- Quick swipe fingerprint sensor to recents(Android M+). \n\n- Fingerprint confirm to split screen(Android N+). \n\nAbove actions will not work when fingerprint sensor encounter unrecoverable error, unfortunately. Wait record minute and try again.</string>
-    <string name="app_intro_title">Instruction</string>
 
     <string name="dialog_bottom_reset">Reset</string>
     <string name="dialog_button_add">Add</string>
@@ -47,6 +54,7 @@
     <string name="label_shortcut_new_tab_short">New tab</string>
     <string name="label_shortcut_private_long">New private tab</string>
     <string name="label_shortcut_private_short">Private</string>
+    <string name="label_accessibility">Accessibility</string>
 
     <string name="options_background">Open tab in background</string>
     <string name="options_copy_url">Copy URL</string>
@@ -73,6 +81,8 @@
     <string name="preference_category_browser">Browser</string>
     <string name="preference_category_function">Function</string>
     <string name="preference_category_others">Others</string>
+    <string name="preference_category_text_size">Text size</string>
+
     <string name="preference_summary_adblock">Use hosts to block advertisement.</string>
     <string name="preference_summary_back_vibrate">Vibrate when long press back to homepage.</string>
     <string name="preference_summary_custom_user_agent">Set custom UA will replace the desktop mode.</string>
@@ -103,6 +113,9 @@
     <string name="preference_title_version">Version</string>
     <string name="preference_title_omnibox_control">Omnibox Control</string>
     <string name="preference_title_omnibox_fixed">Omnibox Fixed</string>
+    <string name="preference_title_preview">Preview</string>
+    <string name="preference_title_text_scale">Text scaling</string>
+
 
     <string name="ssl_error_date_invalid">The date of the certificate is invalid.</string>
     <string name="ssl_error_expired">The certificate has expired.</string>
@@ -142,11 +155,7 @@
     <string name="toast_download_in_background">Start Download %1$s</string>
     <string name="toast_no_handle_application">No Handle Application</string>
 
-    <string name="app_feedback_url">https://github.com/zhongzilu/Ninja2-Kotlin/issues</string>
-    <string name="app_intro_url">https://github.com/zhongzilu/Ninja2-Kotlin/blob/master/README.md</string>
-    <string name="app_licenses_url">https://github.com/zhongzilu/Ninja2-Kotlin/blob/master/LICENSE</string>
-    <string name="app_release_url">https://github.com/zhongzilu/Ninja2-Kotlin/releases</string>
-    <string name="app_name">Ninja2</string>
+
     <string name="preference_key_adblock">preference_key_adblock</string>
     <string name="preference_key_back_vibrate">preference_key_back_vibrate</string>
     <string name="preference_key_clear_cookies">preference_key_clear_cookies</string>
@@ -170,6 +179,7 @@
     <string name="preference_key_omnibox_control">preference_key_omnibox_control</string>
     <string name="preference_key_omnibox_fixed">preference_key_omnibox_fixed</string>
     <string name="preference_key_fingerprint">preference_key_fingerprint</string>
+    <string name="preference_key_text_scaling">preference_key_text_scaling</string>
 
     <string name="snackBar_button_repeal">repeal</string>
     <string name="snackBar_message_delete_pin">Delete Pin Record</string>

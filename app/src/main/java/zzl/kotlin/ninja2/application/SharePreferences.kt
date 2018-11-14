@@ -78,6 +78,11 @@ object SP {
      * 是否存在FingerprintManager Api，默认为false
      */
     var hasFingerprintManager: Boolean by ctx.preference(Key.FINGERPRINT, false)
+
+    /**
+     * 设置网页字体大小，默认为100%
+     */
+    var textScaling: Int by ctx.preference(Key.TEXT_SCALE, 100)
 }
 
 object Key {
@@ -137,5 +142,9 @@ object Key {
 
     val FINGERPRINT: String by lazy(LazyThreadSafetyMode.NONE) {
         ctx.resources.getString(R.string.preference_key_fingerprint)
+    }
+
+    val TEXT_SCALE: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_text_scaling)
     }
 }
