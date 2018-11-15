@@ -14,4 +14,13 @@
         <item>3</item>
         <item>4</item>
     </string-array>
+
+    <array name="pref_text_size_choices">
+        <item>Tiny</item>
+        <item>Small</item>
+        <item>Normal</item>
+        <item>Large</item>
+        <item>Huge</item>
+    </array>
+
 </resources>

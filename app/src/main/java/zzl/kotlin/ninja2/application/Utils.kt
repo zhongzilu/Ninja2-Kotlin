@@ -60,6 +60,8 @@ object WebUtil {
 
     const val HEADER_CONTENT_DISPOSITION = "Content-Disposition: attachment;"
 
+    const val FONT_SIZE_PREVIEW_HTML_FORMAT = "<!doctype html><html><head><meta http-equiv=\"Content-Type\"content=\"text/html; charset=UTF-8\"><style type=\"text/css\">p{margin:2px auto}body{background:#f8f6f6}</style></head><body><p style=\"font-size: 4pt\">%s</p><p style=\"font-size: 8pt\">%s</p><p style=\"font-size: 10pt\">%s</p><p style=\"font-size: 14pt\">%s</p><p style=\"font-size: 18pt\">%s</p></body></html>"
+
 }
 
 /**

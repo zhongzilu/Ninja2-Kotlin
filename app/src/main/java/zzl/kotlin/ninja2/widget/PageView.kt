@@ -236,7 +236,8 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         builtInZoomControls = true
         displayZoomControls = false
         //禁止系统缩放字体大小
-        textZoom = 100
+        textZoom = SP.textZoom
+        minimumFontSize = SP.minimumFontSize
 
         javaScriptEnabled = true
         javaScriptCanOpenWindowsAutomatically = SP.isEnableMultipleWindows
@@ -363,6 +364,15 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         L.e(TAG, "onSharedPreferenceChanged")
         when (key) {
+            //设置网页上的字体缩放
+            resources.getString(R.string.preference_key_text_zoom) -> {
+                settings.textZoom = SP.textZoom
+            }
+
+            //设置网页上的最小字体大小
+            resources.getString(R.string.preference_key_text_minimum_size) -> {
+                settings.minimumFontSize = SP.minimumFontSize
+            }
             resources.getString(R.string.preference_key_adblock) -> {
                 //set ad block
                 isAdBlock = SP.adBlock
