@@ -103,6 +103,8 @@
     <string name="preference_title_omnibox_fixed">地址栏固定</string>
     <string name="preference_title_preview">预览</string>
     <string name="preference_title_text_scale">文字缩放</string>
+    <string name="preference_title_accessibility">辅助功能</string>
+    <string name="preference_title_min_text_size">字体大小下限</string>
 
     <string name="ssl_error_date_invalid">网站证书是无效的。</string>
     <string name="ssl_error_expired">网站证书已经过期。</string>

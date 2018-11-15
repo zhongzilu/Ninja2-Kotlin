@@ -29,10 +29,10 @@
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/MainActivityTheme">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
             <meta-data
                 android:name="android.app.shortcuts"
@@ -114,10 +114,10 @@
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize"
             android:label="@string/label_accessibility"
             android:theme="@style/SettingsActivityTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
 
         <!--桌面快捷方式广播接收器-->

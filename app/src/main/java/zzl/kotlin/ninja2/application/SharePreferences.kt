@@ -4,6 +4,7 @@ import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
 
 /**
+ * SharePreference操作类
  * Created by zhongzilu on 2018/7/27 0027.
  */
 object SP {
@@ -80,9 +81,14 @@ object SP {
     var hasFingerprintManager: Boolean by ctx.preference(Key.FINGERPRINT, false)
 
     /**
-     * 设置网页字体大小，默认为100%
+     * 设置网页字体缩放大小，默认为100%
      */
-    var textScaling: Int by ctx.preference(Key.TEXT_SCALE, 100)
+    var textZoom: Int by ctx.preference(Key.TEXT_ZOOM, 100)
+
+    /**
+     * 设置网页字体大小的最小值，默认为1PT
+     */
+    var minimumFontSize: Int by ctx.preference(Key.TEXT_MINIMUM_SIZE, 1)
 }
 
 object Key {
@@ -144,7 +150,11 @@ object Key {
         ctx.resources.getString(R.string.preference_key_fingerprint)
     }
 
-    val TEXT_SCALE: String by lazy(LazyThreadSafetyMode.NONE) {
-        ctx.resources.getString(R.string.preference_key_text_scaling)
+    val TEXT_ZOOM: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_text_zoom)
+    }
+
+    val TEXT_MINIMUM_SIZE: String by lazy(LazyThreadSafetyMode.NONE) {
+        ctx.resources.getString(R.string.preference_key_text_minimum_size)
     }
 }
