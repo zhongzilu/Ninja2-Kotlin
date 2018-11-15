@@ -2,6 +2,8 @@
 <resources>
     <string name="app_intro_accessibility">应用不会在开启辅助操作时在后台做一些 dirty 的事情，请你放心使用。 \n\n- 快速滑动指纹传感器可跳转至系统应用程序切换界面，支持 Android 6.0 及其以上版本。 \n\n- 按住指纹传感器时可直接进入系统分屏模式，支持 Android 7.0 及其以上版本。 \n\n上述操作在指纹识别器发生不可逆转的错误时将无效，需要您等待几分钟后再尝试。</string>
     <string name="app_intro_title">猛击查看使用指南</string>
+
+
     <string name="dialog_bottom_reset">重置</string>
     <string name="dialog_button_add">添加</string>
     <string name="dialog_button_allow">允许</string>
@@ -21,6 +23,8 @@
     <string name="dialog_message_ssl_error_middle"> 的私密连接失败。</string>
     <string name="dialog_message_ssl_error_prefix">创建到 </string>
     <string name="dialog_message_wait_a_minute">稍等片刻…</string>
+
+
     <string name="hint_add_to_launcher">标签名称</string>
     <string name="hint_custom_ua">自定义 UA</string>
     <string name="hint_input_edit">标签名称</string>
@@ -28,12 +32,17 @@
     <string name="hint_login_password">密码</string>
     <string name="hint_login_username">用户名</string>
     <string name="hint_search">搜索</string>
+
+
     <string name="label_quick_options">快捷操作</string>
     <string name="label_settings">设置</string>
     <string name="label_shortcut_new_tab_long">新建标签页</string>
     <string name="label_shortcut_new_tab_short">新建标签页</string>
     <string name="label_shortcut_private_long">新建无痕浏览</string>
     <string name="label_shortcut_private_short">无痕浏览</string>
+    <string name="label_accessibility">辅助设置</string>
+
+
     <string name="options_background">在后台打开标签页</string>
     <string name="options_copy_url">复制链接</string>
     <string name="options_download_image">下载图片</string>
@@ -42,6 +51,8 @@
     <string name="options_new_tab">新建标签页</string>
     <string name="options_private">新建无痕浏览</string>
     <string name="options_share_url">分享链接</string>
+
+
     <string name="page_menu_add_to_launcher">添加到桌面</string>
     <string name="page_menu_confirm">确定</string>
     <string name="page_menu_custom_ua">自定义 UA</string>
@@ -54,9 +65,12 @@
     <string name="page_menu_settings">设置</string>
     <string name="page_menu_share_url">分享链接</string>
     <string name="page_menu_stop">停止</string>
+
+
     <string name="preference_category_browser">浏览器</string>
     <string name="preference_category_function">功能列表</string>
     <string name="preference_category_others">其他</string>
+    <string name="preference_category_text_size">文字大小</string>
     <string name="preference_summary_adblock">使用 Host 文件屏蔽广告。</string>
     <string name="preference_summary_back_vibrate">长按系统返回键返回时震动。</string>
     <string name="preference_summary_custom_user_agent">设置自定义 UA 将会取代桌面模式。</string>
@@ -87,6 +101,10 @@
     <string name="preference_title_version">版本</string>
     <string name="preference_title_omnibox_control">地址栏控制</string>
     <string name="preference_title_omnibox_fixed">地址栏固定</string>
+    <string name="preference_title_preview">预览</string>
+    <string name="preference_title_text_scale">文字缩放</string>
+    <string name="preference_title_accessibility">辅助功能</string>
+    <string name="preference_title_min_text_size">字体大小下限</string>
 
     <string name="ssl_error_date_invalid">网站证书是无效的。</string>
     <string name="ssl_error_expired">网站证书已经过期。</string>
@@ -94,7 +112,8 @@
     <string name="ssl_error_invalid">网站证书出现错误。</string>
     <string name="ssl_error_notyetvalid">网站证书还没有生效。</string>
     <string name="ssl_error_untrusted">网站证书的作者是不可信任的。</string>
-    <string name="text_select_icon">选择图标</string>
+
+
     <string name="toast_add_to_launcher_successful">已添加 %1$s 到桌面</string>
     <string name="toast_camera_permission_denied">相机权限已被阻止</string>
     <string name="toast_clear_cookies">清空 Cookies?</string>
@@ -123,13 +142,16 @@
     <string name="toast_export_pin_failed">导出失败</string>
     <string name="toast_import_pin_success">导入成功</string>
     <string name="toast_import_pin_failed">导入失败</string>
-    <string name="snackBar_button_repeal">撤销</string>
-    <string name="snackBar_message_delete_pin">删除Pin记录</string>
-    <string name="text_export_pin">导出书签</string>
-    <string name="text_import_pin">导入书签</string>
     <string name="toast_msg_last_history">已经是最新的历史了</string>
     <string name="toast_msg_url_null">网络地址为空</string>
     <string name="toast_download_in_background">开始下载 %1$s</string>
     <string name="toast_no_handle_application">没有可以处理的应用程序</string>
+
+
+    <string name="snackBar_button_repeal">撤销</string>
+    <string name="snackBar_message_delete_pin">删除Pin记录</string>
+    <string name="text_export_pin">导出书签</string>
+    <string name="text_import_pin">导入书签</string>
+    <string name="text_select_icon">选择图标</string>
 
 </resources>

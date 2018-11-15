@@ -110,6 +110,16 @@
             android:label="@string/label_settings"
             android:theme="@style/SettingsActivityTheme" />
 
+        <activity android:name=".AccessibilityActivity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize"
+            android:label="@string/label_accessibility"
+            android:theme="@style/SettingsActivityTheme">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
+
         <!--桌面快捷方式广播接收器-->
         <receiver android:name=".application.ShortcutAddedReceiver">
             <intent-filter>
