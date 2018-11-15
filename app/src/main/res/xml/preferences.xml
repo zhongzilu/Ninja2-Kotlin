@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <PreferenceCategory android:title="@string/preference_category_function">
         <SwitchPreference
             android:defaultValue="false"
@@ -44,6 +45,10 @@
             android:key="@string/preference_key_fingerprint_extension"
             android:summary="@string/preference_summary_fingerprint_extension"
             android:title="@string/preference_title_fingerprint_extension" />
+
+        <Preference
+            android:key="@string/preference_key_accessibility"
+            android:title="@string/preference_title_accessibility"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preference_category_browser">
         <ListPreference
@@ -51,7 +56,8 @@
             android:entries="@array/preference_entries_search_engine_id"
             android:entryValues="@array/preference_entry_values_search_engine_id"
             android:key="@string/preference_key_search_engine_id"
-            android:title="@string/preference_title_search_engine_id" />
+            android:title="@string/preference_title_search_engine_id"
+            tools:summary="Google" />
         <Preference
             android:key="@string/preference_key_custom_user_agent"
             android:summary="@string/preference_summary_custom_user_agent"

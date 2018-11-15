@@ -7,4 +7,13 @@
         <item>百度</item>
         <item>Github</item>
     </array>
+
+    <array name="pref_text_size_choices">
+        <item>最小</item>
+        <item>小</item>
+        <item>適中</item>
+        <item>大</item>
+        <item>最大</item>
+    </array>
+
 </resources>

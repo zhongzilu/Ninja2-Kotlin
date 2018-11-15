@@ -101,6 +101,8 @@
     <string name="preference_title_omnibox_fixed">地址欄固定</string>
     <string name="preference_title_preview">預覽</string>
     <string name="preference_title_text_scale">文字縮放</string>
+    <string name="preference_title_accessibility">協助工具</string>
+    <string name="preference_title_min_text_size">最小字型大小</string>
 
     <string name="ssl_error_date_invalid">網站證書是無效的。</string>
     <string name="ssl_error_expired">網站證書已經過期。</string>

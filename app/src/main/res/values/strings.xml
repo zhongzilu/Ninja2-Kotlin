@@ -115,6 +115,8 @@
     <string name="preference_title_omnibox_fixed">Omnibox Fixed</string>
     <string name="preference_title_preview">Preview</string>
     <string name="preference_title_text_scale">Text scaling</string>
+    <string name="preference_title_accessibility">Accessibility</string>
+    <string name="preference_title_min_text_size">Minimum font size</string>
 
 
     <string name="ssl_error_date_invalid">The date of the certificate is invalid.</string>
@@ -179,7 +181,9 @@
     <string name="preference_key_omnibox_control">preference_key_omnibox_control</string>
     <string name="preference_key_omnibox_fixed">preference_key_omnibox_fixed</string>
     <string name="preference_key_fingerprint">preference_key_fingerprint</string>
-    <string name="preference_key_text_scaling">preference_key_text_scaling</string>
+    <string name="preference_key_text_zoom">preference_key_text_zoom</string>
+    <string name="preference_key_text_minimum_size">preference_key_text_minimum_size</string>
+    <string name="preference_key_accessibility">preference_key_accessibility</string>
 
     <string name="snackBar_button_repeal">repeal</string>
     <string name="snackBar_message_delete_pin">Delete Pin Record</string>

@@ -17,6 +17,7 @@ import android.webkit.CookieManager
 import android.webkit.WebViewDatabase
 import android.widget.Toast
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.application.*
 import zzl.kotlin.ninja2.widget.CustomUADialog
@@ -119,6 +120,9 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 WebViewDatabase.getInstance(activity).clearHttpAuthUsernamePassword()
                 toast(R.string.toast_clear_passwords_success)
             }
+
+        //todo[Checked] 辅助功能
+            R.string.preference_title_accessibility -> activity.startActivity<AccessibilityActivity>()
 
         //todo[Checked] 指纹识别扩展
             R.string.preference_title_fingerprint_extension ->
@@ -256,7 +260,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     }
 
 //    private fun setSearchEngines() {
-        //todo 动态添加搜索引擎
+    //todo 动态添加搜索引擎
 //        val engines: ListPreference = findPreference(getString(R.string.preference_key_search_engine_id)) as ListPreference
 //        engines.entries
 //    }
