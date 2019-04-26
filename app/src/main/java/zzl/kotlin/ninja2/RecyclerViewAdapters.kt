@@ -14,14 +14,16 @@ import zzl.kotlin.ninja2.application.findViewOften
  * Created by zhongzilu on 18-9-19.
  */
 
+typealias ItemClickListener = (view: View, position: Int) -> Unit
+
 /**
  * RecyclerViewAdapter封装抽象类
  */
 abstract class BaseAdapter<T>(var context: Context, var mList: ArrayList<T>) : RecyclerView.Adapter<BaseViewHolder>() {
     override fun getItemCount() = mList.size
 
-    var mClickListener: ((view: View, position: Int) -> Unit)? = null
-    fun setOnClickListener(todo: (view: View, position: Int) -> Unit) {
+    var mClickListener: ItemClickListener? = null
+    fun setOnClickListener(todo: ItemClickListener) {
         mClickListener = todo
     }
 }
@@ -29,7 +31,7 @@ abstract class BaseAdapter<T>(var context: Context, var mList: ArrayList<T>) : R
 /**
  * ViewHolder封装抽象类
  */
-open class BaseViewHolder(itemView: View?, private val listener: ((view: View, position: Int) -> Unit)?)
+open class BaseViewHolder(itemView: View?, private val listener: ItemClickListener?)
     : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
     override fun onClick(v: View) {
@@ -67,7 +69,7 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
     fun addItem(position: Int, pin: Pin) {
         L.i("-->", "position: $position")
         L.i("-->", "size: ${mList.size}")
-        if (position >= mList.size){
+        if (position >= mList.size) {
             mList.add(pin)
             notifyItemInserted(position)
             notifyItemRangeChanged(0, mList.size)
@@ -83,7 +85,7 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
      * 将指定位置的数据从集合中移除
      * @param position 待删除的指定位置
      */
-    fun removeItem(position: Int){
+    fun removeItem(position: Int) {
         mList.removeAt(position)
         notifyItemRemoved(position)
         notifyItemChanged(position)
@@ -94,7 +96,7 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
      * @param pins 待添加的数据集合
      * @param clear 添加之前是否要清除原有数据，默认为false
      */
-    fun addAll(pins: List<Pin>, clear: Boolean = false){
+    fun addAll(pins: List<Pin>, clear: Boolean = false) {
         if (clear) mList.clear()
         mList.addAll(pins)
         notifyItemRangeChanged(0, mList.size)

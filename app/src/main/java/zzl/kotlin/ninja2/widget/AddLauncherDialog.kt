@@ -3,13 +3,14 @@ package zzl.kotlin.ninja2.widget
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Bitmap
-import android.text.Editable
-import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.layout_add_to_launcher.*
 import zzl.kotlin.ninja2.R
+import zzl.kotlin.ninja2.application.Func
+import zzl.kotlin.ninja2.application.Func1
+import zzl.kotlin.ninja2.application.addTextWatcher
 
 /**
  * 将网站添加到桌面图标快捷方式
@@ -129,38 +130,31 @@ class AddLauncherDialog(context: Context) : Dialog(context, R.style.AppTheme_Dia
             dismiss()
         }
 
-        mLabelEdit?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                mPositiveBtn?.isEnabled = s?.isNotEmpty() ?: false
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-        })
+        mLabelEdit?.addTextWatcher {
+            mPositiveBtn?.isEnabled = it.isNotEmpty()
+        }
     }
 
     /**
      * 选择更换图标的监听器
      */
-    private var _selectListener: (() -> Unit)? = null
+    private var _selectListener: Func? = null
 
     /**
      * 设置选择更换图标的监听器
      */
-    fun setOnSelectListener(todo: () -> Unit) = apply { _selectListener = todo }
+    fun setOnSelectListener(todo: Func) = apply { _selectListener = todo }
 
-    private var mPositiveListener: ((v: AddLauncherDialog) -> Unit)? = null
+    private var mPositiveListener: Func1<AddLauncherDialog>? = null
     private var mPositiveBtnText: String = "确定"
-    fun setOnPositiveClickListener(text: String = "确定", todo: ((v: AddLauncherDialog) -> Unit)?) = apply {
+    fun setOnPositiveClickListener(text: String = "确定", todo: Func1<AddLauncherDialog>) = apply {
         mPositiveBtnText = text
         mPositiveListener = todo
     }
 
-    private var mNegativeListener: ((v: AddLauncherDialog) -> Unit)? = null
+    private var mNegativeListener: Func1<AddLauncherDialog>? = null
     private var mNegativeBtnText: String = "取消"
-    fun setOnNegativeClickListener(text: String = "取消", todo: ((v: AddLauncherDialog) -> Unit)?) = apply {
+    fun setOnNegativeClickListener(text: String = "取消", todo: Func1<AddLauncherDialog>) = apply {
         mNegativeBtnText = text
         mNegativeListener = todo
     }

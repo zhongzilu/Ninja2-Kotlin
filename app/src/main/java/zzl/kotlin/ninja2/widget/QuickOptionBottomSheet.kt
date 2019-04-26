@@ -88,19 +88,19 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
 
         //set new tab option click even
         mNewTab.setOnClickListener {
-            baseCallback?.let { _method = it.quickNewTab }
+            baseCallback?.run { _method = quickNewTab }
             dismiss()
         }
 
         //set new private tab option click even
         mNewPrivateTab.setOnClickListener {
-            baseCallback?.let { _method = it.quickNewPrivateTab }
+            baseCallback?.run { _method = quickNewPrivateTab }
             dismiss()
         }
 
         //set download image option click even
         mDownloadImg.setOnClickListener {
-            baseCallback?.let { _method = it.quickDownloadImg }
+            baseCallback?.run { _method = quickDownloadImg }
             dismiss()
         }
 
@@ -112,13 +112,13 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
 
         //set copyToClipboard url option click even
         mCopyUrl.setOnClickListener {
-            baseCallback?.let { _method = it.quickCopyUrl }
+            baseCallback?.run { _method = quickCopyUrl }
             dismiss()
         }
 
         //set share url option click even
         mShareUrl.setOnClickListener {
-            baseCallback?.let { _method = it.quickShareUrl }
+            baseCallback?.run { _method = quickShareUrl }
             dismiss()
         }
 
@@ -185,34 +185,34 @@ class QuickCallbackWrap {
 
     internal lateinit var context: Context
 
-    var quickNewTab: ((String) -> Unit) = {}
-    var quickNewPrivateTab: ((String) -> Unit) = {}
-    var quickDownloadImg: ((String) -> Unit) = {}
-    var quickExtractQR: ((String) -> Unit) = {}
-    var quickCopyUrl: ((String) -> Unit) = {
+    var quickNewTab: Func1<String> = {}
+    var quickNewPrivateTab: Func1<String> = {}
+    var quickDownloadImg: Func1<String> = {}
+    var quickExtractQR: Func1<String> = {}
+    var quickCopyUrl: Func1<String> = {
         context.copyToClipboard(it)
     }
-    var quickShareUrl: ((String) -> Unit) = {
+    var quickShareUrl: Func1<String> = {
         context.shareText(it)
     }
 
-//    fun onQuickNewTab(onQuickNewTab: () -> Unit) {
+//    fun onQuickNewTab(onQuickNewTab: Func) {
 //        quickNewTab = onQuickNewTab
 //    }
 //
-//    fun onQuickNewPrivateTab(privateTab: () -> Unit) {
+//    fun onQuickNewPrivateTab(privateTab: Func) {
 //        quickNewPrivateTab = privateTab
 //    }
 //
-//    fun onQuickDownloadImage(downloadImg: () -> Unit) {
+//    fun onQuickDownloadImage(downloadImg: Func) {
 //        quickDownloadImg = downloadImg
 //    }
 //
-//    fun onQuickCopyUrl(copyUrl: () -> Unit) {
+//    fun onQuickCopyUrl(copyUrl: Func) {
 //        quickCopyUrl = copyUrl
 //    }
 //
-//    fun onQuickShareUrl(shareUrl: () -> Unit) {
+//    fun onQuickShareUrl(shareUrl: Func) {
 //        quickShareUrl = shareUrl
 //    }
 

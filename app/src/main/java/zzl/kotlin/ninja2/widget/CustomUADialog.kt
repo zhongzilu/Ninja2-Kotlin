@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import kotlinx.android.synthetic.main.layout_custom_ua.*
 import zzl.kotlin.ninja2.R
+import zzl.kotlin.ninja2.application.Func1
 
 /**
  * 自定义UA弹出框
@@ -56,7 +57,7 @@ class CustomUADialog(context: Context) : Dialog(context, R.style.AppTheme_Dialog
         super.show()
     }
 
-    private var _method: ((v: CustomUADialog) -> Unit)? = null
+    private var _method: Func1<CustomUADialog>? = null
     private fun initEvent() {
 
         //set download image option click even
@@ -73,14 +74,14 @@ class CustomUADialog(context: Context) : Dialog(context, R.style.AppTheme_Dialog
 
         //set dismiss listener
         setOnDismissListener {
-            _method?.invoke(this@CustomUADialog)
+            _method?.invoke(this)
             _method = null
         }
     }
 
-    private var mPositiveListener: ((v: CustomUADialog) -> Unit)? = null
-    fun setOnPositiveClickListener(todo: ((v: CustomUADialog) -> Unit)?) = apply { mPositiveListener = todo }
+    private var mPositiveListener: Func1<CustomUADialog>? = null
+    fun setOnPositiveClickListener(todo: Func1<CustomUADialog>?) = apply { mPositiveListener = todo }
 
-    private var mNegativeListener: ((v: CustomUADialog) -> Unit)? = null
-    fun setOnNegativeClickListener(todo: ((v: CustomUADialog) -> Unit)?) = apply { mNegativeListener = todo }
+    private var mNegativeListener: Func1<CustomUADialog>? = null
+    fun setOnNegativeClickListener(todo: Func1<CustomUADialog>?) = apply { mNegativeListener = todo }
 }
