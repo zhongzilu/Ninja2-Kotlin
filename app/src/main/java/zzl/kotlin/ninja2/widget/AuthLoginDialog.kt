@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.layout_auth_login.*
 import zzl.kotlin.ninja2.R
+import zzl.kotlin.ninja2.application.Func1
 import zzl.kotlin.ninja2.application.visible
 
 /**
@@ -91,7 +92,7 @@ class AuthLoginDialog(context: Context) : Dialog(context, R.style.AppTheme_Dialo
      */
     fun getPassword(): String = mPasswordEdit.text.toString().trim()
 
-    private var _method: ((v: AuthLoginDialog) -> Unit)? = null
+    private var _method: Func1<AuthLoginDialog>? = null
     private fun initEvent() {
 
         setCancelable(false)
@@ -112,7 +113,7 @@ class AuthLoginDialog(context: Context) : Dialog(context, R.style.AppTheme_Dialo
 
         //set dismiss listener
         setOnDismissListener {
-            _method?.invoke(this@AuthLoginDialog)
+            _method?.invoke(this)
             _method = null
         }
     }
@@ -154,9 +155,9 @@ class AuthLoginDialog(context: Context) : Dialog(context, R.style.AppTheme_Dialo
         super.show()
     }
 
-    private var mPositiveListener: ((v: AuthLoginDialog) -> Unit)? = null
-    fun setOnPositiveClickListener(todo: ((v: AuthLoginDialog) -> Unit)?) = apply { mPositiveListener = todo }
+    private var mPositiveListener: Func1<AuthLoginDialog>? = null
+    fun setOnPositiveClickListener(todo: Func1<AuthLoginDialog>?) = apply { mPositiveListener = todo }
 
-    private var mNegativeListener: ((v: AuthLoginDialog) -> Unit)? = null
-    fun setOnNegativeClickListener(todo: ((v: AuthLoginDialog) -> Unit)?) = apply { mNegativeListener = todo }
+    private var mNegativeListener: Func1<AuthLoginDialog>? = null
+    fun setOnNegativeClickListener(todo: Func1<AuthLoginDialog>?) = apply { mNegativeListener = todo }
 }

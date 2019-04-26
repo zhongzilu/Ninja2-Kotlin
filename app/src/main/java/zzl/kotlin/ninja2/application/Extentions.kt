@@ -316,7 +316,7 @@ fun Activity.pickImage(requestCode: Int) {
  * @param permissions 权限集合
  * @param f 授权后执行的动作
  */
-fun Activity.permission(vararg permissions: String, f: () -> Unit) {
+fun Activity.permission(vararg permissions: String, f: Func) {
     PermissionsManager.getInstance()
             .requestPermissionsIfNecessaryForResult(this, permissions,
                     object : PermissionsResultAction() {
@@ -620,7 +620,7 @@ fun File.mediaScan(context: Context) {
 /**
  * 判断是否是Android M（6.0）以上的系统版本
  */
-inline fun supportM(todo: () -> Unit) {
+inline fun supportM(todo: Func) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         todo()
     }
@@ -629,7 +629,7 @@ inline fun supportM(todo: () -> Unit) {
 /**
  * 判断是否是Android N（7.0）以上的系统版本
  */
-inline fun supportN(todo: () -> Unit) {
+inline fun supportN(todo: Func) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         todo()
     }
@@ -638,7 +638,7 @@ inline fun supportN(todo: () -> Unit) {
 /**
  * 判断Intent是否有效
  */
-inline fun Context.supportIntent(intent: Intent, todo: (Intent) -> Unit) {
+inline fun Context.supportIntent(intent: Intent, todo: Func1<Intent>) {
     if (intent.resolveActivity(packageManager) != null) {
         todo(intent)
     } else {
@@ -649,7 +649,7 @@ inline fun Context.supportIntent(intent: Intent, todo: (Intent) -> Unit) {
 /**
  * 通过包名启动其他应用，假如应用已经启动了在后台运行，则会将应用切到前台
  */
-fun Context.invokeApp(pkg: String, todo: () -> Unit) {
+fun Context.invokeApp(pkg: String, todo: Func) {
     val intent = packageManager.getLaunchIntentForPackage(pkg)
     if (intent != null) {
         startActivity(intent)

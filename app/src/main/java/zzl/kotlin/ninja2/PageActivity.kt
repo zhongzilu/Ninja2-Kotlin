@@ -240,13 +240,18 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 return true
             }
 
+            private var snackBar: Snackbar? = null
             override fun clearView(viewHolder: RecyclerView.ViewHolder) {
                 if (array.size > 0) {
                     L.i(TAG, "clearView array size: ${array.size}")
                     //如果队列中有数据，说明刚才有删掉一些item
-                    Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.snackBar_button_repeal) { revoke() }
-                            .addCallback(mSnackCallback).show()
+                    if (snackBar == null) {
+                        snackBar = Snackbar.make(mInputBox, R.string.snackBar_message_delete_pin, Snackbar.LENGTH_LONG)
+                                .setAction(R.string.snackBar_button_repeal) { revoke() }
+                                .addCallback(mSnackCallback)
+                    }
+
+                    snackBar!!.show()
                 }
             }
 
@@ -310,8 +315,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 //不撤销将执行删除操作，监听SnackBar消失事件，
                 //SnackBar消失（非排挤式消失）出队、删除数据。
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    super.onDismissed(transientBottomBar, event)
                     delete(event)
+                    super.onDismissed(transientBottomBar, event)
                 }
 
             }
@@ -714,10 +719,10 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             when (newState) {
-            //展开状态
+                //展开状态
                 BottomSheetBehavior.STATE_EXPANDED -> afterBottomSheetExpanded()
 
-            //关闭状态
+                //关闭状态
                 BottomSheetBehavior.STATE_COLLAPSED -> afterBottomSheetCollapsed()
 
                 BottomSheetBehavior.STATE_DRAGGING -> mBottomSheetBehavior.isHideable = false
@@ -753,13 +758,13 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                 setPinReversePadding()
             }
 
-        //监听地址栏固定设置
+            //监听地址栏固定设置
             getString(R.string.preference_key_omnibox_fixed) -> setInputBoxNestScroll()
 
-        //地址栏控制设置发生变化
+            //地址栏控制设置发生变化
             getString(R.string.preference_key_omnibox_control) -> setOmniboxControlListener()
 
-        //长按震动设置发生变化
+            //长按震动设置发生变化
             getString(R.string.preference_key_back_vibrate) -> registerVibrator()
         }
     }
@@ -1294,14 +1299,14 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     /**
      * 关闭底部菜单后执行任务
      */
-    private var _closedTodo: (() -> Unit)? = null
+    private var _closedTodo: Func? = null
         get() {
             val m = field
             field = null
             return m
         }
 
-    private fun closeBottomSheet(todo: (() -> Unit)? = null) {
+    private fun closeBottomSheet(todo: Func? = null) {
         _closedTodo = todo
         mBottomSheetBehavior.collapsed()
     }
@@ -1711,8 +1716,8 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         override fun onTick(millisUntilFinished: Long) {}
 
-        private var _todo: (() -> Unit)? = null
-        fun with(f: (() -> Unit)): CountDown {
+        private var _todo: Func? = null
+        fun with(f: Func): CountDown {
             _todo = f
             return this
         }

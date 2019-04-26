@@ -221,7 +221,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     }
 
 //    private var mAlertDialog: AlertDialog.Builder? = null
-//    private fun dialog(msg: Int, confirm: () -> Unit) {
+//    private fun dialog(msg: Int, confirm: Func) {
 //        if (mAlertDialog == null) {
 //            mAlertDialog = AlertDialog.Builder(activity)
 //                    .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
@@ -237,7 +237,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 //
 //    }
 
-    private fun Snackbar(msg: Int, confirm: () -> Unit) {
+    private fun Snackbar(msg: Int, confirm: Func) {
         Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
                 .setAction(R.string.dialog_button_confirm) {
                     confirm()

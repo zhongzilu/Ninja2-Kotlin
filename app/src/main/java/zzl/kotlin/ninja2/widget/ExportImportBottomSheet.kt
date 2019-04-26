@@ -5,6 +5,7 @@ import android.support.design.widget.BottomSheetDialog
 import android.widget.TextView
 import kotlinx.android.synthetic.main.layout_export_import.*
 import zzl.kotlin.ninja2.R
+import zzl.kotlin.ninja2.application.Func
 
 /**
  * 自定义书签导入导出底部菜单栏
@@ -35,7 +36,7 @@ class ExportImportBottomSheet(context: Context) : BottomSheetDialog(context, R.s
         mImportOption = importOption
     }
 
-    private var _method: (() -> Unit)? = null
+    private var _method: Func? = null
     private fun initEvent() {
 
         //set download image option click even
@@ -57,9 +58,9 @@ class ExportImportBottomSheet(context: Context) : BottomSheetDialog(context, R.s
         }
     }
 
-    private var mExportEvent: (() -> Unit)? = null
-    fun setOnExportOptionClick(todo: (() -> Unit)?) = apply { mExportEvent = todo }
+    private var mExportEvent: Func? = null
+    fun setOnExportOptionClick(todo: Func?) = apply { mExportEvent = todo }
 
-    private var mImportEvent: (() -> Unit)? = null
-    fun setOnImportOptionClick(todo: (() -> Unit)?) = apply { mImportEvent = todo }
+    private var mImportEvent: Func? = null
+    fun setOnImportOptionClick(todo: Func?) = apply { mImportEvent = todo }
 }
