@@ -1,10 +1,10 @@
 package zzl.kotlin.ninja2.application
 
 import android.content.Context
-import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.CoordinatorLayout
 import android.util.AttributeSet
 import android.view.View
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.jetbrains.anko.find
 import zzl.kotlin.ninja2.R
 

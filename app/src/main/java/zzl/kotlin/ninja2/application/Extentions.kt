@@ -13,8 +13,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.preference.PreferenceManager
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -28,8 +26,10 @@ import android.view.animation.LinearInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.anthonycr.grant.PermissionsManager
 import com.anthonycr.grant.PermissionsResultAction
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.jetbrains.anko.toast
 import zzl.kotlin.ninja2.App
 import zzl.kotlin.ninja2.R
@@ -60,37 +60,37 @@ fun View.isGone() = visibility == View.GONE
 /**
  * 判断BottomSheet的状态是否为关闭，关闭时取决于@{link #peekHeight}的高度，默认为0
  */
-fun <T : View> BottomSheetBehavior<T>.isCollapsed() = state == BottomSheetBehavior.STATE_COLLAPSED
+fun <T : View> BottomSheetBehavior<T>.isCollapsed() = state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 
 /**
  * 设置BottomSheet的状态为关闭
  */
 fun <T : View> BottomSheetBehavior<T>.collapsed() {
-    state = BottomSheetBehavior.STATE_COLLAPSED
+    state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 }
 
 /**
  * 判断BottomSheet的状态是否为隐藏
  */
-fun <T : View> BottomSheetBehavior<T>.isHidden() = state == BottomSheetBehavior.STATE_HIDDEN
+fun <T : View> BottomSheetBehavior<T>.isHidden() = state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 
 /**
  * 设置BottomSheet的状态为隐藏
  */
 fun <T : View> BottomSheetBehavior<T>.hidden() {
-    state = BottomSheetBehavior.STATE_HIDDEN
+    state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 }
 
 /**
  * 判断BottomSheet的状态是否为展开
  */
-fun <T : View> BottomSheetBehavior<T>.isExpanded() = state == BottomSheetBehavior.STATE_EXPANDED
+fun <T : View> BottomSheetBehavior<T>.isExpanded() = state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 
 /**
  * 设置BottomSheet的状态为展开
  */
 fun <T : View> BottomSheetBehavior<T>.expanded() {
-    state = BottomSheetBehavior.STATE_EXPANDED
+    state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 }
 
 
