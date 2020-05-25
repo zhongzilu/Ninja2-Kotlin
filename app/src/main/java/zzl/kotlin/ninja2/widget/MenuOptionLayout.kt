@@ -2,9 +2,9 @@ package zzl.kotlin.ninja2.widget
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v4.widget.NestedScrollView
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.widget.NestedScrollView
 import kotlinx.android.synthetic.main.layout_page_menu.view.*
 import zzl.kotlin.ninja2.application.*
 

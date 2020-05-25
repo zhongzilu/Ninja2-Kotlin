@@ -10,8 +10,8 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.Handler
 import android.os.Message
-import android.support.v4.app.ActivityCompat
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.app.ActivityCompat
 
 /**
  * 指纹识别无障碍服务

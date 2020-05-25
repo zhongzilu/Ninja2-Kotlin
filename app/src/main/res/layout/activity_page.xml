@@ -7,7 +7,7 @@
     <!-- Main Content -->
     <include layout="@layout/content_main" />
 
-    <!--Full Screen Mask Layout, It's below Bottom Sheet layout but above Main Content-->
+    <!--Full Screen Mask Layout, It's below BottomSheet layout but above Main Content-->
     <View
         android:id="@+id/mMaskView"
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
         android:alpha="0.0"
         android:background="@color/black" />
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="zzl.kotlin.ninja2.PageActivity">
@@ -23,7 +23,7 @@
         <!-- Bottom Sheet Content -->
         <include layout="@layout/content_bottom_sheet" />
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!--自定义布局，用于网页呈现特殊布局，比如全屏观看视频-->
     <FrameLayout

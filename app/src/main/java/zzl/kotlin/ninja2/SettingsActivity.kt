@@ -11,11 +11,11 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceScreen
 import android.provider.Settings
-import android.support.design.widget.Snackbar
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebViewDatabase
 import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.uiThread
@@ -84,7 +84,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      */
     override fun onPreferenceTreeClick(preferenceScreen: PreferenceScreen?, preference: Preference): Boolean {
         when (preference.titleRes) {
-        //清空Cookies
+            //清空Cookies
             R.string.preference_title_clear_cookies -> Snackbar(R.string.toast_clear_cookies) {
                 CookieManager.getInstance().apply {
                     flush()
@@ -95,7 +95,7 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 }
             }
 
-        //清空表单数据
+            //清空表单数据
             R.string.preference_title_clear_form_data -> Snackbar(R.string.toast_clear_form_data) {
                 try {
                     WebViewDatabase.getInstance(activity).clearFormData()
@@ -106,41 +106,41 @@ class SettingPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 }
             }
 
-        //清空历史记录
+            //清空历史记录
             R.string.preference_title_clear_history -> Snackbar(R.string.toast_clear_history) {
-                //todo[Checked] 清空历史纪录
+                //todo[✔] 清空历史纪录
                 doAsync {
                     SQLHelper.clearAllRecord()
                     uiThread { toast(R.string.toast_clear_history_success) }
                 }
             }
 
-        //清空网站密码
+            //清空网站密码
             R.string.preference_title_clear_passwords -> Snackbar(R.string.toast_clear_passwords) {
                 WebViewDatabase.getInstance(activity).clearHttpAuthUsernamePassword()
                 toast(R.string.toast_clear_passwords_success)
             }
 
-        //todo[Checked] 辅助功能
+            //todo[✔] 辅助功能
             R.string.preference_title_accessibility -> activity.startActivity<AccessibilityActivity>()
 
-        //todo[Checked] 指纹识别扩展
+            //todo[✔] 指纹识别扩展
             R.string.preference_title_fingerprint_extension ->
                 activity.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
 
-        //todo[Checked] 处理书签的导入/导出
+            //todo[✔] 处理书签的导入/导出
             R.string.preference_title_import_export_pin -> showExportImportBottomSheet()
 
-        //todo[Checked] 实现UA的自定义设置
+            //todo[✔] 实现UA的自定义设置
             R.string.preference_title_custom_user_agent -> showCustomUADialog()
 
-        //反馈
+            //反馈
             R.string.preference_title_feedback -> openUrl(getString(R.string.app_feedback_url))
 
-        //开源协议
+            //开源协议
             R.string.preference_title_licenses -> openUrl(getString(R.string.app_licenses_url))
 
-        //todo[Checked] 应用版本的问题
+            //todo[✔] 应用版本的问题
             R.string.preference_title_version -> openUrl(getString(R.string.app_release_url))
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference)

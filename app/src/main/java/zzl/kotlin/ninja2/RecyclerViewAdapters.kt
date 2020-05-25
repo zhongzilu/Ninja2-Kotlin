@@ -1,12 +1,11 @@
 package zzl.kotlin.ninja2
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import zzl.kotlin.ninja2.application.L
+import androidx.recyclerview.widget.RecyclerView
 import zzl.kotlin.ninja2.application.findViewOften
 
 /**
@@ -31,7 +30,7 @@ abstract class BaseAdapter<T>(var context: Context, var mList: ArrayList<T>) : R
 /**
  * ViewHolder封装抽象类
  */
-open class BaseViewHolder(itemView: View?, private val listener: ItemClickListener?)
+open class BaseViewHolder(itemView: View, private val listener: ItemClickListener?)
     : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
     override fun onClick(v: View) {
@@ -39,7 +38,7 @@ open class BaseViewHolder(itemView: View?, private val listener: ItemClickListen
     }
 
     init {
-        itemView?.setOnClickListener(this)
+        itemView.setOnClickListener(this)
     }
 
     fun <T : View> findView(viewId: Int): T {
@@ -67,8 +66,8 @@ class PinsAdapter(context: Context, mPins: ArrayList<Pin>) : BaseAdapter<Pin>(co
      * @param pin 待添加的数据对象
      */
     fun addItem(position: Int, pin: Pin) {
-        L.i("-->", "position: $position")
-        L.i("-->", "size: ${mList.size}")
+//        L.i("-->", "position: $position")
+//        L.i("-->", "size: ${mList.size}")
         if (position >= mList.size) {
             mList.add(pin)
             notifyItemInserted(position)

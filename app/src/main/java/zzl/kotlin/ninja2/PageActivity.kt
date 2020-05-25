@@ -15,13 +15,13 @@ import android.os.*
 import android.preference.PreferenceManager
 import android.provider.MediaStore
 import android.security.KeyChain
-import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.Snackbar
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.text.*
 import android.text.style.StyleSpan
 import android.view.*
@@ -259,7 +259,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
              * 撤销方法
              */
             fun revoke() {
-                //todo[Checked] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
+                //todo[✔] 处理最后一条Pin撤销时，RecyclerView中不显示的问题
                 //SnackBar的撤销按钮被点击，队列中取出刚被删掉的数据，然后再添加到数据集合，实现数据被撤回的动作
                 val index = array.size - 1
                 val item = array[index]
@@ -547,7 +547,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             showKeyboard()
         }
 
-        //todo[Checked] 地址栏控制
+        //todo[✔] 地址栏控制
         setOmniboxControlListener()
     }
 
@@ -677,7 +677,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 搜索历史记录
      */
     private fun searchRecord(input: CharSequence) {
-        //todo[Checked] 后台查询匹配记录项，查到后进行差异比较，最后更新对应位置的数据
+        //todo[✔] 后台查询匹配记录项，查到后进行差异比较，最后更新对应位置的数据
         doAsync {
             val records = SQLHelper.searchRecord(input.toString())
 
@@ -770,7 +770,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onReceivedWebThemeColor(str: String) {
-        //todo[Checked] 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
+        //todo[✔] 处理接收到的网站主题色，可以用来更换任务栏颜色或其他作用
         L.d(TAG, "onReceivedWebThemeColor: $str")
         setStatusBarColor(str)
     }
@@ -784,7 +784,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onFormResubmission(dontResend: Message, resend: Message) {
-        //todo[Checked] 处理表单重新提交数据
+        //todo[✔] 处理表单重新提交数据
         dialogBuilder().setCancelable(false)
                 .setMessage(R.string.dialog_message_form_resubmission)
                 .setPositiveButton(R.string.dialog_button_resend) { dialog, _ ->
@@ -799,7 +799,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
 
     override fun onReceivedClientCertRequest(request: ClientCertRequest) {
-        //todo[Checked] 处理接收到SSL认证请求
+        //todo[✔] 处理接收到SSL认证请求
         KeyChain.choosePrivateKeyAlias(this, { alias ->
             alias?.let {
                 if (it.isEmpty()) request.cancel()
@@ -831,7 +831,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * @see https://blog.csdn.net/Crazy_zihao/article/details/51557425
      */
     override fun onReceivedSslError(handler: SslErrorHandler, error: SslError) {
-        //todo[Checked] 处理HTTPS的网站加载HTTP的内容安全问题
+        //todo[✔] 处理HTTPS的网站加载HTTP的内容安全问题
         val host = error.url.host()
 
         val builder = SpannableStringBuilder().apply {
@@ -873,7 +873,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onReceivedHttpAuthRequest(handler: HttpAuthHandler, host: String, realm: String) {
-        //todo[Checked] 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
+        //todo[✔] 接收一个HTTP认证请求，使用提供的HttpAuthHandler对象设置WebView对HTTP认证请求的响应
         AuthLoginDialog(this).apply {
             setTitle(host)
             setOnPositiveClickListener { handler.proceed(getUserName(), getPassword()) }
@@ -920,7 +920,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onDownloadStart(url: String, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
-        //todo[Checked] 处理下载任务监听
+        //todo[✔] 处理下载任务监听
         permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
 
             var fileName = Download.parseFileName(url, contentDisposition, mimetype)
@@ -942,7 +942,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     )
 
     override fun onWebViewLongPress(url: String, type: Int) {
-        //todo[Checked] 处理网页长按事件，弹出快捷菜单浮窗
+        //todo[✔] 处理网页长按事件，弹出快捷菜单浮窗
         if (mQuickOptionDialog == null) {
             mQuickOptionDialog = QuickOptionDialog(this)
                     .setQuickListener {
@@ -1003,7 +1003,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     private var mOriginalOrientation: Int = 0
     private var mCustomViewCallback: WebChromeClient.CustomViewCallback? = null
     override fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) {
-        //todo[Checked] 通知主应用程序当前页面已进入全屏模式
+        //todo[✔] 通知主应用程序当前页面已进入全屏模式
         mCustomView?.let {
             onHideCustomView()
             return
@@ -1033,7 +1033,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
     @SuppressLint("WrongConstant")
     override fun onHideCustomView() {
-        //todo[Checked] 通知主应用程序当前页面已退出全屏模式
+        //todo[✔] 通知主应用程序当前页面已退出全屏模式
         // 1. Remove the custom view
 //        val decor = window.decorView as FrameLayout
 //        val decor = find<FrameLayout>(android.R.id.content)
@@ -1051,7 +1051,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        //todo[Checked] 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
+        //todo[✔] 通知主应用程序Web内容正在请求访问指定资源的权限，当前权限未授予或拒绝该权限
         val permission = arrayOfNulls<String>(0)
         request.resources.forEach {
             when (it) {
@@ -1093,7 +1093,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
-        //todo[Checked] 处理网站请求访问用户地理位置权限
+        //todo[✔] 处理网站请求访问用户地理位置权限
         permission(Manifest.permission.ACCESS_FINE_LOCATION) {
             showRequestLocationPermissionDialog(origin, callback)
         }
@@ -1107,7 +1107,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 弹出网站请求获取用户地理位置权限的弹窗
      */
     private fun showRequestLocationPermissionDialog(origin: String, callback: GeolocationPermissions.Callback) {
-        //todo[Checked] 容易出现获取host不正确的问题，解决方法：mPageView.url.host()改为使用origin参数
+        //todo[✔] 容易出现获取host不正确的问题，解决方法：mPageView.url.host()改为使用origin参数
         val builder = SpannableStringBuilder().apply {
             val prefix = getString(R.string.dialog_message_allow_location_prefix)
             append(prefix)
@@ -1135,7 +1135,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onReceivedTitle(url: String, title: String) {
-        //todo[Checked] 处理接收到的网站标题
+        //todo[✔] 处理接收到的网站标题
         setAppTaskDescription(title, null)
     }
 
@@ -1143,7 +1143,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 回调处理网页上的Favicon图标，
      */
     override fun onReceivedIcon(url: String, title: String, icon: Bitmap?) {
-        //todo[Checked] 处理接收到网站图标
+        //todo[✔] 处理接收到网站图标
 //        setAppTaskDescription(title, icon)
     }
 
@@ -1153,7 +1153,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      * 可以用来实现一些针对不同网站配置呈现不同视觉效果的功能，比如这里用来更改最近任务栏的样式
      */
     override fun onReceivedWebConfig(title: String, icon: Bitmap?, color: String) {
-        //todo[Checked] 处理接收到的网站配置
+        //todo[✔] 处理接收到的网站配置
         L.d(TAG, "onReceivedWebConfig $title : $color | ${icon != null}")
         setStatusBarColor(color)
         setAppTaskDescription(title, icon, color)
@@ -1225,7 +1225,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onJsAlert(url: String, message: String, result: JsResult): Boolean {
-        //todo[Checked] 处理网站上的alert弹窗
+        //todo[✔] 处理网站上的alert弹窗
 //        jsResponseDialog(url, message, result)
         longToast(message)
         result.confirm()
@@ -1233,7 +1233,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onJsPrompt(url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
-        //todo[Checked] 处理网站上的prompt弹窗
+        //todo[✔] 处理网站上的prompt弹窗
         dialogBuilder().setTitle(url.host())
                 .setCancelable(false)
                 .setMessage(message)
@@ -1249,25 +1249,25 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     }
 
     override fun onCreateWindow(isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
-        //todo[Checked] 处理请求主应用程序创建一个新窗口
+        //todo[✔] 处理请求主应用程序创建一个新窗口
         App.MESSAGE = resultMsg
         openUrl("", isPrivate, taskId)
         return true
     }
 
     override fun onCloseWindow() {
-        //todo[Checked] 关闭给定的WebView并在必要时将其从视图系统中删除
+        //todo[✔] 关闭给定的WebView并在必要时将其从视图系统中删除
         finishAndRemoveTask()
     }
 
     override fun onJsConfirm(url: String, message: String, result: JsResult): Boolean {
-        //todo[Checked] 处理网站上的confirm弹窗
+        //todo[✔] 处理网站上的confirm弹窗
         jsResponseDialog(url, message, result)
         return true
     }
 
     override fun onJsBeforeUnload(url: String, message: String, result: JsResult): Boolean {
-        //todo[Checked] 告诉客户端显示一个对话框，以确认离开当前页面的导航
+        //todo[✔] 告诉客户端显示一个对话框，以确认离开当前页面的导航
         jsResponseDialog(url, message, result)
         return true
     }
@@ -1377,7 +1377,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
                     }
         }
 
-        //todo[Checked] 当网站未设置favicon图标时，此方法会抛出异常
+        //todo[✔] 当网站未设置favicon图标时，此方法会抛出异常
         mAddLauncherDialog!!
                 .setUrl(mPageView.url)
                 .setIcon(mPageView.favicon)
@@ -1561,7 +1561,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             return
         }
 
-        //todo[Checked] 处理多任务窗口，如果后台打开了多个窗口，可以从当前窗口回到上一个窗口
+        //todo[✔] 处理多任务窗口，如果后台打开了多个窗口，可以从当前窗口回到上一个窗口
         listAppTask()
 
 //        super.onBackPressed()
@@ -1630,7 +1630,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
             data?.let {
                 try {
                     var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
-                    //todo[Checked] bitmap过大将不能创建桌面快捷方式，解决方法：裁剪或缩放或压缩图片的大小或尺寸
+                    //todo[✔] bitmap过大将不能创建桌面快捷方式，解决方法：裁剪或缩放或压缩图片的大小或尺寸
                     if (bitmap.width > 192 || bitmap.height > 192) {
                         bitmap = bitmap.scale(192f, 192f)
                     }
@@ -1699,7 +1699,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
      */
     private fun handleKeyLongPress(): Boolean {
         if (mCurrentMode == Type.MODE_WEB) {
-            //todo[Checked] 长按返回时震动
+            //todo[✔] 长按返回时震动
             vibrate()
             restUiAndStatus()
             return true

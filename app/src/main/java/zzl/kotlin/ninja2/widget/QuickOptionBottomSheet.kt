@@ -1,9 +1,9 @@
 package zzl.kotlin.ninja2.widget
 
 import android.content.Context
-import android.support.design.widget.BottomSheetDialog
 import android.widget.Switch
 import android.widget.TextView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.layout_quick_option.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast

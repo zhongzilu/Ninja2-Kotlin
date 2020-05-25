@@ -10,11 +10,11 @@ import android.net.http.SslError
 import android.os.Build
 import android.os.Message
 import android.preference.PreferenceManager
-import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.View
 import android.webkit.*
 import android.webkit.WebChromeClient.FileChooserParams
+import androidx.annotation.RequiresApi
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import zzl.kotlin.ninja2.App
