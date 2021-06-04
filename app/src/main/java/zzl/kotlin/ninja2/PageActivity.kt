@@ -76,7 +76,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         L.i(TAG, "onNewIntent")
-        // It is good pratice to remove a document from the overview stack if not needed anymore.
+        // It is good practice to remove a document from the overview stack if not needed anymore.
 //        finishAndRemoveTask()
     }
 
@@ -1724,6 +1724,7 @@ class PageActivity : BaseActivity(), PageView.Delegate, SharedPreferences.OnShar
 
         fun cancle() {
             _todo = null
+            cancle()
         }
     }
 

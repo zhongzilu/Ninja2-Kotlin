@@ -88,9 +88,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     /**
      * 使用普通方式打开网址
-     * @param context   上下文Context
      * @param url       访问的目标URL
-     * @param isPrivate 是否为隐私访问
+     * @param private   是否为隐私访问
      * @param taskId    任务
      */
     fun openUrl(url: String, private: Boolean = false, taskId: Int = 0) {
@@ -99,9 +98,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     /**
      * 像谷歌浏览器那样呈现分组式的切换界面，详情请查看：http://mthli.github.io/Chrome-Overview-Screen
-     * @param context   上下文Context
      * @param url       访问的目标URL
-     * @param isPrivate 是否为隐私访问
+     * @param private   是否为隐私访问
      * @param taskId    任务
      */
     fun openUrlOverviewScreen(url: String, private: Boolean = false, taskId: Int = 0) {

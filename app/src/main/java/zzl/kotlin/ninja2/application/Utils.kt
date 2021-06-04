@@ -202,14 +202,9 @@ object Evaluate {
      * @param size 尺寸信息字段串，该字符串符合格式：NxN
      * @return 解析出的尺寸信息
      */
-    fun parseSize(size: String): Int {
-        return try {
-            size.split("x")[0].toInt()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            0
-        }
-    }
+    fun parseSize(size: String): Int = if (Regex("^[1-9]\\d*[xX][1-9]\\d*\$").matches(size)) {
+        size.split("x")[0].toInt()
+    } else 0
 }
 
 /**
@@ -522,6 +517,7 @@ object QR {
      * @return String? 如果为二维码图片则返回解析结果，如果不是二维码图片则返回null
      */
     fun decodeUrl(url: String): String? {
+        if (!url.isBase64Url() && !url.isWebUrl()) return null
         var bitmap = url.base64ToBitmap()
 
         if (bitmap == null) {

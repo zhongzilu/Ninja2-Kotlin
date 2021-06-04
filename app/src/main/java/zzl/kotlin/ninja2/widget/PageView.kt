@@ -138,9 +138,11 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         super.destroy()
     }
 
+    private var _clearHistory = false
     fun onBackPressed() {
         stopLoading()
         onPause()
+        _clearHistory = true
         gone()
     }
 
@@ -306,12 +308,12 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
     /**
      * 滚动监听器
      */
-    private var _scrollListener: ((dx: Int, dy: Int) -> Unit)? = null
+    private var _scrollListener: ScrollListener? = null
 
     /**
      * 设置滚动监听器
      */
-    fun setScrollChangeListener(todo: ((dx: Int, dy: Int) -> Unit)?) {
+    fun setScrollChangeListener(todo: ScrollListener?) {
         _scrollListener = todo
     }
 
@@ -447,9 +449,10 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
 
     override fun doUpdateVisitedHistory(url: String, isReload: Boolean) {
         L.e(TAG, "doUpdateVisitedHistory $url isReload $isReload")
-        if (mPrivateFlag)
+        if (mPrivateFlag || _clearHistory) {
             clearHistory()
-        else if (!isReload) {
+            _clearHistory = false
+        } else if (!isReload) {
             SQLHelper.saveOrUpdateRecord(title, url)
         }
     }
@@ -616,6 +619,8 @@ class PageView : WebView, PageViewClient.Delegate, PageChromeClient.Delegate,
         return _delegate?.onJsBeforeUnload(url, message, result) ?: false
     }
 }
+
+typealias ScrollListener = (dx: Int, dy: Int) -> Unit
 
 /******************************
  *
