@@ -60,37 +60,37 @@ fun View.isGone() = visibility == View.GONE
 /**
  * 判断BottomSheet的状态是否为关闭，关闭时取决于@{link #peekHeight}的高度，默认为0
  */
-fun <T : View> BottomSheetBehavior<T>.isCollapsed() = state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+fun <T : View> BottomSheetBehavior<T>.isCollapsed() = state == BottomSheetBehavior.STATE_COLLAPSED
 
 /**
  * 设置BottomSheet的状态为关闭
  */
 fun <T : View> BottomSheetBehavior<T>.collapsed() {
-    state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+    state = BottomSheetBehavior.STATE_COLLAPSED
 }
 
 /**
  * 判断BottomSheet的状态是否为隐藏
  */
-fun <T : View> BottomSheetBehavior<T>.isHidden() = state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
+fun <T : View> BottomSheetBehavior<T>.isHidden() = state == BottomSheetBehavior.STATE_HIDDEN
 
 /**
  * 设置BottomSheet的状态为隐藏
  */
 fun <T : View> BottomSheetBehavior<T>.hidden() {
-    state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
+    state = BottomSheetBehavior.STATE_HIDDEN
 }
 
 /**
  * 判断BottomSheet的状态是否为展开
  */
-fun <T : View> BottomSheetBehavior<T>.isExpanded() = state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+fun <T : View> BottomSheetBehavior<T>.isExpanded() = state == BottomSheetBehavior.STATE_EXPANDED
 
 /**
  * 设置BottomSheet的状态为展开
  */
 fun <T : View> BottomSheetBehavior<T>.expanded() {
-    state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+    state = BottomSheetBehavior.STATE_EXPANDED
 }
 
 
@@ -189,6 +189,7 @@ fun <T : View> View.findViewOften(viewId: Int): T {
 
 fun Context.openIntentByDefault(url: String) {
     val intent = url.parseIntent()
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     val component = intent.resolveActivity(packageManager)
     if (component == null) {
         toast(R.string.toast_no_handle_application)
@@ -246,6 +247,7 @@ fun Context.sendMailTo(mail: String) {
         putExtra(Intent.EXTRA_SUBJECT, parse.subject)
         putExtra(Intent.EXTRA_CC, parse.cc)
         type = "message/rfc822"
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
     supportIntent(intent) { startActivity(it) }

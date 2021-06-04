@@ -5,6 +5,7 @@ import android.widget.Switch
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.layout_quick_option.*
+import org.jetbrains.anko.attempt
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
@@ -83,7 +84,7 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
         mOptionSwitch.isChecked = SP.isOpenInBackground
         mOptionSwitch.setOnCheckedChangeListener { _, isChecked ->
             SP.isOpenInBackground = isChecked
-            context?.toast(if (isChecked) R.string.options_background else R.string.options_foreground)
+            context.toast(if (isChecked) R.string.options_background else R.string.options_foreground)
         }
 
         //set new tab option click even
@@ -142,15 +143,16 @@ class QuickOptionDialog(context: Context) : BottomSheetDialog(context, R.style.A
     private var mExtractRes = ""
     private fun parseUrl(url: String) {
         doAsync {
-            val res = QR.decodeUrl(url)
-            if (res == null) {
+            val res = attempt { QR.decodeUrl(url) }.then {
+                isQRImage = true
+                mExtractRes = it!!
+                uiThread { mExtractQRImg.visible() }
+                return@doAsync
+            }
+            if (res.isError) {
                 isQRImage = false
                 mExtractRes = ""
                 uiThread { mExtractQRImg.gone() }
-            } else {
-                isQRImage = true
-                mExtractRes = res
-                uiThread { mExtractQRImg.visible() }
             }
         }
     }
